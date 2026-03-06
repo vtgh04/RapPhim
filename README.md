@@ -1,4 +1,4 @@
-# 🎬 RapPhim - Hệ Thống Quản Lý Rạp Chiếu Phim
+#  RapPhim - Hệ Thống Quản Lý Rạp Chiếu Phim
 
 > **Dự án môn học** | **Java Swing** | **MVC Architecture**
 
@@ -8,29 +8,27 @@
 [![Maven](https://img.shields.io/badge/Build-Maven-red.svg)](https://maven.apache.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
----
-
-## 📋 Giới Thiệu
+## Giới Thiệu
 
 **RapPhim** là ứng dụng desktop quản lý rạp chiếu phim được xây dựng bằng **Java Swing**, áp dụng mô hình kiến trúc **MVC (Model - View - Controller)** theo chuẩn doanh nghiệp.
 
-### 🎯 Chức Năng Chính
+### Chức Năng Chính
 
-| Module | Mô Tả |
-|--------|--------|
-| 🎥 Quản lý Phim | Thêm, sửa, xóa, tìm kiếm thông tin phim |
-| 🏟️ Quản lý Phòng Chiếu | Quản lý phòng và sơ đồ ghế ngồi |
-| 📅 Lịch Chiếu | Tạo và quản lý lịch chiếu phim |
-| 🎫 Bán Vé | Đặt vé, in vé, quản lý giao dịch |
-| 👥 Quản lý Khách Hàng | Thông tin khách hàng, thẻ thành viên |
-| 👨‍💼 Quản lý Nhân Viên | Ca làm việc, phân quyền |
-| 🍿 Dịch Vụ Ăn Uống | Quản lý bắp rang, nước uống |
-| 📊 Báo Cáo & Thống Kê | Doanh thu, xuất Excel/PDF |
-| 🔐 Phân Quyền | Admin, Thu ngân, Quản lý |
+| Module                  | Mô Tả                                       |
+| ----------------------- | --------------------------------------------- |
+| Quản lý Phim        | Thêm, sửa, xóa, tìm kiếm thông tin phim |
+| Quản lý Phòng Chiếu | Quản lý phòng và sơ đồ ghế ngồi      |
+| Lịch Chiếu            | Tạo và quản lý lịch chiếu phim          |
+| Bán Vé                | Đặt vé, in vé, quản lý giao dịch       |
+| Quản lý Khách Hàng  | Thông tin khách hàng, thẻ thành viên    |
+| Quản lý Nhân Viên   | Ca làm việc, phân quyền                   |
+| Dịch Vụ Ăn Uống     | Quản lý bắp rang, nước uống             |
+| Báo Cáo & Thống Kê  | Doanh thu, xuất Excel/PDF                    |
+| Phân Quyền            | Admin, Thu ngân, Quản lý                   |
 
 ---
 
-## 🏗️ Kiến Trúc Dự Án
+## Kiến Trúc Dự Án
 
 ```
 RapPhim/
@@ -61,23 +59,24 @@ RapPhim/
 
 ---
 
-## 🛠️ Công Nghệ Sử Dụng
+## Công Nghệ Sử Dụng
 
-| Thành Phần | Công Nghệ |
-|-----------|-----------|
-| Ngôn ngữ | Java 17 |
-| Giao diện | Java Swing + FlatLaf UI |
-| Cơ sở dữ liệu | MySQL 8.0 |
-| Kết nối CSDL | JDBC (MySQL Connector) |
-| Build Tool | Apache Maven |
-| Xuất báo cáo | Apache POI (Excel), iText (PDF) |
-| Đồ thị thống kê | JFreeChart |
+| Thành Phần         | Công Nghệ                     |
+| -------------------- | ------------------------------- |
+| Ngôn ngữ           | Java 17                         |
+| Giao diện           | Java Swing + FlatLaf UI         |
+| Cơ sở dữ liệu    | MySQL 8.0                       |
+| Kết nối CSDL       | JDBC (MySQL Connector)          |
+| Build Tool           | Apache Maven                    |
+| Xuất báo cáo      | Apache POI (Excel), iText (PDF) |
+| Đồ thị thống kê | JFreeChart                      |
 
 ---
 
-## 🚀 Hướng Dẫn Cài Đặt
+## Hướng Dẫn Cài Đặt
 
 ### Yêu Cầu Hệ Thống
+
 - Java JDK 17 trở lên
 - MySQL Server 8.0 trở lên
 - Apache Maven 3.8+
@@ -107,21 +106,21 @@ mvn exec:java -Dexec.mainClass="com.rapphim.Main"
 
 ---
 
-## 👨‍💻 Nhóm Phát Triển
+## Nhóm Phát Triển
 
-| Họ Tên | MSSV | Vai Trò |
-|--------|------|---------|
+| Họ Tên     | MSSV   | Vai Trò       |
+| ------------ | ------ | -------------- |
 | [Thêm tên] | [MSSV] | Nhóm trưởng |
-| [Thêm tên] | [MSSV] | Backend/DAO |
-| [Thêm tên] | [MSSV] | UI/Swing |
+| [Thêm tên] | [MSSV] | Backend/DAO    |
+| [Thêm tên] | [MSSV] | UI/Swing       |
 
-**Giảng Viên Hướng Dẫn:** [Tên GV]  
-**Môn Học:** [Tên môn]  
-**Trường:** [Tên trường]  
+**Giảng Viên Hướng Dẫn:** [Tên GV]
+**Môn Học:** [Tên môn]
+**Trường:** [Tên trường]
 **Năm:** 2026
 
 ---
 
-## 📄 Giấy Phép
+## Giấy Phép
 
 MIT License - Xem [LICENSE](LICENSE)

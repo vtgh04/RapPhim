@@ -1,16 +1,36 @@
 package com.rapphim.view.panels;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.net.URL;
-import javax.swing.*;
-import javax.swing.border.*;
+
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 
 public class LoginPanel extends JFrame {
 
-    private int loginPanel_W  = 400;
-    private int loginPanel_H  = 490;
-    private int FIELD_W = 310;
-    private int FIELD_H = 40;
+    private final int CARD_W = 400;
+    private final int CARD_H = 490;
+    private final int FIELD_W = 310;
+    private final int FIELD_H = 40;
 
     public LoginPanel() {
         setTitle("Cinema Manager Pro");
@@ -28,7 +48,7 @@ public class LoginPanel extends JFrame {
         JPanel loginPanel = new JPanel();
         loginPanel.setLayout(new BoxLayout(loginPanel, BoxLayout.Y_AXIS));
         loginPanel.setBackground(Color.WHITE);
-        loginPanel.setPreferredSize(new Dimension(loginPanel_W, loginPanel_H));
+        loginPanel.setPreferredSize(new Dimension(CARD_W, CARD_H));
         loginPanel.setBorder(new CompoundBorder(
                 new LineBorder(new Color(228, 228, 228), 1, true),
                 new EmptyBorder(35, 45, 30, 45)));
@@ -38,7 +58,9 @@ public class LoginPanel extends JFrame {
         JLabel logoLabel = new JLabel();
         logoLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         ImageIcon logoIcon = loadIcon("images/icons/WelcomeLogo.png", 52, 52);
-        if (logoIcon != null) logoLabel.setIcon(logoIcon);
+        if (logoIcon != null) {
+            logoLabel.setIcon(logoIcon);
+        }
         loginPanel.add(logoLabel);
         loginPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
@@ -118,7 +140,9 @@ public class LoginPanel extends JFrame {
 
     }
 
-    /** Tạo một hàng input có icon bên trái. */
+    /**
+     * Tạo một hàng input có icon bên trái.
+     */
     private JPanel createInputRow(String iconPath) {
         JPanel panel = new JPanel(new BorderLayout(8, 0));
         panel.setBackground(Color.WHITE);
@@ -126,13 +150,17 @@ public class LoginPanel extends JFrame {
                 new LineBorder(new Color(210, 215, 225), 1, true),
                 new EmptyBorder(5, 10, 5, 10)));
         ImageIcon icon = loadIcon(iconPath, 20, 20);
-        if (icon != null) panel.add(new JLabel(icon), BorderLayout.WEST);
+        if (icon != null) {
+            panel.add(new JLabel(icon), BorderLayout.WEST);
+        }
         return panel;
     }
 
     private ImageIcon loadIcon(String path, int w, int h) {
         URL url = getClass().getClassLoader().getResource(path);
-        if (url == null) return null;
+        if (url == null) {
+            return null;
+        }
         return new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
     }
 

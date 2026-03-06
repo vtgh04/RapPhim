@@ -10,7 +10,7 @@
 
 ## Giới Thiệu
 
-**RapPhim** là ứng dụng desktop quản lý rạp chiếu phim được xây dựng bằng **Java Swing**, áp dụng mô hình kiến trúc **MVC (Model - View - Controller)** theo chuẩn doanh nghiệp.
+**RapPhim** là ứng dụng desktop quản lý rạp chiếu phim được xây dựng bằng **Java Swing**
 
 ### Chức Năng Chính
 
@@ -58,19 +58,6 @@ RapPhim/
 ```
 
 ---
-
-## Công Nghệ Sử Dụng
-
-| Thành Phần         | Công Nghệ                     |
-| -------------------- | ------------------------------- |
-| Ngôn ngữ           | Java 17                         |
-| Giao diện           | Java Swing + FlatLaf UI         |
-| Cơ sở dữ liệu    | MySQL 8.0                       |
-| Kết nối CSDL       | JDBC (MySQL Connector)          |
-| Build Tool           | Apache Maven                    |
-| Xuất báo cáo      | Apache POI (Excel), iText (PDF) |
-| Đồ thị thống kê | JFreeChart                      |
-
 ---
 
 ## Hướng Dẫn Cài Đặt
@@ -104,23 +91,3 @@ mvn clean install
 mvn exec:java -Dexec.mainClass="com.rapphim.Main"
 ```
 
----
-
-## Nhóm Phát Triển
-
-| Họ Tên     | MSSV   | Vai Trò       |
-| ------------ | ------ | -------------- |
-| [Thêm tên] | [MSSV] | Nhóm trưởng |
-| [Thêm tên] | [MSSV] | Backend/DAO    |
-| [Thêm tên] | [MSSV] | UI/Swing       |
-
-**Giảng Viên Hướng Dẫn:** [Tên GV]
-**Môn Học:** [Tên môn]
-**Trường:** [Tên trường]
-**Năm:** 2026
-
----
-
-## Giấy Phép
-
-MIT License - Xem [LICENSE](LICENSE)

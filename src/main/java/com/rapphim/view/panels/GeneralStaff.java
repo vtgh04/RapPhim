@@ -1,5 +1,7 @@
 package com.rapphim.view.panels;
 
+import com.rapphim.model.Employee;
+
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -32,7 +34,8 @@ import javax.swing.border.MatteBorder;
 
 public class GeneralStaff extends JPanel {
 
-    // ── Design tokens
+    private static final long serialVersionUID = 1L;
+	// ── Design tokens
     private static final Color PRIMARY_RED = new Color(220, 20, 20);
     private static final Color BG_COLOR = new Color(240, 242, 245);
     private static final Color SIDEBAR_BG = Color.WHITE;
@@ -49,8 +52,22 @@ public class GeneralStaff extends JPanel {
 
     private JButton activeNavBtn = null;
     private final JPanel rightPanel;
+    private String loggedInName = "";
 
+    /** Constructor mặc định (dùng cho test UI độc lập). */
     public GeneralStaff() {
+        this(null);
+    }
+
+    /**
+     * Constructor nhận Employee sau khi đăng nhập thành công.
+     *
+     * @param employee nhân viên đã xác thực (null = chế độ test)
+     */
+    public GeneralStaff(Employee employee) {
+        if (employee != null) {
+            this.loggedInName = employee.getFullName();
+        }
         setLayout(new BorderLayout());
         setBackground(BG_COLOR);
 
@@ -59,6 +76,21 @@ public class GeneralStaff extends JPanel {
 
         rightPanel = createRightPanel();
         add(rightPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Mở Staff Dashboard trong JFrame mới.
+     * Dùng bởi {@link com.rapphim.controller.LoginController}.
+     */
+    public static void openAsFrame(Employee employee) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Cinema Manager Pro – Staff");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(1200, 750);
+            frame.setLocationRelativeTo(null);
+            frame.setContentPane(new GeneralStaff(employee));
+            frame.setVisible(true);
+        });
     }
 
     private JPanel createLeftPanel() {
@@ -121,7 +153,8 @@ public class GeneralStaff extends JPanel {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(BG_COLOR);
 
-        JLabel welcomeLabel = new JLabel("Welcome back ");
+        String name = loggedInName.isBlank() ? "" : ", " + loggedInName + "!";
+        JLabel welcomeLabel = new JLabel("Welcome back" + name);
         welcomeLabel.setFont(FONT_BOLD_26);
         welcomeLabel.setForeground(TEXT_PRIMARY);
 

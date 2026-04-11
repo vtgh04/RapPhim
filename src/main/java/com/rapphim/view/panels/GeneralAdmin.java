@@ -1,5 +1,7 @@
 package com.rapphim.view.panels;
 
+import com.rapphim.model.Employee;
+
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -50,19 +52,45 @@ public class GeneralAdmin extends JPanel {
 
     private JButton activeNavBtn = null;
     private final JPanel rightPanel;
+    private String loggedInName = "";
 
+    /** Constructor mặc định (dùng cho test UI độc lập). */
     public GeneralAdmin() {
-        // 1. Một BigPanel lớn chứa tất cả - Bố cục sử dụng BorderLayout
+        this(null);
+    }
+
+    /**
+     * Constructor nhận Employee sau khi đăng nhập thành công.
+     *
+     * @param employee nhân viên đã xác thực (null = chế độ test)
+     */
+    public GeneralAdmin(Employee employee) {
+        if (employee != null) {
+            this.loggedInName = employee.getFullName();
+        }
         setLayout(new BorderLayout());
         setBackground(BG_COLOR);
 
-        // 2 & 3. Panel leftPanel chứa Sidebar và đăng ký ActionListener
         JPanel leftPanel = createLeftPanel();
         add(leftPanel, BorderLayout.WEST);
 
-        // 4. Panel rightPanel tạo một Text Label nằm trung tâm "Welcome back "
         rightPanel = createRightPanel();
         add(rightPanel, BorderLayout.CENTER);
+    }
+
+    /**
+     * Mở Admin Dashboard trong JFrame mới.
+     * Dùng bởi {@link com.rapphim.controller.LoginController}.
+     */
+    public static void openAsFrame(Employee employee) {
+        SwingUtilities.invokeLater(() -> {
+            JFrame frame = new JFrame("Cinema Manager Pro – Admin");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setSize(1200, 750);
+            frame.setLocationRelativeTo(null);
+            frame.setContentPane(new GeneralAdmin(employee));
+            frame.setVisible(true);
+        });
     }
 
     private JPanel createLeftPanel() {
@@ -139,7 +167,8 @@ public class GeneralAdmin extends JPanel {
         JPanel panel = new JPanel(new GridBagLayout());
         panel.setBackground(BG_COLOR);
 
-        JLabel welcomeLabel = new JLabel("Welcome back ");
+        String name = loggedInName.isBlank() ? "" : ", " + loggedInName + "!";
+        JLabel welcomeLabel = new JLabel("Welcome back" + name);
         welcomeLabel.setFont(FONT_BOLD_26);
         welcomeLabel.setForeground(TEXT_PRIMARY);
 

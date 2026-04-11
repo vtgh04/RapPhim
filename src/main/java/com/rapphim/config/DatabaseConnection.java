@@ -1,96 +1,59 @@
 package com.rapphim.config;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Properties;
 
 /**
- * Singleton class quản lý kết nối CSDL MySQL.
- * Sử dụng JDBC để kết nối.
+ * Singleton quản lý kết nối JDBC tới MySQL.
+ * <p>
+ * Cấu hình qua các hằng số bên dưới (hoặc đọc từ file properties nếu cần).
+ * </p>
  */
 public class DatabaseConnection {
 
-    private static DatabaseConnection instance;
-    private Connection connection;
+    // ── Cấu hình kết nối ────────────────────────────────────────────────────
+    private static final String URL      = "jdbc:mysql://localhost:3306/rapphim"
+                                         + "?useUnicode=true"
+                                         + "&characterEncoding=UTF-8"
+                                         + "&serverTimezone=Asia/Ho_Chi_Minh"
+                                         + "&useSSL=false"
+                                         + "&allowPublicKeyRetrieval=true";
+    private static final String USER     = "root";
+    private static final String PASSWORD = "";          // Đổi thành mật khẩu MySQL của bạn
 
-    private String url;
-    private String username;
-    private String password;
+    // ── Singleton instance ───────────────────────────────────────────────────
+    private static Connection instance;
 
-    private DatabaseConnection() {
-        loadConfig();
-    }
+    private DatabaseConnection() {}
 
     /**
-     * Singleton: lấy instance duy nhất
+     * Trả về Connection duy nhất; tạo mới nếu chưa có hoặc đã đóng.
+     *
+     * @return {@link Connection} đang mở tới DB
+     * @throws SQLException nếu không kết nối được
      */
-    public static DatabaseConnection getInstance() {
-        if (instance == null) {
-            synchronized (DatabaseConnection.class) {
-                if (instance == null) {
-                    instance = new DatabaseConnection();
-                }
+    public static Connection getInstance() throws SQLException {
+        if (instance == null || instance.isClosed()) {
+            try {
+                Class.forName("com.mysql.cj.jdbc.Driver");
+            } catch (ClassNotFoundException e) {
+                throw new SQLException("MySQL JDBC Driver not found.", e);
             }
+            instance = DriverManager.getConnection(URL, USER, PASSWORD);
         }
         return instance;
     }
 
     /**
-     * Đọc cấu hình từ file database.properties
+     * Đóng kết nối hiện tại (gọi khi ứng dụng tắt).
      */
-    private void loadConfig() {
-        try (InputStream input = getClass().getClassLoader()
-                .getResourceAsStream("config/database.properties")) {
-            if (input == null) {
-                System.err.println("Không tìm thấy file database.properties!");
-                // Dùng cấu hình mặc định
-                this.url = "jdbc:mysql://localhost:3306/rapphim_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Ho_Chi_Minh";
-                this.username = "root";
-                this.password = "";
-                return;
-            }
-            Properties prop = new Properties();
-            prop.load(input);
-            this.url = prop.getProperty("db.url");
-            this.username = prop.getProperty("db.username");
-            this.password = prop.getProperty("db.password");
-        } catch (IOException e) {
-            System.err.println("Lỗi đọc file config: " + e.getMessage());
-        }
-    }
-
-    /**
-     * Lấy Connection tới database
-     */
-    public Connection getConnection() {
-        try {
-            if (connection == null || connection.isClosed()) {
-                Class.forName("com.mysql.cj.jdbc.Driver");
-                connection = DriverManager.getConnection(url, username, password);
-                System.out.println("✅ Kết nối Database thành công!");
-            }
-        } catch (ClassNotFoundException e) {
-            System.err.println("❌ Không tìm thấy MySQL Driver: " + e.getMessage());
-        } catch (SQLException e) {
-            System.err.println("❌ Lỗi kết nối Database: " + e.getMessage());
-        }
-        return connection;
-    }
-
-    /**
-     * Đóng kết nối
-     */
-    public void closeConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                System.out.println("🔌 Đã đóng kết nối Database.");
-            }
-        } catch (SQLException e) {
-            System.err.println("Lỗi đóng kết nối: " + e.getMessage());
+    public static void close() {
+        if (instance != null) {
+            try {
+                instance.close();
+            } catch (SQLException ignored) {}
+            instance = null;
         }
     }
 }

@@ -6,10 +6,10 @@ import com.rapphim.model.enums.EmployeeRole;
 import com.rapphim.model.enums.EmployeeStatus;
 
 public class Employee implements Serializable {
-    private int employeeId;
+    private String employeeId;
     private String fullName;
     private String username;
-    private String passwordHash;
+    private String password;
     private EmployeeRole role;
     private EmployeeStatus status;
     private String phone;
@@ -18,24 +18,24 @@ public class Employee implements Serializable {
     public Employee() {
     }
 
-    public Employee(int employeeId, String fullName, String username, String passwordHash, EmployeeRole role,
+    public Employee(String employeeId, String fullName, String username, String password, EmployeeRole role,
             EmployeeStatus status,
             String phone, String email) {
         this.employeeId = employeeId;
         this.fullName = fullName;
         this.username = username;
-        this.passwordHash = passwordHash;
+        this.password = password;
         this.role = role;
         this.status = status;
         this.phone = phone;
         this.email = email;
     }
 
-    public int getEmployeeId() {
+    public String getEmployeeId() {
         return employeeId;
     }
 
-    public void setEmployeeId(int employeeId) {
+    public void setEmployeeId(String employeeId) {
         this.employeeId = employeeId;
     }
 
@@ -55,12 +55,12 @@ public class Employee implements Serializable {
         this.username = username;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
+    public String getPassword() {
+        return password;
     }
 
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public EmployeeRole getRole() {

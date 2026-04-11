@@ -21,14 +21,12 @@ import java.util.Optional;
 public class EmployeeDAO {
 
     // ── SQL Queries ──────────────────────────────────────────────────────────
-    private static final String SQL_FIND_BY_USERNAME =
-            "SELECT employee_id, full_name, username, password_hash," +
+    private static final String SQL_FIND_BY_USERNAME = "SELECT employee_id, full_name, username, password," +
             "       role, status, phone, email" +
             "  FROM employees" +
             " WHERE username = ?";
 
-    private static final String SQL_FIND_BY_ID =
-            "SELECT employee_id, full_name, username, password_hash," +
+    private static final String SQL_FIND_BY_ID = "SELECT employee_id, full_name, username, password," +
             "       role, status, phone, email" +
             "  FROM employees" +
             " WHERE employee_id = ?";
@@ -62,10 +60,10 @@ public class EmployeeDAO {
      * @return {@link Optional} chứa Employee nếu tìm thấy, rỗng nếu không
      * @throws SQLException lỗi truy vấn DB
      */
-    public Optional<Employee> findById(int id) throws SQLException {
+    public Optional<Employee> findById(String id) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_BY_ID)) {
-            ps.setInt(1, id);
+            ps.setString(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(mapRow(rs));
@@ -78,14 +76,13 @@ public class EmployeeDAO {
     // ── Mapper ───────────────────────────────────────────────────────────────
     private Employee mapRow(ResultSet rs) throws SQLException {
         return new Employee(
-                rs.getInt("employee_id"),
+                rs.getString("employee_id"),
                 rs.getString("full_name"),
                 rs.getString("username"),
-                rs.getString("password_hash"),
+                rs.getString("password"),
                 EmployeeRole.fromString(rs.getString("role")),
                 EmployeeStatus.fromString(rs.getString("status")),
                 rs.getString("phone"),
-                rs.getString("email")
-        );
+                rs.getString("email"));
     }
 }

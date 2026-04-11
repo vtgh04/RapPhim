@@ -3,7 +3,7 @@ package com.rapphim.service;
 import com.rapphim.dao.EmployeeDAO;
 import com.rapphim.model.Employee;
 import com.rapphim.model.enums.EmployeeStatus;
-import com.rapphim.util.PasswordUtils;
+
 
 import java.sql.SQLException;
 import java.util.Optional;
@@ -70,7 +70,7 @@ public class AuthService {
      * Thực hiện đăng nhập.
      *
      * @param username tên đăng nhập
-     * @param password mật khẩu gốc (chưa băm)
+     * @param password mật khẩu
      * @return {@link Employee} đã được xác thực
      * @throws AuthException   khi đăng nhập thất bại (xem {@link AuthError})
      */
@@ -80,8 +80,10 @@ public class AuthService {
         try {
             opt = employeeDAO.findByUsername(username);
         } catch (SQLException e) {
-            throw new AuthException(AuthError.DATABASE_ERROR,
-                    "Không thể kết nối cơ sở dữ liệu: " + e.getMessage());
+            // In lỗi thật ra Eclipse Console để debug
+            System.err.println("[DB ERROR] " + e.getMessage());
+            e.printStackTrace();
+            throw new AuthException(AuthError.DATABASE_ERROR, e.getMessage());
         }
 
         // 2. Username không tồn tại
@@ -99,7 +101,7 @@ public class AuthService {
         }
 
         // 4. Xác minh mật khẩu
-        if (!PasswordUtils.verifyPassword(password, employee.getPasswordHash())) {
+        if (!password.equals(employee.getPassword())) {
             throw new AuthException(AuthError.INVALID_CREDENTIALS,
                     "Tên đăng nhập hoặc mật khẩu không đúng.");
         }

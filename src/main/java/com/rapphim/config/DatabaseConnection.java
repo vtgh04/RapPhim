@@ -5,40 +5,58 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Singleton quản lý kết nối JDBC tới MySQL.
+ * Singleton quản lý kết nối JDBC tới Microsoft SQL Server.
+ *
  * <p>
- * Cấu hình qua các hằng số bên dưới (hoặc đọc từ file properties nếu cần).
+ * Driver yêu cầu: {@code com.microsoft.sqlserver:mssql-jdbc} — đã khai báo
+ * trong pom.xml.
+ * </p>
+ *
+ * <p>
+ * Cấu hình kết nối chỉnh ở các hằng số bên dưới.
  * </p>
  */
 public class DatabaseConnection {
 
-    // ── Cấu hình kết nối ────────────────────────────────────────────────────
-    private static final String URL      = "jdbc:mysql://localhost:3306/rapphim"
-                                         + "?useUnicode=true"
-                                         + "&characterEncoding=UTF-8"
-                                         + "&serverTimezone=Asia/Ho_Chi_Minh"
-                                         + "&useSSL=false"
-                                         + "&allowPublicKeyRetrieval=true";
-    private static final String USER     = "root";
-    private static final String PASSWORD = "";          // Đổi thành mật khẩu MySQL của bạn
+    // ── Cấu hình kết nối SQL Server ─────────────────────────────────────────
+    // SQL Server Authentication: sa / 123
+    private static final String SERVER   = "localhost\\SQLEXPRESS";
+    private static final String PORT     = "1433";
+    private static final String DATABASE = "RapPhim";
+
+    private static final String URL =
+            "jdbc:sqlserver://" + SERVER + ":" + PORT + ";"
+            + "databaseName="          + DATABASE + ";"
+            + "encrypt=false;"
+            + "trustServerCertificate=true;"
+            + "loginTimeout=5;"
+            + "connectRetryCount=0;";
+
+    private static final String USER     = "sa";
+    private static final String PASSWORD = "123";
+
 
     // ── Singleton instance ───────────────────────────────────────────────────
     private static Connection instance;
 
-    private DatabaseConnection() {}
+    private DatabaseConnection() {
+    }
 
     /**
      * Trả về Connection duy nhất; tạo mới nếu chưa có hoặc đã đóng.
      *
-     * @return {@link Connection} đang mở tới DB
+     * @return {@link Connection} đang mở tới SQL Server
      * @throws SQLException nếu không kết nối được
      */
     public static Connection getInstance() throws SQLException {
         if (instance == null || instance.isClosed()) {
             try {
-                Class.forName("com.mysql.cj.jdbc.Driver");
+                Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
             } catch (ClassNotFoundException e) {
-                throw new SQLException("MySQL JDBC Driver not found.", e);
+                throw new SQLException(
+                        "SQL Server JDBC Driver không tìm thấy. " +
+                                "Hãy thêm 'mssql-jdbc' vào pom.xml.",
+                        e);
             }
             instance = DriverManager.getConnection(URL, USER, PASSWORD);
         }
@@ -52,7 +70,8 @@ public class DatabaseConnection {
         if (instance != null) {
             try {
                 instance.close();
-            } catch (SQLException ignored) {}
+            } catch (SQLException ignored) {
+            }
             instance = null;
         }
     }

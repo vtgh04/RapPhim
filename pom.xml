@@ -12,7 +12,7 @@
 
     <name>RapPhim - Quản Lý Rạp Chiếu Phim</name>
     <description>Hệ thống quản lý rạp chiếu phim sử dụng Java Swing và MySQL</description>
-    <url>https://github.com/YOUR_USERNAME/RapPhim</url>
+    <url>https://github.com/vtgh1602/RapPhim</url>
 
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
@@ -28,11 +28,13 @@
 
     <dependencies>
         <!-- ===== DATABASE ===== -->
-        <!-- MySQL JDBC Connector -->
+        <!-- Microsoft SQL Server JDBC Driver (sqljdbc42.jar - local file) -->
         <dependency>
-            <groupId>com.mysql</groupId>
-            <artifactId>mysql-connector-j</artifactId>
-            <version>${mysql.connector.version}</version>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>sqljdbc42.jar</artifactId>
+            <version>4.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/jdbc/sqljdbc42.jar</systemPath>  
         </dependency>
 
         <!-- ===== UI ENHANCEMENTS ===== -->

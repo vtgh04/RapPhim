@@ -21,7 +21,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
-import javax.swing.KeyStroke;
+// import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
@@ -40,7 +40,7 @@ public class Login extends JFrame {
     private final int FIELD_H = 40;
 
     // Fields exposed to controller
-    private JTextField    usernameField;
+    private JTextField usernameField;
     private JPasswordField pwField;
     private LoginController controller;
 
@@ -174,11 +174,11 @@ public class Login extends JFrame {
         // ── Wire up LoginController ───────────────────────────────────────
         controller = new LoginController(this);
 
-        // Click handler
+        // Click handler — DB chạy trên background thread trong controller
         signInBtn.addActionListener(e -> {
             String username = usernameField.getText().trim();
             String password = new String(pwField.getPassword()).trim();
-            controller.handleLogin(username, password);
+            controller.handleLogin(username, password, signInBtn);
         });
 
         // Allow pressing Enter in password field to trigger login

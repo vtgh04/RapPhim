@@ -1,6 +1,7 @@
 package com.rapphim.view.panels;
 
 import com.rapphim.model.Employee;
+// import com.rapphim.view.panels.EmployeePanel;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
@@ -35,7 +36,7 @@ import javax.swing.border.MatteBorder;
 public class GeneralAdmin extends JPanel {
 
     private static final long serialVersionUID = 1L;
-	// ── Design tokens
+    // ── Design tokens
     private static final Color PRIMARY_RED = new Color(220, 20, 20);
     private static final Color BG_COLOR = new Color(240, 242, 245);
     private static final Color SIDEBAR_BG = Color.WHITE;
@@ -86,7 +87,7 @@ public class GeneralAdmin extends JPanel {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Cinema Manager Pro – Admin");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 750);
+            frame.setSize(1500,900);
             frame.setLocationRelativeTo(null);
             frame.setContentPane(new GeneralAdmin(employee));
             frame.setVisible(true);
@@ -132,7 +133,7 @@ public class GeneralAdmin extends JPanel {
         sidebar.add(logoPanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // ── Navigation Buttons 
+        // ── Navigation Buttons
         JButton dashBtn = createNavButton("Dashboard", "images/icons/dashboard.png", true);
         activeNavBtn = dashBtn;
         sidebar.add(dashBtn);
@@ -257,16 +258,19 @@ public class GeneralAdmin extends JPanel {
      * Display RightPanel content based on the navigation item clicked.
      */
     private void handleNavigation(String page) {
-        // Right now, it's just updating the placeholder label text.
-        // Later, this would swap out the content in rightPanel using CardLayout or by replacing components.
         rightPanel.removeAll();
+        rightPanel.setLayout(new BorderLayout());
 
         if (page.equals("Dashboard")) {
+            rightPanel.setLayout(new GridBagLayout());
             JLabel welcomeLabel = new JLabel("Welcome back ");
             welcomeLabel.setFont(FONT_BOLD_26);
             welcomeLabel.setForeground(TEXT_PRIMARY);
             rightPanel.add(welcomeLabel);
+        } else if (page.equals("Employees")) {
+            rightPanel.add(new EmployeePanel(), BorderLayout.CENTER);
         } else {
+            rightPanel.setLayout(new GridBagLayout());
             JLabel pageLabel = new JLabel(page + " Page");
             pageLabel.setFont(FONT_BOLD_26);
             pageLabel.setForeground(TEXT_PRIMARY);
@@ -323,7 +327,8 @@ public class GeneralAdmin extends JPanel {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ignored) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException
+                | UnsupportedLookAndFeelException ignored) {
         }
 
         SwingUtilities.invokeLater(() -> {

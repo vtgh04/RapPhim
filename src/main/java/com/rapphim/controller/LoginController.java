@@ -15,22 +15,24 @@ import javax.swing.SwingWorker;
 /**
  * Controller xử lý luồng đăng nhập.
  *
- * <p><b>Quan trọng:</b> Truy vấn DB được thực hiện trên
+ * <p>
+ * <b>Quan trọng:</b> Truy vấn DB được thực hiện trên
  * {@link SwingWorker} (background thread) để không chặn EDT,
- * tránh hiện tượng UI đóng băng.</p>
+ * tránh hiện tượng UI đóng băng.
+ * </p>
  *
  * <ul>
- *   <li>MANAGER → {@link GeneralAdmin}</li>
- *   <li>STAFF   → {@link GeneralStaff}</li>
+ * <li>MANAGER → {@link GeneralAdmin}</li>
+ * <li>STAFF → {@link GeneralStaff}</li>
  * </ul>
  */
 public class LoginController {
 
-    private final Login       loginView;
+    private final Login loginView;
     private final AuthService authService;
 
     public LoginController(Login loginView) {
-        this.loginView   = loginView;
+        this.loginView = loginView;
         this.authService = new AuthService();
     }
 
@@ -56,7 +58,7 @@ public class LoginController {
         // Chạy DB call trên background thread (không block EDT)
         new SwingWorker<Employee, Void>() {
 
-            private AuthException authError;
+            // private AuthException authError;
 
             @Override
             protected Employee doInBackground() throws Exception {
@@ -79,7 +81,7 @@ public class LoginController {
                         switch (ex.getError()) {
                             case ACCOUNT_INACTIVE -> showWarning(ex.getMessage());
                             // Hiện lỗi SQL thật để debug
-                            case DATABASE_ERROR   -> showError(
+                            case DATABASE_ERROR -> showError(
                                     "Lỗi kết nối cơ sở dữ liệu:\n" + ex.getMessage());
                             default -> showError(ex.getMessage());
                         }

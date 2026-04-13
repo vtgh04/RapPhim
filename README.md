@@ -1,10 +1,10 @@
-#  RapPhim - Hệ Thống Quản Lý Rạp Chiếu Phim
+# RapPhim - Hệ Thống Quản Lý Rạp Chiếu Phim
 
 > **Dự án môn học** | **Java Swing** | **MVC Architecture**
 
 [![Java](https://img.shields.io/badge/Java-17+-orange.svg)](https://www.java.com)
 [![Swing](https://img.shields.io/badge/UI-Java%20Swing-blue.svg)](https://docs.oracle.com/javase/tutorial/uiswing/)
-[![MySQL](https://img.shields.io/badge/Database-MySQL-green.svg)](https://www.mysql.com/)
+
 [![Maven](https://img.shields.io/badge/Build-Maven-red.svg)](https://maven.apache.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -16,7 +16,7 @@
 
 | Module                  | Mô Tả                                       |
 | ----------------------- | --------------------------------------------- |
-| Quản lý Phim        | Thêm, sửa, xóa, tìm kiếm thông tin phim |
+| Quản lý Phim          | Thêm, sửa, xóa, tìm kiếm thông tin phim |
 | Quản lý Phòng Chiếu | Quản lý phòng và sơ đồ ghế ngồi      |
 | Lịch Chiếu            | Tạo và quản lý lịch chiếu phim          |
 | Bán Vé                | Đặt vé, in vé, quản lý giao dịch       |
@@ -58,6 +58,7 @@ RapPhim/
 ```
 
 ---
+
 ---
 
 ## Hướng Dẫn Cài Đặt
@@ -90,4 +91,3 @@ mvn clean install
 # 5. Chạy ứng dụng
 mvn exec:java -Dexec.mainClass="com.rapphim.Main"
 ```
-

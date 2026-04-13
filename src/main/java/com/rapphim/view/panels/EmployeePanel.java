@@ -23,9 +23,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.sql.SQLException;
+import java.io.File;
 import java.util.List;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
+import com.rapphim.util.EmployeeExcelUtils;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -68,6 +73,10 @@ public class EmployeePanel extends JPanel {
     private static final Color GREEN_TEXT = new Color(6, 95, 70);
     private static final Color RED_BG = new Color(254, 226, 226);
     private static final Color RED_TEXT = new Color(185, 28, 28);
+    private static final Color BLUE_BG = new Color(37, 99, 235);
+    private static final Color HOVER_BLUE = new Color(29, 78, 216);
+    private static final Color EXCEL_GREEN = new Color(16, 185, 129);
+    private static final Color HOVER_EXCEL = new Color(5, 150, 105);
     private static final Color MANAGER_BG = new Color(255, 237, 213);
     private static final Color MANAGER_TEXT = new Color(154, 52, 18);
     private static final Color STAFF_BG = new Color(224, 231, 255);
@@ -143,13 +152,155 @@ public class EmployeePanel extends JPanel {
 
         header.add(titlePanel, BorderLayout.WEST);
 
+        JButton exportBtn = createExportButton();
+        JButton importBtn = createImportButton();
         JButton addBtn = createAddButton();
-        JPanel btnWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+
+        JPanel btnWrapper = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         btnWrapper.setOpaque(false);
+        btnWrapper.add(exportBtn);
+        btnWrapper.add(importBtn);
         btnWrapper.add(addBtn);
         header.add(btnWrapper, BorderLayout.EAST);
 
         return header;
+    }
+
+    private JButton createExportButton() {
+        JButton btn = new JButton("Export Excel") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(FONT_BTN);
+        btn.setForeground(WHITE);
+        btn.setBackground(BLUE_BG);
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(120, 42));
+
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(HOVER_BLUE);
+                btn.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(BLUE_BG);
+                btn.repaint();
+            }
+        });
+
+        // Icon optional
+        ImageIcon icon = loadIcon("images/icons/download.png", 16, 16);
+        if (icon != null) {
+            btn.setIcon(icon);
+            btn.setIconTextGap(8);
+        }
+
+        btn.addActionListener(e -> handleExportExcel());
+        return btn;
+    }
+
+    private JButton createImportButton() {
+        JButton btn = new JButton("Import Excel") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(FONT_BTN);
+        btn.setForeground(WHITE);
+        btn.setBackground(EXCEL_GREEN);
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(120, 42));
+
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(HOVER_EXCEL);
+                btn.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(EXCEL_GREEN);
+                btn.repaint();
+            }
+        });
+
+        // Icon optional
+        ImageIcon icon = loadIcon("images/icons/upload.png", 16, 16);
+        if (icon != null) {
+            btn.setIcon(icon);
+            btn.setIconTextGap(8);
+        }
+
+        btn.addActionListener(e -> handleImportExcel());
+        return btn;
+    }
+
+    private void handleExportExcel() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Lưu file Excel");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel files (*.xlsx)", "xlsx"));
+        fileChooser.setSelectedFile(new File("Employees.xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            if (!fileToSave.getName().toLowerCase().endsWith(".xlsx")) {
+                fileToSave = new File(fileToSave.getParentFile(), fileToSave.getName() + ".xlsx");
+            }
+            try {
+                EmployeeExcelUtils.exportToExcel(employees, fileToSave);
+                showModernMessageDialog("Thành công", "Đã xuất dữ liệu ra file Excel:\n" + fileToSave.getAbsolutePath(),
+                        false);
+            } catch (Exception ex) {
+                showModernMessageDialog("Lỗi", "Lỗi khi xuất file:\n" + ex.getMessage(), true);
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    private void handleImportExcel() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn file Excel");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel files (*.xlsx)", "xlsx"));
+
+        int userSelection = fileChooser.showOpenDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToRead = fileChooser.getSelectedFile();
+            try {
+                List<Employee> importedList = EmployeeExcelUtils.importFromExcel(fileToRead, employeeDAO);
+                showModernMessageDialog("Thành công", "Đã nhập thành công " + importedList.size() + " nhân viên!",
+                        false);
+                refreshData();
+            } catch (Exception ex) {
+                showModernMessageDialog("Lỗi", "Lỗi khi đọc file:\n" + ex.getMessage(), true);
+                ex.printStackTrace();
+            }
+        }
     }
 
     private JButton createAddButton() {
@@ -881,9 +1032,6 @@ public class EmployeePanel extends JPanel {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         JDialog dialog = new JDialog(parentFrame, title, true);
         dialog.setUndecorated(true);
-        dialog.setSize(420, 200);
-        dialog.setLocationRelativeTo(this);
-        dialog.getContentPane().setBackground(WHITE);
 
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(BG_COLOR);
@@ -902,7 +1050,8 @@ public class EmployeePanel extends JPanel {
         titleLabel.setForeground(borderColor);
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel messageLabel = new JLabel("<html><body>" + message.replace("\n", "<br>") + "</body></html>");
+        JLabel messageLabel = new JLabel("<html><body style='width: 400px; word-wrap: break-word;'>"
+                + message.replace("\n", "<br>") + "</body></html>");
         messageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         messageLabel.setForeground(TEXT_SECONDARY);
         messageLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -925,7 +1074,11 @@ public class EmployeePanel extends JPanel {
         mainPanel.add(btnPanel);
         wrapper.add(mainPanel, BorderLayout.CENTER);
 
+        dialog.getContentPane().setBackground(WHITE);
         dialog.setContentPane(wrapper);
+        dialog.pack();
+        dialog.setSize(400, 250);
+        dialog.setLocationRelativeTo(parentFrame);
         dialog.setVisible(true);
     }
 

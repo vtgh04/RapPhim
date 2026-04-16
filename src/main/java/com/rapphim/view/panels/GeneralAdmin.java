@@ -87,7 +87,7 @@ public class GeneralAdmin extends JPanel {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Cinema Manager Pro – Admin");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1500,900);
+            frame.setSize(1500, 900);
             frame.setLocationRelativeTo(null);
             frame.setContentPane(new GeneralAdmin(employee));
             frame.setVisible(true);
@@ -269,6 +269,8 @@ public class GeneralAdmin extends JPanel {
             rightPanel.add(welcomeLabel);
         } else if (page.equals("Employees")) {
             rightPanel.add(new EmployeePanel(), BorderLayout.CENTER);
+        } else if (page.equals("Movies")) {
+            rightPanel.add(new MoviePanel(), BorderLayout.CENTER);
         } else {
             rightPanel.setLayout(new GridBagLayout());
             JLabel pageLabel = new JLabel(page + " Page");

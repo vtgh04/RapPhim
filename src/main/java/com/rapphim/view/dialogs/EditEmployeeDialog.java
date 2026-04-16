@@ -272,7 +272,7 @@ public class EditEmployeeDialog extends JDialog {
         panel.add(Box.createRigidArea(new Dimension(0, 6)));
 
         if (inputField instanceof JTextField) {
-            ((JTextField) inputField).setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+            ((JTextField) inputField).setMaximumSize(new Dimension(Short.MAX_VALUE, 42));
             ((JTextField) inputField).setAlignmentX(Component.LEFT_ALIGNMENT);
         }
         panel.add(inputField);
@@ -331,7 +331,7 @@ public class EditEmployeeDialog extends JDialog {
         cmbStatus = new JComboBox<>(new String[] { "Active", "Retired" });
         cmbStatus.setFont(FONT_INPUT);
         cmbStatus.setPreferredSize(new Dimension(160, 42));
-        cmbStatus.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        cmbStatus.setMaximumSize(new Dimension(Short.MAX_VALUE, 42));
         cmbStatus.setBackground(WHITE);
         cmbStatus.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         cmbStatus.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -393,7 +393,7 @@ public class EditEmployeeDialog extends JDialog {
         field.setBorder(BorderFactory.createCompoundBorder(
                 new RoundedBorder(10, BORDER_COLOR),
                 new EmptyBorder(8, 14, 8, 14)));
-        field.setPreferredSize(new Dimension(Integer.MAX_VALUE, 42));
+        field.setPreferredSize(new Dimension(200, 42));
         field.setBackground(WHITE);
 
         return field;

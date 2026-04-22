@@ -35,6 +35,10 @@ public class SettingPanel extends JPanel {
     private int totalHalls = 0;
     private int totalMovies = 0;
 
+    // CardLayout for sub-page navigation
+    private CardLayout cardLayout;
+    private JPanel cardHost;
+
     public SettingPanel() {
         this(null);
     }
@@ -62,9 +66,11 @@ public class SettingPanel extends JPanel {
 
     private void buildUI() {
         setBackground(BG);
-        setLayout(new BorderLayout());
+        cardLayout = new CardLayout();
+        cardHost = new JPanel(cardLayout);
+        cardHost.setBackground(BG);
 
-        // Outer scroll wrapper
+        // ── Main settings page ─────────────────────────────────────────
         JPanel root = new JPanel(new BorderLayout());
         root.setOpaque(false);
         root.setBorder(new EmptyBorder(28, 32, 28, 32));
@@ -107,7 +113,20 @@ public class SettingPanel extends JPanel {
         scroll.getViewport().setOpaque(false);
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(12);
-        add(scroll, BorderLayout.CENTER);
+
+        // ── SecurityProfilePanel ───────────────────────────────────────
+        SecurityProfilePanel securityPanel = new SecurityProfilePanel(employee, () -> navigate("main"));
+
+        cardHost.add(scroll, "main");
+        cardHost.add(securityPanel, "security");
+
+        setLayout(new BorderLayout());
+        add(cardHost, BorderLayout.CENTER);
+    }
+
+    /** Navigate between setting sub-pages. */
+    private void navigate(String card) {
+        cardLayout.show(cardHost, card);
     }
 
     private JPanel buildProfileCard() {
@@ -241,11 +260,7 @@ public class SettingPanel extends JPanel {
         SettingItem[] items = {
                 new SettingItem("images/icons/baomat.png", "Bảo mật", "Cài đặt tài khoản và mật khẩu",
                         "security"),
-                new SettingItem("", "Dữ liệu", "Cài đặt dữ liệu", "database"),
-                new SettingItem("", "Ngôn ngữ",
-                        "Cài đặt ngôn ngữ", "prefs"),
-                new SettingItem("", "Cài đặt", "Cài đặt hệ thống",
-                        "notifications"),
+
         };
 
         for (int i = 0; i < items.length; i++) {
@@ -293,7 +308,7 @@ public class SettingPanel extends JPanel {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                onItemClicked(item.key);
+                navigate(item.key);
             }
         });
 
@@ -362,17 +377,6 @@ public class SettingPanel extends JPanel {
         sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
         sep.setPreferredSize(new Dimension(0, 1));
         return sep;
-    }
-
-    private void onItemClicked(String key) {
-        String msg = switch (key) {
-            case "security" -> "Security Settings đang được phát triển.";
-            case "database" -> "Database Management đang được phát triển.";
-            case "prefs" -> "Global Preferences đang được phát triển.";
-            case "notifications" -> "Notification Rules đang được phát triển.";
-            default -> "Chức năng đang được phát triển.";
-        };
-        JOptionPane.showMessageDialog(this, msg, "Thông báo", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private ImageIcon loadIcon(String path, int w, int h) {

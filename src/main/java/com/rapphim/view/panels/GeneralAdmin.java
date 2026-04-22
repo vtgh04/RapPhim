@@ -28,8 +28,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
@@ -46,7 +44,6 @@ public class GeneralAdmin extends JPanel {
 
     private static final Font FONT_PLAIN_13 = new Font("Segoe UI", Font.PLAIN, 13);
     private static final Font FONT_BOLD_11 = new Font("Segoe UI", Font.BOLD, 11);
-    private static final Font FONT_BOLD_16 = new Font("Segoe UI", Font.BOLD, 16);
     private static final Font FONT_BOLD_26 = new Font("Segoe UI", Font.BOLD, 26);
 
     private static final int SIDEBAR_W = 200;
@@ -54,6 +51,7 @@ public class GeneralAdmin extends JPanel {
     private JButton activeNavBtn = null;
     private final JPanel rightPanel;
     private String loggedInName = "";
+    private Employee currentEmployee = null;
 
     /** Constructor mặc định (dùng cho test UI độc lập). */
     public GeneralAdmin() {
@@ -66,6 +64,7 @@ public class GeneralAdmin extends JPanel {
      * @param employee nhân viên đã xác thực (null = chế độ test)
      */
     public GeneralAdmin(Employee employee) {
+        this.currentEmployee = employee;
         if (employee != null) {
             this.loggedInName = employee.getFullName();
         }
@@ -85,9 +84,9 @@ public class GeneralAdmin extends JPanel {
      */
     public static void openAsFrame(Employee employee) {
         SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Cinema Manager Pro – Admin");
+            JFrame frame = new JFrame("Ứng dụng bán vé tại rạp chiếu phim");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1500, 900);
+            frame.setSize(1600, 900);
             frame.setLocationRelativeTo(null);
             frame.setContentPane(new GeneralAdmin(employee));
             frame.setVisible(true);
@@ -103,33 +102,37 @@ public class GeneralAdmin extends JPanel {
 
         // ── Logo
         JPanel logoPanel = new JPanel();
-        logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.Y_AXIS));
+        logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.X_AXIS));
         logoPanel.setBackground(SIDEBAR_BG);
         logoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logoPanel.setBorder(new EmptyBorder(25, 0, 20, 0));
+        logoPanel.setBorder(new EmptyBorder(25, 15, 20, 15));
 
-        ImageIcon logoIcon = loadIcon("images/icons/WelcomeLogo.png", 50, 50);
+        ImageIcon logoIcon = loadIcon("images/icons/cinema.png", 46, 46);
         if (logoIcon != null) {
             JLabel iconLabel = new JLabel(logoIcon);
-            iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             logoPanel.add(iconLabel);
-            logoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            logoPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         }
 
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setBackground(SIDEBAR_BG);
+
         JLabel brandName = new JLabel("CinePro");
-        brandName.setFont(FONT_BOLD_16);
-        brandName.setForeground(TEXT_PRIMARY);
-        brandName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        brandName.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        brandName.setForeground(new Color(0, 51, 102));
+        brandName.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel brandSub = new JLabel("Manager Dashboard");
-        brandSub.setFont(FONT_BOLD_11);
-        brandSub.setForeground(TEXT_SECONDARY);
-        brandSub.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel brandSub = new JLabel("Quản lý rạp phim");
+        brandSub.setFont(new Font("Consolas", Font.PLAIN, 12));
+        brandSub.setForeground(new Color(110, 150, 190));
+        brandSub.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        logoPanel.add(brandName);
-        logoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        logoPanel.add(brandSub);
+        textPanel.add(brandName);
+        textPanel.add(brandSub);
 
+        logoPanel.add(textPanel);
+        logoPanel.add(Box.createHorizontalGlue()); // Đẩy các icon/text sang lề trái
         sidebar.add(logoPanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
@@ -137,6 +140,9 @@ public class GeneralAdmin extends JPanel {
         JButton dashBtn = createNavButton("Dashboard", "images/icons/dashboard.png", true);
         activeNavBtn = dashBtn;
         sidebar.add(dashBtn);
+        sidebar.add(createNavButton("Sales & POS", "images/icons/sales.png", false));
+        sidebar.add(createNavButton("Transactions", "images/icons/transactions.png", false));
+        sidebar.add(createNavButton("Members", "images/icons/members.png", false));
         sidebar.add(createNavButton("Movies", "images/icons/Movies.png", false));
         sidebar.add(createNavButton("Showtimes", "images/icons/Showtimes.png", false));
         sidebar.add(createNavButton("Halls & Seats", "images/icons/hall.png", false));
@@ -261,48 +267,112 @@ public class GeneralAdmin extends JPanel {
         rightPanel.removeAll();
         rightPanel.setLayout(new BorderLayout());
 
-        if (page.equals("Dashboard")) {
-            rightPanel.setLayout(new GridBagLayout());
-            JLabel welcomeLabel = new JLabel("Welcome back ");
-            welcomeLabel.setFont(FONT_BOLD_26);
-            welcomeLabel.setForeground(TEXT_PRIMARY);
-            rightPanel.add(welcomeLabel);
-        } else if (page.equals("Employees")) {
-            rightPanel.add(new EmployeePanel(), BorderLayout.CENTER);
-        } else if (page.equals("Movies")) {
-            rightPanel.add(new MoviePanel(), BorderLayout.CENTER);
-        } else {
-            rightPanel.setLayout(new GridBagLayout());
-            JLabel pageLabel = new JLabel(page + " Page");
-            pageLabel.setFont(FONT_BOLD_26);
-            pageLabel.setForeground(TEXT_PRIMARY);
-            rightPanel.add(pageLabel);
+        switch (page) {
+            case "Dashboard" -> {
+                rightPanel.setLayout(new GridBagLayout());
+                String name = loggedInName.isBlank() ? "!" : ", " + loggedInName + "!";
+                JLabel welcomeLabel = new JLabel("Welcome back" + name);
+                welcomeLabel.setFont(FONT_BOLD_26);
+                welcomeLabel.setForeground(TEXT_PRIMARY);
+                rightPanel.add(welcomeLabel);
+            }
+            case "Employees" -> rightPanel.add(new EmployeePanel(), BorderLayout.CENTER);
+            case "Movies" -> rightPanel.add(new MoviePanel(), BorderLayout.CENTER);
+            case "Halls & Seats" -> rightPanel.add(new HallPanel(), BorderLayout.CENTER);
+            case "Sales & POS" -> rightPanel.add(createPlaceholderPanel(
+                    "Sales & POS", "images/icons/sales.png",
+                    "Quản lý bán vé và điểm bán hàng tại quầy."), BorderLayout.CENTER);
+            case "Transactions" -> rightPanel.add(createPlaceholderPanel(
+                    "Transactions", "images/icons/transactions.png",
+                    "Xem lịch sử và thống kê giao dịch."), BorderLayout.CENTER);
+            case "Members" -> rightPanel.add(createPlaceholderPanel(
+                    "Members", "images/icons/members.png",
+                    "Quản lý hội viên và chương trình thành viên."), BorderLayout.CENTER);
+            case "Showtimes" -> rightPanel.add(createPlaceholderPanel(
+                    "Showtimes", "images/icons/Showtimes.png",
+                    "Lập lịch và quản lý suất chiếu phim."), BorderLayout.CENTER);
+            case "Products" -> rightPanel.add(createPlaceholderPanel(
+                    "Products", "images/icons/Product.png",
+                    "Quản lý sản phẩm F&B: bắp rang, nước uống, combo."), BorderLayout.CENTER);
+            case "Settings" -> rightPanel.add(new SettingPanel(currentEmployee), BorderLayout.CENTER);
+            default -> {
+                rightPanel.setLayout(new GridBagLayout());
+                JLabel pageLabel = new JLabel(page + " Page");
+                pageLabel.setFont(FONT_BOLD_26);
+                pageLabel.setForeground(TEXT_PRIMARY);
+                rightPanel.add(pageLabel);
+            }
         }
 
         rightPanel.revalidate();
         rightPanel.repaint();
     }
 
+    /**
+     * Tạo một panel giữ chỗ (placeholder) đẹp cho các trang chưa triển khai.
+     */
+    private JPanel createPlaceholderPanel(String title, String iconPath, String subtitle) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(BG_COLOR);
+        panel.setBorder(new EmptyBorder(60, 0, 0, 0));
+
+        // Icon lớn
+        ImageIcon bigIcon = loadIcon(iconPath, 64, 64);
+        if (bigIcon != null) {
+            JLabel iconLbl = new JLabel(bigIcon);
+            iconLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+            panel.add(iconLbl);
+            panel.add(Box.createRigidArea(new Dimension(0, 24)));
+        }
+
+        // Tiêu đề
+        JLabel titleLbl = new JLabel(title);
+        titleLbl.setFont(FONT_BOLD_26);
+        titleLbl.setForeground(TEXT_PRIMARY);
+        titleLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(titleLbl);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Mô tả
+        JLabel subLbl = new JLabel(subtitle);
+        subLbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        subLbl.setForeground(TEXT_SECONDARY);
+        subLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(subLbl);
+        panel.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        // Badge "Đang phát triển"
+        JLabel badge = new JLabel("🚧  Tính năng đang được phát triển");
+        badge.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        badge.setForeground(new Color(180, 100, 0));
+        badge.setOpaque(true);
+        badge.setBackground(new Color(255, 237, 213));
+        badge.setBorder(new EmptyBorder(10, 24, 10, 24));
+        badge.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(badge);
+
+        // Bọc trong wrapper để căn giữa dọc
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setBackground(BG_COLOR);
+        wrapper.add(panel);
+        return wrapper;
+    }
+
     private String iconPathForButton(String label) {
         return switch (label) {
-            case "Dashboard" ->
-                "images/icons/dashboard.png";
-            case "Movies" ->
-                "images/icons/Movies.png";
-            case "Showtimes" ->
-                "images/icons/Showtimes.png";
-            case "Halls & Seats" ->
-                "images/icons/hall.png";
-            case "Employees" ->
-                "images/icons/employees.png";
-            case "Products" ->
-                "images/icons/Product.png";
-            case "Settings" ->
-                "images/icons/Setting.png";
-            case "Logout" ->
-                "images/icons/logout.png";
-            default ->
-                "";
+            case "Dashboard" -> "images/icons/dashboard.png";
+            case "Sales & POS" -> "images/icons/sales.png";
+            case "Transactions" -> "images/icons/transactions.png";
+            case "Members" -> "images/icons/members.png";
+            case "Movies" -> "images/icons/Movies.png";
+            case "Showtimes" -> "images/icons/Showtimes.png";
+            case "Halls & Seats" -> "images/icons/hall.png";
+            case "Employees" -> "images/icons/employees.png";
+            case "Products" -> "images/icons/Product.png";
+            case "Settings" -> "images/icons/Setting.png";
+            case "Logout" -> "images/icons/logout.png";
+            default -> "";
         };
     }
 
@@ -326,20 +396,4 @@ public class GeneralAdmin extends JPanel {
         return new ImageIcon(bi);
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException
-                | UnsupportedLookAndFeelException ignored) {
-        }
-
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("GeneralFrame Layout Test");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 750);
-            frame.setLocationRelativeTo(null);
-            frame.setContentPane(new GeneralAdmin());
-            frame.setVisible(true);
-        });
-    }
 }

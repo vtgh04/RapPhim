@@ -14,13 +14,13 @@ import java.util.Optional;
 
 public class MovieDAO {
 
-    private static final String SQL_FIND_ALL = "SELECT movie_id, title, genre, duration_mins, format_movie, language, release_date, status, description, poster_url FROM movies ORDER BY movie_id";
+    private static final String SQL_FIND_ALL = "SELECT movie_id, title, genre, duration_mins, format_movie, rating, language, release_date, status, description, poster_url FROM movies ORDER BY movie_id";
 
-    private static final String SQL_FIND_BY_ID = "SELECT movie_id, title, genre, duration_mins, format_movie, language, release_date, status, description, poster_url FROM movies WHERE movie_id = ?";
+    private static final String SQL_FIND_BY_ID = "SELECT movie_id, title, genre, duration_mins, format_movie, rating, language, release_date, status, description, poster_url FROM movies WHERE movie_id = ?";
 
-    private static final String SQL_INSERT = "INSERT INTO movies (movie_id, title, genre, duration_mins, format_movie, language, release_date, status, description, poster_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT = "INSERT INTO movies (movie_id, title, genre, duration_mins, format_movie, rating, language, release_date, status, description, poster_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_UPDATE = "UPDATE movies SET title = ?, genre = ?, duration_mins = ?, format_movie = ?, language = ?, release_date = ?, status = ?, description = ?, poster_url = ? WHERE movie_id = ?";
+    private static final String SQL_UPDATE = "UPDATE movies SET title = ?, genre = ?, duration_mins = ?, format_movie = ?, rating = ?, language = ?, release_date = ?, status = ?, description = ?, poster_url = ? WHERE movie_id = ?";
 
     private static final String SQL_MAX_ID = "SELECT MAX(movie_id) AS max_id FROM movies";
 
@@ -57,15 +57,16 @@ public class MovieDAO {
             ps.setNString(3, movie.getGenre());
             ps.setInt(4, movie.getDurationMins());
             ps.setString(5, movie.getFormatMovie());
-            ps.setNString(6, movie.getLanguage());
+            ps.setString(6, movie.getRating());
+            ps.setNString(7, movie.getLanguage());
             if (movie.getReleaseDate() != null) {
-                ps.setDate(7, java.sql.Date.valueOf(movie.getReleaseDate()));
+                ps.setDate(8, java.sql.Date.valueOf(movie.getReleaseDate()));
             } else {
-                ps.setNull(7, java.sql.Types.DATE);
+                ps.setNull(8, java.sql.Types.DATE);
             }
-            ps.setString(8, movie.getStatus().getValue());
-            ps.setNString(9, movie.getDescription());
-            ps.setString(10, movie.getPosterUrl());
+            ps.setString(9, movie.getStatus().getValue());
+            ps.setNString(10, movie.getDescription());
+            ps.setString(11, movie.getPosterUrl());
             ps.executeUpdate();
         }
     }
@@ -77,16 +78,17 @@ public class MovieDAO {
             ps.setNString(2, movie.getGenre());
             ps.setInt(3, movie.getDurationMins());
             ps.setString(4, movie.getFormatMovie());
-            ps.setNString(5, movie.getLanguage());
+            ps.setString(5, movie.getRating());
+            ps.setNString(6, movie.getLanguage());
             if (movie.getReleaseDate() != null) {
-                ps.setDate(6, java.sql.Date.valueOf(movie.getReleaseDate()));
+                ps.setDate(7, java.sql.Date.valueOf(movie.getReleaseDate()));
             } else {
-                ps.setNull(6, java.sql.Types.DATE);
+                ps.setNull(7, java.sql.Types.DATE);
             }
-            ps.setString(7, movie.getStatus().getValue());
-            ps.setNString(8, movie.getDescription());
-            ps.setString(9, movie.getPosterUrl());
-            ps.setString(10, movie.getMovieId());
+            ps.setString(8, movie.getStatus().getValue());
+            ps.setNString(9, movie.getDescription());
+            ps.setString(10, movie.getPosterUrl());
+            ps.setString(11, movie.getMovieId());
             ps.executeUpdate();
         }
     }
@@ -116,6 +118,7 @@ public class MovieDAO {
                 rs.getString("genre"),
                 rs.getInt("duration_mins"),
                 rs.getString("format_movie"),
+                rs.getString("rating"),
                 rs.getString("language"),
                 releaseDate,
                 MovieStatus.fromString(rs.getString("status")),

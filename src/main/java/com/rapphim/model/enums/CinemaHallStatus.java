@@ -15,7 +15,8 @@ public enum CinemaHallStatus {
     }
 
     public static CinemaHallStatus fromString(String text) {
-        if (text == null) return null;
+        if (text == null)
+            return null;
         for (CinemaHallStatus status : CinemaHallStatus.values()) {
             if (status.value.equalsIgnoreCase(text)) {
                 return status;

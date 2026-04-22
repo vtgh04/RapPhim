@@ -167,20 +167,10 @@ public class EmployeePanel extends JPanel {
     }
 
     private JButton createExportButton() {
-        JButton btn = new JButton("Export Excel") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
+        JButton btn = new JButton("Export Excel");
         btn.setFont(FONT_BTN);
-        btn.setForeground(WHITE);
-        btn.setBackground(BLUE_BG);
+        btn.setForeground(Color.BLACK);
+        btn.setBackground(WHITE);
         btn.setOpaque(false);
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
@@ -214,20 +204,11 @@ public class EmployeePanel extends JPanel {
     }
 
     private JButton createImportButton() {
-        JButton btn = new JButton("Import Excel") {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
-                g2.dispose();
-                super.paintComponent(g);
-            }
-        };
+        JButton btn = new JButton("Import Excel");
+
         btn.setFont(FONT_BTN);
-        btn.setForeground(WHITE);
-        btn.setBackground(EXCEL_GREEN);
+        btn.setForeground(Color.BLACK);
+        btn.setBackground(WHITE);
         btn.setOpaque(false);
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);

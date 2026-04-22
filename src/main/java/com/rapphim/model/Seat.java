@@ -9,15 +9,18 @@ public class Seat implements Serializable {
     private char rowChar;
     private int colNumber;
     private SeatType seatType;
+    private double seatPrice;
+    private boolean isBroken;
 
     public Seat() {}
 
-    public Seat(String seatId, String hallId, char rowChar, int colNumber, SeatType seatType) {
+    public Seat(String seatId, String hallId, char rowChar, int colNumber, SeatType seatType, double seatPrice) {
         this.seatId = seatId;
         this.hallId = hallId;
         this.rowChar = rowChar;
         this.colNumber = colNumber;
         this.seatType = seatType;
+        this.seatPrice = seatPrice;
     }
 
     public String getSeatId() {
@@ -26,6 +29,14 @@ public class Seat implements Serializable {
 
     public void setSeatId(String seatId) {
         this.seatId = seatId;
+    }
+
+    public boolean isBroken() {
+        return isBroken;
+    }
+
+    public void setBroken(boolean broken) {
+        isBroken = broken;
     }
 
     public String getHallId() {
@@ -60,6 +71,14 @@ public class Seat implements Serializable {
         this.seatType = seatType;
     }
 
+    public double getSeatPrice() {
+        return seatPrice;
+    }
+
+    public void setSeatPrice(double seatPrice) {
+        this.seatPrice = seatPrice;
+    }
+
     /**
      * Phương thức tiện ích để lấy tên hiển thị của ghế (VD: A1, B5)
      */
@@ -75,6 +94,8 @@ public class Seat implements Serializable {
                 ", rowChar=" + rowChar +
                 ", colNumber=" + colNumber +
                 ", seatType=" + seatType +
+                ", seatPrice=" + seatPrice +
+                ", isBroken=" + isBroken +
                 '}';
     }
 }

@@ -10,6 +10,7 @@ public class Movie implements Serializable {
     private String genre;
     private int durationMins;
     private String formatMovie;
+    private String rating;
     private String language;
     private LocalDate releaseDate;
     private MovieStatus status;
@@ -19,13 +20,14 @@ public class Movie implements Serializable {
     public Movie() {}
 
     public Movie(String movieId, String title, String genre, int durationMins, String formatMovie,
-                 String language, LocalDate releaseDate, MovieStatus status, 
+                 String rating, String language, LocalDate releaseDate, MovieStatus status,
                  String description, String posterUrl) {
         this.movieId = movieId;
         this.title = title;
         this.genre = genre;
         this.durationMins = durationMins;
         this.formatMovie = formatMovie;
+        this.rating = rating;
         this.language = language;
         this.releaseDate = releaseDate;
         this.status = status;
@@ -47,6 +49,9 @@ public class Movie implements Serializable {
 
     public String getFormatMovie() { return formatMovie; }
     public void setFormatMovie(String formatMovie) { this.formatMovie = formatMovie; }
+
+    public String getRating() { return rating; }
+    public void setRating(String rating) { this.rating = rating; }
 
     public String getLanguage() { return language; }
     public void setLanguage(String language) { this.language = language; }
@@ -71,6 +76,7 @@ public class Movie implements Serializable {
                 ", genre='" + genre + '\'' +
                 ", durationMins=" + durationMins +
                 ", formatMovie='" + formatMovie + '\'' +
+                ", rating='" + rating + '\'' +
                 ", status=" + status +
                 '}';
     }

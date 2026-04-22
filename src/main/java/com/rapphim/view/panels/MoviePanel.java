@@ -19,6 +19,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
 
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import com.rapphim.util.MovieExcelUtils;
+
 import com.rapphim.dao.MovieDAO;
 import com.rapphim.model.Movie;
 import com.rapphim.model.enums.MovieStatus;
@@ -30,52 +35,41 @@ public class MoviePanel extends JPanel {
     private static final long serialVersionUID = 1L;
 
     // ── Colors ───────────────────────────────────────────────────────────────
-    private static final Color BG = new Color(240, 242, 245);
-    private static final Color WHITE = Color.WHITE;
-    private static final Color C_PRIMARY = new Color(30, 30, 35);
-    private static final Color C_SECONDARY = new Color(130, 135, 148);
-    private static final Color C_BORDER = new Color(228, 228, 228);
-    private static final Color C_RED = new Color(220, 38, 38);
-    private static final Color C_RED_HOVER = new Color(185, 28, 28);
-    private static final Color C_DARK = new Color(30, 30, 35);
-    private static final Color C_SURFACE = new Color(249, 250, 251);
-    private static final Color C_GRID_LINE = new Color(243, 244, 246);
-
-    // Stat icon backgrounds
-    private static final Color BLUE_BG = new Color(219, 234, 254);
-    private static final Color BLUE_FG = new Color(59, 130, 246);
-    private static final Color GREEN_BG = new Color(209, 250, 229);
-    private static final Color GREEN_FG = new Color(16, 185, 129);
-    private static final Color ORANGE_BG = new Color(255, 237, 213);
-    private static final Color ORANGE_FG = new Color(245, 158, 11);
-    private static final Color GRAY_BG = new Color(243, 244, 246);
-    private static final Color GRAY_FG = new Color(107, 114, 128);
+    Color BG = new Color(240, 242, 245);
+    Color WHITE = Color.WHITE;
+    Color C_PRIMARY = new Color(30, 30, 35);
+    Color C_SECONDARY = new Color(130, 135, 148);
+    Color C_BORDER = new Color(228, 228, 228);
+    Color C_RED = new Color(220, 38, 38);
+    Color C_RED_HOVER = new Color(185, 28, 28);
+    Color C_DARK = new Color(30, 30, 35);
+    Color C_SURFACE = new Color(249, 250, 251);
+    Color C_GRID_LINE = new Color(243, 244, 246);
 
     // Badge
-    private static final Color ACT_BG = new Color(209, 250, 229);
-    private static final Color ACT_FG = new Color(6, 95, 70);
-    private static final Color INA_BG = new Color(254, 226, 226);
-    private static final Color INA_FG = new Color(185, 28, 28);
+    Color ACT_BG = new Color(209, 250, 229);
+    Color ACT_FG = new Color(6, 95, 70);
+    Color INA_BG = new Color(254, 226, 226);
+    Color INA_FG = new Color(185, 28, 28);
 
     // ── Fonts ────────────────────────────────────────────────────────────────
-    private static final Font F_SECTION = new Font("Segoe UI", Font.BOLD, 11);
-    private static final Font F_TITLE = new Font("Segoe UI", Font.BOLD, 26);
-    private static final Font F_SUBTITLE = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font F_BTN = new Font("Segoe UI", Font.BOLD, 13);
-    private static final Font F_SPOTLIGHT = new Font("Segoe UI", Font.BOLD, 11);
-    private static final Font F_FEAT_TITLE = new Font("Segoe UI", Font.BOLD, 34);
-    private static final Font F_FEAT_DESC = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font F_STAT_LABEL = new Font("Segoe UI", Font.BOLD, 11);
-    private static final Font F_STAT_VALUE = new Font("Segoe UI", Font.BOLD, 26);
-    private static final Font F_SEARCH = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font F_CARD_META = new Font("Segoe UI", Font.PLAIN, 11);
-    private static final Font F_CARD_TITLE = new Font("Segoe UI", Font.BOLD, 15);
-    private static final Font F_BADGE = new Font("Segoe UI", Font.BOLD, 10);
-    private static final Font F_TABLE = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font F_TH = new Font("Segoe UI", Font.BOLD, 12);
-    private static final Font F_PILL = new Font("Segoe UI", Font.BOLD, 11);
+    Font F_SECTION = new Font("Segoe UI", Font.BOLD, 11);
+    Font F_TITLE = new Font("Segoe UI", Font.BOLD, 26);
+    Font F_SUBTITLE = new Font("Segoe UI", Font.PLAIN, 13);
+    Font F_BTN = new Font("Segoe UI", Font.BOLD, 13);
+    Font F_SPOTLIGHT = new Font("Segoe UI", Font.BOLD, 11);
+    Font F_FEAT_TITLE = new Font("Segoe UI", Font.BOLD, 34);
+    Font F_FEAT_DESC = new Font("Segoe UI", Font.PLAIN, 13);
 
-    private static final String PLACEHOLDER = "Search by title, genre, or ID...";
+    Font F_SEARCH = new Font("Segoe UI", Font.PLAIN, 13);
+    Font F_CARD_META = new Font("Segoe UI", Font.PLAIN, 11);
+    Font F_CARD_TITLE = new Font("Segoe UI", Font.BOLD, 15);
+    Font F_BADGE = new Font("Segoe UI", Font.BOLD, 10);
+    Font F_TABLE = new Font("Segoe UI", Font.PLAIN, 13);
+    Font F_TH = new Font("Segoe UI", Font.BOLD, 12);
+    Font F_PILL = new Font("Segoe UI", Font.BOLD, 11);
+
+    String PLACEHOLDER = "Tìm kiếm theo tên, thể loại hoặc mã phim...";
 
     // ── State ────────────────────────────────────────────────────────────────
     private List<Movie> allMovies = new ArrayList<>();
@@ -86,29 +80,24 @@ public class MoviePanel extends JPanel {
 
     // Components updated dynamically
     private JPanel bannerHolder;
-    private JLabel lTotal, lActive, lInactive;
+
     private JTextField searchField;
     private JComboBox<String> filterCombo;
     private JButton gridBtn, tableBtn;
     private JPanel listHolder;
 
-    // ════════════════════════════════════════════════════════════════════════
-    // CONSTRUCTOR
-    // ════════════════════════════════════════════════════════════════════════
     public MoviePanel() {
         setLayout(new BorderLayout(0, 0));
         setBackground(BG);
 
         loadData();
 
-        // ── content panel wrapping all 3 sections ────────────────────────────
         JPanel content = new JPanel(new BorderLayout(0, 0));
         content.setBackground(BG);
         content.add(buildNorth(), BorderLayout.NORTH);
         content.add(buildCenter(), BorderLayout.CENTER);
         content.add(buildSouth(), BorderLayout.SOUTH);
 
-        // ── make the whole panel scrollable ──────────────────────────────────
         JScrollPane scroll = new JScrollPane(content);
         scroll.setBorder(BorderFactory.createEmptyBorder());
         scroll.getVerticalScrollBar().setUnitIncrement(20);
@@ -117,7 +106,6 @@ public class MoviePanel extends JPanel {
         scroll.getViewport().setBackground(BG);
         add(scroll, BorderLayout.CENTER);
 
-        refreshStats();
         renderList();
     }
 
@@ -137,14 +125,6 @@ public class MoviePanel extends JPanel {
         featuredIdx = 0;
     }
 
-    private void refreshStats() {
-        lTotal.setText(String.valueOf(allMovies.size()));
-        long act = allMovies.stream().filter(m -> m.getStatus() == MovieStatus.ACTIVE).count();
-        long ina = allMovies.stream().filter(m -> m.getStatus() == MovieStatus.INACTIVE).count();
-        lActive.setText(String.valueOf(act));
-        lInactive.setText(String.valueOf(ina));
-    }
-
     // ════════════════════════════════════════════════════════════════════════
     // NORTH — header bar
     // ════════════════════════════════════════════════════════════════════════
@@ -158,16 +138,16 @@ public class MoviePanel extends JPanel {
         left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
         left.setOpaque(false);
 
-        JLabel lblSection = new JLabel("  LIBRARY MANAGEMENT");
+        JLabel lblSection = new JLabel(" QUẢN LÝ PHIM");
         lblSection.setIcon(loadIcon("images/icons/film.png", 14, 14));
         lblSection.setFont(F_SECTION);
         lblSection.setForeground(C_RED);
 
-        JLabel lblTitle = new JLabel("Movie Catalog");
+        JLabel lblTitle = new JLabel("Danh sách phim");
         lblTitle.setFont(F_TITLE);
         lblTitle.setForeground(C_PRIMARY);
 
-        JLabel lblSub = new JLabel("Curate and manage your cinema's cinematic offerings.");
+        JLabel lblSub = new JLabel("Quản lý danh sách phim.");
         lblSub.setFont(F_SUBTITLE);
         lblSub.setForeground(C_SECONDARY);
 
@@ -181,9 +161,13 @@ public class MoviePanel extends JPanel {
         JPanel right = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         right.setOpaque(false);
 
-        JButton btnExport = roundBtn(" Export CSV", new Color(243, 244, 246), C_PRIMARY, new Color(229, 231, 235),
+        JButton btnExport = roundBtn(" Export Excel", new Color(243, 244, 246), C_PRIMARY, new Color(229, 231, 235),
                 140);
-        btnExport.addActionListener(e -> JOptionPane.showMessageDialog(this, "Export CSV"));
+        btnExport.addActionListener(e -> handleExportExcel());
+
+        JButton btnImport = roundBtn(" Import Excel", new Color(243, 244, 246), C_PRIMARY, new Color(229, 231, 235),
+                140);
+        btnImport.addActionListener(e -> handleImportExcel());
 
         JButton btnAdd = roundBtn(" Add New Movie", C_RED, WHITE, C_RED_HOVER, 160);
         btnAdd.addActionListener(e -> {
@@ -192,13 +176,13 @@ public class MoviePanel extends JPanel {
             dlg.setVisible(true);
             if (dlg.isSaved()) {
                 loadData();
-                refreshStats();
                 renderList();
                 refreshBanner();
             }
         });
 
         right.add(btnExport);
+        right.add(btnImport);
         right.add(btnAdd);
 
         north.add(left, BorderLayout.WEST);
@@ -221,11 +205,6 @@ public class MoviePanel extends JPanel {
         bannerHolder.setAlignmentX(Component.LEFT_ALIGNMENT);
         refreshBanner();
         center.add(bannerHolder);
-
-        center.add(Box.createRigidArea(new Dimension(0, 18)));
-
-        // pInfo — stat boxes
-        center.add(buildInfoRow());
 
         return center;
     }
@@ -285,7 +264,7 @@ public class MoviePanel extends JPanel {
         text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
         text.setOpaque(false);
 
-        JLabel spotlightLbl = new JLabel("  FEATURED SPOTLIGHT");
+        JLabel spotlightLbl = new JLabel(" FEATURED SPOTLIGHT");
         spotlightLbl.setIcon(loadIcon("images/icons/star.png", 13, 13));
         spotlightLbl.setFont(F_SPOTLIGHT);
         spotlightLbl.setForeground(new Color(251, 191, 36));
@@ -334,83 +313,6 @@ public class MoviePanel extends JPanel {
         bannerHolder.add(bannerPanel, BorderLayout.CENTER);
         bannerHolder.revalidate();
         bannerHolder.repaint();
-    }
-
-    // ── info row ─────────────────────────────────────────────────────────────
-    private JPanel buildInfoRow() {
-        lTotal = new JLabel("0");
-        lActive = new JLabel("0");
-        lInactive = new JLabel("0");
-
-        JPanel row = new JPanel(new GridLayout(1, 4, 16, 0));
-        row.setOpaque(false);
-        row.setAlignmentX(Component.LEFT_ALIGNMENT);
-        row.setMaximumSize(new Dimension(Integer.MAX_VALUE, 85));
-
-        long total = allMovies.size();
-        long nowShow = allMovies.stream().filter(m -> m.getStatus() == MovieStatus.ACTIVE).count();
-        long comingSoon = 0;
-        long inactive = allMovies.stream().filter(m -> m.getStatus() == MovieStatus.INACTIVE).count();
-
-        lTotal.setText(String.valueOf(total));
-        lActive.setText(String.valueOf(nowShow));
-        lInactive.setText(String.valueOf(inactive));
-
-        JLabel lComing = new JLabel(String.valueOf(comingSoon));
-
-        row.add(statCard("TOTAL MOVIES", lTotal, "🎬", BLUE_BG, BLUE_FG));
-        row.add(statCard("NOW SHOWING", lActive, "📈", GREEN_BG, GREEN_FG));
-        row.add(statCard("COMING SOON", lComing, "📅", ORANGE_BG, ORANGE_FG));
-        row.add(statCard("INACTIVE", lInactive, "👁", GRAY_BG, GRAY_FG));
-        return row;
-    }
-
-    private JPanel statCard(String label, JLabel valLbl, String emoji, Color ibg, Color ifg) {
-        JPanel card = new RoundedPanel(14, WHITE);
-        card.setLayout(new FlowLayout(FlowLayout.LEFT, 14, 14));
-        card.setBorder(BorderFactory.createCompoundBorder(
-                new RoundedBorder(14, C_BORDER),
-                new EmptyBorder(6, 10, 6, 10)));
-
-        JPanel icon = new RoundedPanel(30, ibg) {
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(44, 44);
-            }
-
-            @Override
-            public Dimension getMinimumSize() {
-                return getPreferredSize();
-            }
-
-            @Override
-            public Dimension getMaximumSize() {
-                return getPreferredSize();
-            }
-        };
-        icon.setLayout(new GridBagLayout());
-        JLabel ico = new JLabel(emoji);
-        ico.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 18));
-        ico.setForeground(ifg);
-        icon.add(ico);
-
-        JPanel txt = new JPanel();
-        txt.setLayout(new BoxLayout(txt, BoxLayout.Y_AXIS));
-        txt.setOpaque(false);
-
-        JLabel lbl = new JLabel(label);
-        lbl.setFont(F_STAT_LABEL);
-        lbl.setForeground(C_SECONDARY);
-
-        valLbl.setFont(F_STAT_VALUE);
-        valLbl.setForeground(C_PRIMARY);
-
-        txt.add(lbl);
-        txt.add(valLbl);
-
-        card.add(icon);
-        card.add(txt);
-        return card;
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -638,7 +540,18 @@ public class MoviePanel extends JPanel {
 
         String lang = movie.getLanguage() != null ? movie.getLanguage() : "N/A";
         boolean act = movie.getStatus() == MovieStatus.ACTIVE;
-        topRow.add(badge(lang, new Color(99, 102, 241), WHITE), BorderLayout.WEST);
+        String rating = movie.getRating();
+
+        // LEFT: [lang badge] [rating badge] side by side
+        JPanel leftBadges = new JPanel(new FlowLayout(FlowLayout.LEFT, 4, 0));
+        leftBadges.setOpaque(false);
+        leftBadges.add(badge(lang, new Color(99, 102, 241), WHITE));
+        if (rating != null && !rating.isEmpty()) {
+            leftBadges.add(ratingBadge(rating));
+        }
+        topRow.add(leftBadges, BorderLayout.WEST);
+
+        // RIGHT: status badge
         topRow.add(badge(act ? "ACTIVE" : "INACTIVE", act ? ACT_BG : INA_BG,
                 act ? ACT_FG : INA_FG), BorderLayout.EAST);
 
@@ -685,7 +598,6 @@ public class MoviePanel extends JPanel {
                 dlg.setVisible(true);
                 if (dlg.isSaved()) {
                     loadData();
-                    refreshStats();
                     renderList();
                     refreshBanner();
                 }
@@ -713,6 +625,51 @@ public class MoviePanel extends JPanel {
         b.setOpaque(false);
         b.setBorder(new EmptyBorder(3, 7, 3, 7));
         return b;
+    }
+
+    private JLabel ratingBadge(String rating) {
+        Color[] rc = ratingColor(rating);
+        Color rbg = rc[0], rfg = rc[1];
+        JLabel b = new JLabel(rating) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(rbg);
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                g2.setColor(rfg);
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 8, 8);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        b.setFont(new Font("Segoe UI", Font.BOLD, 10));
+        b.setForeground(rfg);
+        b.setHorizontalAlignment(SwingConstants.CENTER);
+        b.setOpaque(false);
+        b.setBorder(new EmptyBorder(2, 6, 2, 6));
+        return b;
+    }
+
+    /** Returns [backgroundColor, foregroundColor] for a rating code */
+    private Color[] ratingColor(String rating) {
+        if (rating == null)
+            return new Color[] { new Color(107, 114, 128), Color.WHITE };
+        switch (rating.toUpperCase()) {
+            case "P":
+                return new Color[] { new Color(34, 197, 94), new Color(20, 83, 45) }; // Green
+            case "K":
+                return new Color[] { new Color(59, 130, 246), Color.WHITE }; // Blue
+            case "T13":
+                return new Color[] { new Color(234, 179, 8), new Color(92, 67, 3) }; // Yellow
+            case "T16":
+                return new Color[] { new Color(249, 115, 22), Color.WHITE }; // Orange
+            case "T18":
+                return new Color[] { new Color(220, 38, 38), Color.WHITE }; // Red
+            default:
+                return new Color[] { new Color(107, 114, 128), Color.WHITE }; // Gray
+        }
     }
 
     // ── table ────────────────────────────────────────────────────────────────
@@ -1134,6 +1091,57 @@ public class MoviePanel extends JPanel {
         @Override
         protected Dimension getMinimumThumbSize() {
             return new Dimension(THUMB_W, 40);
+        }
+    }
+
+    // ════════════════════════════════════════════════════════════════════════
+    // EXPORT / IMPORT HANDLERS
+    // ════════════════════════════════════════════════════════════════════════
+    private void handleExportExcel() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Lưu file Excel");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel files (*.xlsx)", "xlsx"));
+        fileChooser.setSelectedFile(new File("Movies.xlsx"));
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToSave = fileChooser.getSelectedFile();
+            if (!fileToSave.getName().toLowerCase().endsWith(".xlsx")) {
+                fileToSave = new File(fileToSave.getParentFile(), fileToSave.getName() + ".xlsx");
+            }
+            try {
+                MovieExcelUtils.exportToExcel(allMovies, fileToSave);
+                JOptionPane.showMessageDialog(this, "Đã xuất dữ liệu ra file Excel:\n" + fileToSave.getAbsolutePath(),
+                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Lỗi khi xuất file:\n" + ex.getMessage(), "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void handleImportExcel() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Chọn file Excel");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Excel files (*.xlsx)", "xlsx"));
+
+        int userSelection = fileChooser.showOpenDialog(this);
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            File fileToRead = fileChooser.getSelectedFile();
+            try {
+                List<Movie> importedList = MovieExcelUtils.importFromExcel(fileToRead, new MovieDAO());
+                JOptionPane.showMessageDialog(this, "Đã nhập thành công " + importedList.size() + " phim!",
+                        "Thành công", JOptionPane.INFORMATION_MESSAGE);
+                loadData();
+
+                renderList();
+                refreshBanner();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Lỗi khi đọc file:\n" + ex.getMessage(), "Lỗi",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 

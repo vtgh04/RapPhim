@@ -340,6 +340,8 @@ public class HallPanel extends JPanel {
         item.add(icon);
         item.add(lbl);
         return item;
+    }
+
     private JPanel buildSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));

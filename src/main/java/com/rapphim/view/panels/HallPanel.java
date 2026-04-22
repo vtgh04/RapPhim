@@ -3,6 +3,7 @@ package com.rapphim.view.panels;
 import com.rapphim.dao.HallDao;
 import com.rapphim.model.CinemaHall;
 import com.rapphim.model.Seat;
+import com.rapphim.model.enums.CinemaHallStatus;
 import com.rapphim.model.enums.SeatType;
 
 import javax.swing.*;
@@ -54,6 +55,7 @@ public class HallPanel extends JPanel {
     private JTextField txtHallName;
     private JTextField txtCap;
     private JComboBox<String> cmbType;
+    private JComboBox<String> cmbStatus; // Active / Inactive
     private JPanel seatContainer;
 
     // Giá mặc định theo loại ghế (đọc từ DB / fallback)
@@ -115,7 +117,6 @@ public class HallPanel extends JPanel {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        // Cập nhật spinners nếu đã khởi tạo
         if (spnStdPrice != null)
             spnStdPrice.setValue((int) stdPrice);
         if (spnVipPrice != null)
@@ -424,6 +425,42 @@ public class HallPanel extends JPanel {
         capRow.add(capBox);
         capRow.add(typeBox);
         card.add(capRow);
+        card.add(Box.createRigidArea(new Dimension(0, 12)));
+
+        // Status row
+        JPanel statusBox = new JPanel();
+        statusBox.setLayout(new BoxLayout(statusBox, BoxLayout.Y_AXIS));
+        statusBox.setOpaque(false);
+        statusBox.setAlignmentX(LEFT_ALIGNMENT);
+        statusBox.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
+
+        statusBox.add(sectionLabel("Trạng thái"));
+        statusBox.add(Box.createRigidArea(new Dimension(0, 5)));
+
+        CinemaHallStatus curStatus = (currentHall != null && currentHall.getStatus() != null)
+                ? currentHall.getStatus()
+                : CinemaHallStatus.ACTIVE;
+        cmbStatus = new JComboBox<>(new String[] { "ACTIVE", "INACTIVE" });
+        cmbStatus.setFont(FONT_SUB);
+        cmbStatus.setSelectedItem(curStatus.getValue());
+        cmbStatus.setBorder(new LineBorder(new Color(210, 215, 225), 1, true));
+        cmbStatus.setAlignmentX(LEFT_ALIGNMENT);
+        // Colour-code the selected item via renderer
+        cmbStatus.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(
+                    JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (!isSelected) {
+                    lbl.setForeground("ACTIVE".equals(value)
+                            ? new Color(22, 163, 74) // green
+                            : new Color(185, 28, 28)); // red
+                }
+                return lbl;
+            }
+        });
+        statusBox.add(cmbStatus);
+        card.add(statusBox);
         card.add(Box.createRigidArea(new Dimension(0, 16)));
 
         JButton btnSaveDetails = new JButton("Lưu thay đổi");
@@ -450,8 +487,13 @@ public class HallPanel extends JPanel {
 
         String newName = txtHallName.getText().trim();
         String newType = cmbType.getSelectedItem().toString();
+        CinemaHallStatus newStatus = CinemaHallStatus.fromString(cmbStatus.getSelectedItem().toString());
 
-        if (!newName.equals(currentHall.getName()) || !newType.equals(currentHall.getHallType())) {
+        boolean nameOrTypeChanged = !newName.equals(currentHall.getName())
+                || !newType.equals(currentHall.getHallType());
+        boolean statusChanged = newStatus != null && newStatus != currentHall.getStatus();
+
+        if (nameOrTypeChanged || statusChanged) {
 
             if (!newName.equalsIgnoreCase(currentHall.getName())) {
                 boolean isDuplicate = allHalls.stream().anyMatch(
@@ -465,9 +507,17 @@ public class HallPanel extends JPanel {
 
             hasHallChange = true;
             try {
-                hallDao.updateHallInfo(currentHall.getHallId(), newName, newType);
-                currentHall.setName(newName);
-                currentHall.setHallType(newType);
+                if (nameOrTypeChanged) {
+                    hallDao.updateHallInfo(currentHall.getHallId(), newName, newType);
+                    currentHall.setName(newName);
+                    currentHall.setHallType(newType);
+                }
+                if (statusChanged) {
+                    hallDao.updateHallStatus(currentHall.getHallId(), newStatus);
+                    currentHall.setStatus(newStatus);
+                    // Refresh seat interactivity
+                    refreshSeatInteractivity();
+                }
             } catch (SQLException e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật thông tin rạp:\n" + e.getMessage(), "Lỗi",
@@ -477,6 +527,13 @@ public class HallPanel extends JPanel {
         }
 
         if (hasSeatChange) {
+            // Chỉ cho phép lưu ghế khi phòng đang ACTIVE
+            if (currentHall.getStatus() != CinemaHallStatus.ACTIVE) {
+                JOptionPane.showMessageDialog(this,
+                        "Không thể lưu trạng thái ghế khi phòng đang INACTIVE!",
+                        "Không được phép", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             try {
                 hallDao.updateSeatStatuses(modifiedSeats);
                 modifiedSeats.clear();
@@ -504,6 +561,22 @@ public class HallPanel extends JPanel {
         } else {
             JOptionPane.showMessageDialog(this, "Không có thay đổi nào cần lưu.", "Thông báo",
                     JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    /** Enable/disable seat clicking based on hall status. */
+    private void refreshSeatInteractivity() {
+        if (seatContainer == null)
+            return;
+        boolean isActive = currentHall != null && currentHall.getStatus() == CinemaHallStatus.ACTIVE;
+        enableComponents(seatContainer, isActive);
+    }
+
+    private void enableComponents(Container container, boolean enable) {
+        for (Component c : container.getComponents()) {
+            c.setEnabled(enable);
+            if (c instanceof Container)
+                enableComponents((Container) c, enable);
         }
     }
 
@@ -636,6 +709,10 @@ public class HallPanel extends JPanel {
             txtCap.setText(String.valueOf(currentHall.getTotalSeats()));
         if (cmbType != null)
             cmbType.setSelectedItem(currentHall.getHallType());
+        if (cmbStatus != null) {
+            CinemaHallStatus s = currentHall.getStatus();
+            cmbStatus.setSelectedItem(s != null ? s.getValue() : "ACTIVE");
+        }
 
         // Rebuild grid ghế theo đúng số hàng/cột của phòng mới
         if (seatContainer != null) {
@@ -644,5 +721,8 @@ public class HallPanel extends JPanel {
             seatContainer.revalidate();
             seatContainer.repaint();
         }
+
+        // Refresh seat interactivity based on new hall status
+        refreshSeatInteractivity();
     }
 }

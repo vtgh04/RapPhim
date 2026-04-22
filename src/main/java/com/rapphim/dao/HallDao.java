@@ -25,6 +25,8 @@ public class HallDao {
 
     private static final String SQL_UPDATE_HALL_INFO = "UPDATE cinema_halls SET name = ?, hall_type = ? WHERE hall_id = ?";
 
+    private static final String SQL_UPDATE_HALL_STATUS = "UPDATE cinema_halls SET status = ? WHERE hall_id = ?";
+
     public List<CinemaHall> findAllHalls() throws SQLException {
         List<CinemaHall> halls = new ArrayList<>();
         Connection conn = DatabaseConnection.getInstance();
@@ -56,6 +58,16 @@ public class HallDao {
             ps.setString(1, name);
             ps.setString(2, hallType);
             ps.setString(3, hallId);
+            ps.executeUpdate();
+        }
+    }
+
+    /** Cập nhật trạng thái hoạt động của phòng chiếu. */
+    public void updateHallStatus(String hallId, CinemaHallStatus status) throws SQLException {
+        Connection conn = DatabaseConnection.getInstance();
+        try (PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_HALL_STATUS)) {
+            ps.setString(1, status.getValue());
+            ps.setString(2, hallId);
             ps.executeUpdate();
         }
     }

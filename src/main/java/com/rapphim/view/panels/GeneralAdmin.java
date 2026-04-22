@@ -133,7 +133,6 @@ public class GeneralAdmin extends JPanel {
         sidebar.add(dashBtn);
         sidebar.add(createNavButton("Sales & POS", "images/icons/sales.png", false));
         sidebar.add(createNavButton("Transactions", "images/icons/transactions.png", false));
-        sidebar.add(createNavButton("Members", "images/icons/members.png", false));
         sidebar.add(createNavButton("Movies", "images/icons/Movies.png", false));
         sidebar.add(createNavButton("Showtimes", "images/icons/Showtimes.png", false));
         sidebar.add(createNavButton("Halls & Seats", "images/icons/hall.png", false));
@@ -271,12 +270,7 @@ public class GeneralAdmin extends JPanel {
             case "Sales & POS" -> rightPanel.add(createPlaceholderPanel(
                     "Sales & POS", "images/icons/sales.png",
                     "Quản lý bán vé và điểm bán hàng tại quầy."), BorderLayout.CENTER);
-            case "Transactions" -> rightPanel.add(createPlaceholderPanel(
-                    "Transactions", "images/icons/transactions.png",
-                    "Xem lịch sử và thống kê giao dịch."), BorderLayout.CENTER);
-            case "Members" -> rightPanel.add(createPlaceholderPanel(
-                    "Members", "images/icons/members.png",
-                    "Quản lý hội viên và chương trình thành viên."), BorderLayout.CENTER);
+            case "Transactions" -> rightPanel.add(new TransactionPanel(), BorderLayout.CENTER);
             case "Showtimes" -> rightPanel.add(createPlaceholderPanel(
                     "Showtimes", "images/icons/Showtimes.png",
                     "Lập lịch và quản lý suất chiếu phim."), BorderLayout.CENTER);
@@ -350,7 +344,6 @@ public class GeneralAdmin extends JPanel {
             case "Dashboard" -> "images/icons/dashboard.png";
             case "Sales & POS" -> "images/icons/sales.png";
             case "Transactions" -> "images/icons/transactions.png";
-            case "Members" -> "images/icons/members.png";
             case "Movies" -> "images/icons/Movies.png";
             case "Showtimes" -> "images/icons/Showtimes.png";
             case "Halls & Seats" -> "images/icons/hall.png";

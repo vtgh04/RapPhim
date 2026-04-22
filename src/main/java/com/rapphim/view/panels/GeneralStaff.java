@@ -43,8 +43,6 @@ public class GeneralStaff extends JPanel {
     private static final Color BORDER_COLOR = new Color(228, 228, 228);
 
     private static final Font FONT_PLAIN_13 = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font FONT_BOLD_11 = new Font("Segoe UI", Font.BOLD, 11);
-    private static final Font FONT_BOLD_16 = new Font("Segoe UI", Font.BOLD, 16);
     private static final Font FONT_BOLD_26 = new Font("Segoe UI", Font.BOLD, 26);
 
     private static final int SIDEBAR_W = 200;
@@ -52,12 +50,14 @@ public class GeneralStaff extends JPanel {
     private JButton activeNavBtn = null;
     private final JPanel rightPanel;
     private String loggedInName = "";
+    private Employee currentEmployee = null;
 
     public GeneralStaff() {
         this(null);
     }
 
     public GeneralStaff(Employee employee) {
+        this.currentEmployee = employee;
         if (employee != null) {
             this.loggedInName = employee.getFullName();
         }
@@ -89,42 +89,50 @@ public class GeneralStaff extends JPanel {
         sidebar.setPreferredSize(new Dimension(SIDEBAR_W, 0));
         sidebar.setBorder(new MatteBorder(0, 0, 0, 1, BORDER_COLOR));
 
+        // ── Logo panel – horizontal layout (same as Admin) ──────────
         JPanel logoPanel = new JPanel();
-        logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.Y_AXIS));
+        logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.X_AXIS));
         logoPanel.setBackground(SIDEBAR_BG);
         logoPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        logoPanel.setBorder(new EmptyBorder(25, 0, 20, 0));
+        logoPanel.setBorder(new EmptyBorder(25, 15, 20, 15));
 
-        ImageIcon logoIcon = loadIcon("images/icons/WelcomeLogo.png", 50, 50);
+        ImageIcon logoIcon = loadIcon("images/icons/cinema.png", 46, 46);
         if (logoIcon != null) {
             JLabel iconLabel = new JLabel(logoIcon);
-            iconLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
             logoPanel.add(iconLabel);
-            logoPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            logoPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         }
 
+        JPanel textPanel = new JPanel();
+        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
+        textPanel.setBackground(SIDEBAR_BG);
+
         JLabel brandName = new JLabel("CinePro");
-        brandName.setFont(FONT_BOLD_16);
-        brandName.setForeground(TEXT_PRIMARY);
-        brandName.setAlignmentX(Component.CENTER_ALIGNMENT);
+        brandName.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        brandName.setForeground(new Color(0, 51, 102));
+        brandName.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JLabel brandSub = new JLabel("Staff Dashboard");
-        brandSub.setFont(FONT_BOLD_11);
-        brandSub.setForeground(TEXT_SECONDARY);
-        brandSub.setAlignmentX(Component.CENTER_ALIGNMENT);
+        JLabel brandSub = new JLabel("Quản lý rạp phim");
+        brandSub.setFont(new Font("Consolas", Font.PLAIN, 12));
+        brandSub.setForeground(new Color(110, 150, 190));
+        brandSub.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        logoPanel.add(brandName);
-        logoPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-        logoPanel.add(brandSub);
+        textPanel.add(brandName);
+        textPanel.add(brandSub);
+
+        logoPanel.add(textPanel);
+        logoPanel.add(Box.createHorizontalGlue());
 
         sidebar.add(logoPanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
+        // ── Navigation buttons ──────────────────────────────────────
         JButton dashBtn = createNavButton("Dashboard", "images/icons/dashboard.png", true);
         activeNavBtn = dashBtn;
         sidebar.add(dashBtn);
-        sidebar.add(createNavButton("Bill", "images/icons/bill.png", false));
-        sidebar.add(createNavButton("Products", "images/icons/Product.png", false));
+        sidebar.add(createNavButton("Sales & POS", "images/icons/sales.png", false));
+        sidebar.add(createNavButton("Transactions", "images/icons/transactions.png", false));
+        sidebar.add(createNavButton("Showtimes", "images/icons/Showtimes.png", false));
 
         sidebar.add(Box.createVerticalGlue());
 
@@ -229,35 +237,102 @@ public class GeneralStaff extends JPanel {
      * Display RightPanel content based on the navigation item clicked.
      */
     private void handleNavigation(String page) {
-        // Right now, it's just updating the placeholder label text.
-        // Later, this would swap out the content in rightPanel using CardLayout or by
-        // replacing components.
         rightPanel.removeAll();
+        rightPanel.setLayout(new BorderLayout());
 
-        if (page.equals("Dashboard")) {
-            JLabel welcomeLabel = new JLabel("Welcome back ");
-            welcomeLabel.setFont(FONT_BOLD_26);
-            welcomeLabel.setForeground(TEXT_PRIMARY);
-            rightPanel.add(welcomeLabel);
-        } else {
-            JLabel pageLabel = new JLabel(page + " Page");
-            pageLabel.setFont(FONT_BOLD_26);
-            pageLabel.setForeground(TEXT_PRIMARY);
-            rightPanel.add(pageLabel);
+        switch (page) {
+            case "Dashboard" -> {
+                rightPanel.setLayout(new GridBagLayout());
+                String name = loggedInName.isBlank() ? "!" : ", " + loggedInName + "!";
+                JLabel welcomeLabel = new JLabel("Welcome back" + name);
+                welcomeLabel.setFont(FONT_BOLD_26);
+                welcomeLabel.setForeground(TEXT_PRIMARY);
+                rightPanel.add(welcomeLabel);
+            }
+            case "Sales & POS" -> rightPanel.add(createPlaceholderPanel(
+                    "Sales & POS", "images/icons/sales.png",
+                    "Quản lý bán vé và điểm bán hàng tại quầy."), BorderLayout.CENTER);
+            case "Transactions" -> rightPanel.add(createPlaceholderPanel(
+                    "Transactions", "images/icons/transactions.png",
+                    "Xem lịch sử và thống kê giao dịch."), BorderLayout.CENTER);
+            case "Showtimes" -> rightPanel.add(createPlaceholderPanel(
+                    "Showtimes", "images/icons/Showtimes.png",
+                    "Lập lịch và quản lý suất chiếu phim."), BorderLayout.CENTER);
+            case "Settings" -> rightPanel.add(new SettingPanel(currentEmployee), BorderLayout.CENTER);
+            default -> {
+                rightPanel.setLayout(new GridBagLayout());
+                JLabel pageLabel = new JLabel(page + " Page");
+                pageLabel.setFont(FONT_BOLD_26);
+                pageLabel.setForeground(TEXT_PRIMARY);
+                rightPanel.add(pageLabel);
+            }
         }
 
         rightPanel.revalidate();
         rightPanel.repaint();
     }
 
+    /**
+     * Create a styled placeholder panel for modules under development.
+     */
+    private JPanel createPlaceholderPanel(String title, String iconPath, String subtitle) {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(BG_COLOR);
+        panel.setBorder(new EmptyBorder(60, 0, 0, 0));
+
+        // Icon lớn
+        ImageIcon bigIcon = loadIcon(iconPath, 64, 64);
+        if (bigIcon != null) {
+            JLabel iconLbl = new JLabel(bigIcon);
+            iconLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+            panel.add(iconLbl);
+            panel.add(Box.createRigidArea(new Dimension(0, 24)));
+        }
+
+        // Tiêu đề
+        JLabel titleLbl = new JLabel(title);
+        titleLbl.setFont(FONT_BOLD_26);
+        titleLbl.setForeground(TEXT_PRIMARY);
+        titleLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(titleLbl);
+        panel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        // Mô tả
+        JLabel subLbl = new JLabel(subtitle);
+        subLbl.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        subLbl.setForeground(TEXT_SECONDARY);
+        subLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(subLbl);
+        panel.add(Box.createRigidArea(new Dimension(0, 30)));
+
+        // Badge "Đang phát triển"
+        JLabel badge = new JLabel("\uD83D\uDEA7  Tính năng đang được phát triển");
+        badge.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        badge.setForeground(new Color(180, 100, 0));
+        badge.setOpaque(true);
+        badge.setBackground(new Color(255, 237, 213));
+        badge.setBorder(new EmptyBorder(10, 24, 10, 24));
+        badge.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(badge);
+
+        // Bọc trong wrapper để căn giữa dọc
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setBackground(BG_COLOR);
+        wrapper.add(panel);
+        return wrapper;
+    }
+
     private String iconPathForButton(String label) {
         return switch (label) {
             case "Dashboard" ->
                 "images/icons/dashboard.png";
-            case "Bill" ->
-                "images/icons/bill.png";
-            case "Products" ->
-                "images/icons/Product.png";
+            case "Sales & POS" ->
+                "images/icons/sales.png";
+            case "Transactions" ->
+                "images/icons/transactions.png";
+            case "Showtimes" ->
+                "images/icons/Showtimes.png";
             case "Settings" ->
                 "images/icons/Setting.png";
             case "Logout" ->

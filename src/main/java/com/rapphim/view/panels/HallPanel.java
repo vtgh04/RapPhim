@@ -107,7 +107,6 @@ public class HallPanel extends JPanel {
             for (Seat s : seats) {
                 String key = String.valueOf(s.getRowChar()) + s.getColNumber();
                 seatMap.put(key, s);
-                // Lấy giá đại diện theo loại ghế (ghế đầu tiên của mỗi type)
                 if (s.getSeatType() == SeatType.REGULAR && s.getSeatPrice() > 0) {
                     stdPrice = s.getSeatPrice();
                 } else if (s.getSeatType() == SeatType.VIP && s.getSeatPrice() > 0) {
@@ -414,28 +413,6 @@ public class HallPanel extends JPanel {
         return item;
     }
 
-    private JPanel legendItemColor(Color color, String label) {
-        JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
-        item.setOpaque(false);
-        JLabel icon = new JLabel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(color);
-                g2.fillRoundRect(0, 2, 16, 16, 5, 5);
-                g2.dispose();
-            }
-        };
-        icon.setPreferredSize(new Dimension(16, 20));
-        JLabel lbl = new JLabel(label);
-        lbl.setFont(new Font("Segoe UI", Font.BOLD, 11));
-        lbl.setForeground(new Color(80, 85, 100));
-        item.add(icon);
-        item.add(lbl);
-        return item;
-    }
-
     private JPanel buildSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
@@ -535,7 +512,7 @@ public class HallPanel extends JPanel {
                 : CinemaHallStatus.ACTIVE;
         cmbStatus = new JComboBox<>(new String[] { "Đang hoạt động", "Không hoạt động" });
         cmbStatus.setFont(FONT_SUB);
-        cmbStatus.setSelectedItem(curStatus.getValue());
+        cmbStatus.setSelectedItem(curStatus == CinemaHallStatus.ACTIVE ? "Đang hoạt động" : "Không hoạt động");
         cmbStatus.setBorder(new LineBorder(new Color(210, 215, 225), 1, true));
         cmbStatus.setAlignmentX(LEFT_ALIGNMENT);
         // Colour-code the selected item via renderer
@@ -545,7 +522,7 @@ public class HallPanel extends JPanel {
                     JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 JLabel lbl = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (!isSelected) {
-                    lbl.setForeground("ACTIVE".equals(value)
+                    lbl.setForeground("Đang hoạt động".equals(value)
                             ? new Color(22, 163, 74) // green
                             : new Color(185, 28, 28)); // red
                 }
@@ -580,7 +557,9 @@ public class HallPanel extends JPanel {
 
         String newName = txtHallName.getText().trim();
         String newType = cmbType.getSelectedItem().toString();
-        CinemaHallStatus newStatus = CinemaHallStatus.fromString(cmbStatus.getSelectedItem().toString());
+        String statusStr = cmbStatus.getSelectedItem().toString();
+        CinemaHallStatus newStatus = statusStr.equals("Đang hoạt động") ? CinemaHallStatus.ACTIVE
+                : CinemaHallStatus.INACTIVE;
 
         boolean nameOrTypeChanged = !newName.equals(currentHall.getName())
                 || !newType.equals(currentHall.getHallType());
@@ -592,8 +571,7 @@ public class HallPanel extends JPanel {
                 boolean isDuplicate = allHalls.stream().anyMatch(
                         h -> h.getName().equalsIgnoreCase(newName) && !h.getHallId().equals(currentHall.getHallId()));
                 if (isDuplicate) {
-                    JOptionPane.showMessageDialog(this, "Tên phòng chiếu đã tồn tại, vui lòng chọn tên khác!",
-                            "Trùng lập", JOptionPane.WARNING_MESSAGE);
+                    showModernMessageDialog("Trùng lập", "Tên phòng chiếu đã tồn tại, vui lòng chọn tên khác!", true);
                     return;
                 }
             }
@@ -613,8 +591,7 @@ public class HallPanel extends JPanel {
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Lỗi khi cập nhật thông tin rạp:\n" + e.getMessage(), "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
+                showModernMessageDialog("Lỗi", "Lỗi khi cập nhật thông tin rạp:\n" + e.getMessage(), true);
                 return;
             }
         }
@@ -622,9 +599,8 @@ public class HallPanel extends JPanel {
         if (hasSeatChange) {
             // Chỉ cho phép lưu ghế khi phòng đang ACTIVE
             if (currentHall.getStatus() != CinemaHallStatus.ACTIVE) {
-                JOptionPane.showMessageDialog(this,
-                        "Không thể lưu trạng thái ghế khi phòng đang INACTIVE!",
-                        "Không được phép", JOptionPane.WARNING_MESSAGE);
+                showModernMessageDialog("Không được phép", "Không thể lưu trạng thái ghế khi phòng đang INACTIVE!",
+                        true);
                 return;
             }
             try {
@@ -632,15 +608,13 @@ public class HallPanel extends JPanel {
                 modifiedSeats.clear();
             } catch (SQLException e) {
                 e.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Lỗi khi lưu ghế:\n" + e.getMessage(), "Lỗi",
-                        JOptionPane.ERROR_MESSAGE);
+                showModernMessageDialog("Lỗi", "Lỗi khi lưu ghế:\n" + e.getMessage(), true);
                 return;
             }
         }
 
         if (hasHallChange || hasSeatChange) {
-            JOptionPane.showMessageDialog(this, "Đã lưu thay đổi thành công!", "Thành công",
-                    JOptionPane.INFORMATION_MESSAGE);
+            showModernMessageDialog("Thành công", "Đã lưu thay đổi thành công!", false);
             if (hasHallChange) {
                 isUpdatingCombo = true;
                 int idx = selectRoom.getSelectedIndex();
@@ -652,8 +626,7 @@ public class HallPanel extends JPanel {
                 isUpdatingCombo = false;
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Không có thay đổi nào cần lưu.", "Thông báo",
-                    JOptionPane.INFORMATION_MESSAGE);
+            showModernMessageDialog("Thông báo", "Không có thay đổi nào cần lưu.", false);
         }
     }
 
@@ -674,9 +647,22 @@ public class HallPanel extends JPanel {
     }
 
     private JPanel buildPricingCard() {
-        // Lấy giá hiện tại từ spinner hoặc mặc định
-        int currentStd = (spnStdPrice == null) ? 100_000 : (int) spnStdPrice.getValue();
-        int currentVip = (spnVipPrice == null) ? 110_000 : (int) spnVipPrice.getValue();
+        // Lấy giá hiện tại từ database thông qua seatMap đã load
+        int currentStd = 100_000;
+        int currentVip = 110_000;
+        if (spnStdPrice != null) {
+            currentStd = (int) spnStdPrice.getValue();
+        } else if (!seatMap.isEmpty()) {
+            for (Seat s : seatMap.values()) {
+                if (s.getSeatType() == SeatType.REGULAR && s.getSeatPrice() > 0)
+                    currentStd = (int) s.getSeatPrice();
+                else if (s.getSeatType() == SeatType.VIP && s.getSeatPrice() > 0)
+                    currentVip = (int) s.getSeatPrice();
+            }
+        }
+        if (spnVipPrice != null) {
+            currentVip = (int) spnVipPrice.getValue();
+        }
 
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -703,8 +689,8 @@ public class HallPanel extends JPanel {
         spnStdPrice.setFont(new Font("Segoe UI", Font.BOLD, 13));
         spnStdPrice.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         spnStdPrice.setAlignmentX(LEFT_ALIGNMENT);
-        // Format editor không có dấu phẩy nhóm số
-        JSpinner.NumberEditor stdEditor = new JSpinner.NumberEditor(spnStdPrice, "#,### VND");
+        // Format editor không có suffix VND để tránh lỗi ParseException khi gõ tay
+        JSpinner.NumberEditor stdEditor = new JSpinner.NumberEditor(spnStdPrice, "#,###");
         spnStdPrice.setEditor(stdEditor);
 
         SpinnerNumberModel vipModel = new SpinnerNumberModel(currentVip, 0, 10_000_000, 5_000);
@@ -712,7 +698,7 @@ public class HallPanel extends JPanel {
         spnVipPrice.setFont(new Font("Segoe UI", Font.BOLD, 13));
         spnVipPrice.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
         spnVipPrice.setAlignmentX(LEFT_ALIGNMENT);
-        JSpinner.NumberEditor vipEditor = new JSpinner.NumberEditor(spnVipPrice, "#,### VND");
+        JSpinner.NumberEditor vipEditor = new JSpinner.NumberEditor(spnVipPrice, "#,###");
         spnVipPrice.setEditor(vipEditor);
 
         card.add(pricingRow("Phổ thông", false, spnStdPrice));
@@ -740,21 +726,31 @@ public class HallPanel extends JPanel {
     private void handleUpdatePrices() {
         if (currentHall == null)
             return;
+
+        try {
+            if (spnStdPrice != null)
+                spnStdPrice.commitEdit();
+            if (spnVipPrice != null)
+                spnVipPrice.commitEdit();
+        } catch (java.text.ParseException pe) {
+            showModernMessageDialog("Lỗi nhập liệu", "Vui lòng nhập số tiền hợp lệ!", true);
+            return;
+        }
+
         double stdPrice = ((Number) spnStdPrice.getValue()).doubleValue();
         double vipPrice = ((Number) spnVipPrice.getValue()).doubleValue();
         try {
             hallDao.updateSeatPriceByType(currentHall.getHallId(), SeatType.REGULAR, stdPrice);
             hallDao.updateSeatPriceByType(currentHall.getHallId(), SeatType.VIP, vipPrice);
-            JOptionPane.showMessageDialog(this,
-                    String.format("Đã cập nhật giá thành công!%n" +
-                            "  Phổ thông: %,.0f VND%n" +
-                            "  Vip:      %,.0f VND", stdPrice, vipPrice),
-                    "Cập nhật giá ghế", JOptionPane.INFORMATION_MESSAGE);
+            showModernMessageDialog("Thành công",
+                    String.format("Đã cập nhật giá thành công!%n  Phổ thông: %,.0f VND%n  Vip:      %,.0f VND",
+                            stdPrice, vipPrice),
+                    false);
+            // Refresh loaded data so next reload reflects the correct prices
+            loadSeatsForHall(currentHall.getHallId());
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this,
-                    "Lỗi khi cập nhật giá:\n" + ex.getMessage(),
-                    "Lỗi", JOptionPane.ERROR_MESSAGE);
+            showModernMessageDialog("Lỗi", "Lỗi khi cập nhật giá:\n" + ex.getMessage(), true);
         }
     }
 
@@ -771,8 +767,17 @@ public class HallPanel extends JPanel {
         lbl.setFont(FONT_LABEL);
         lbl.setForeground(isVip ? new Color(185, 120, 0) : new Color(130, 135, 155));
 
+        JPanel spinWrap = new JPanel(new BorderLayout(5, 0));
+        spinWrap.setOpaque(false);
+        spinWrap.add(spinner, BorderLayout.CENTER);
+
+        JLabel lblVND = new JLabel("VND");
+        lblVND.setFont(FONT_LABEL);
+        lblVND.setForeground(new Color(130, 135, 155));
+        spinWrap.add(lblVND, BorderLayout.EAST);
+
         wrapper.add(lbl, BorderLayout.NORTH);
-        wrapper.add(spinner, BorderLayout.CENTER);
+        wrapper.add(spinWrap, BorderLayout.CENTER);
         return wrapper;
     }
 
@@ -817,5 +822,128 @@ public class HallPanel extends JPanel {
 
         // Refresh seat interactivity based on new hall status
         refreshSeatInteractivity();
+    }
+
+    // =====================================================================
+    // CUSTOM MODERN DIALOG
+    // =====================================================================
+    private void showModernMessageDialog(String title, String message, boolean isError) {
+        JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        JDialog dialog = new JDialog(parentFrame, title, true);
+        dialog.setUndecorated(true);
+
+        JPanel wrapper = new JPanel(new BorderLayout());
+        wrapper.setBackground(BG_PAGE);
+        wrapper.setBorder(new EmptyBorder(10, 10, 10, 10));
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBackground(WHITE);
+        Color borderColor = isError ? ACCENT_RED : new Color(22, 163, 74);
+        mainPanel.setBorder(BorderFactory.createCompoundBorder(
+                new RoundedBorder(16, borderColor),
+                new EmptyBorder(25, 30, 25, 30)));
+
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titleLabel.setForeground(borderColor);
+        titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        JLabel messageLabel = new JLabel("<html><body style='width: 300px; word-wrap: break-word;'>"
+                + message.replace("\n", "<br>") + "</body></html>");
+        messageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        messageLabel.setForeground(new Color(100, 110, 120));
+        messageLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        mainPanel.add(titleLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        mainPanel.add(messageLabel);
+        mainPanel.add(Box.createRigidArea(new Dimension(0, 25)));
+
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        btnPanel.setOpaque(false);
+        btnPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        Color btnBg = isError ? ACCENT_RED : new Color(22, 163, 74);
+        Color btnHover = isError ? new Color(185, 28, 28) : new Color(21, 128, 61);
+        JButton okBtn = createRoundedButton("OK", btnBg, WHITE, btnHover);
+        okBtn.addActionListener(e -> dialog.dispose());
+        btnPanel.add(okBtn);
+
+        mainPanel.add(btnPanel);
+        wrapper.add(mainPanel, BorderLayout.CENTER);
+
+        dialog.setContentPane(wrapper);
+        dialog.pack();
+        dialog.setLocationRelativeTo(parentFrame);
+        dialog.setVisible(true);
+    }
+
+    private JButton createRoundedButton(String text, Color bg, Color fg, Color hoverBg) {
+        JButton btn = new JButton(text) {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setColor(getBackground());
+                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
+                g2.dispose();
+                super.paintComponent(g);
+            }
+        };
+        btn.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        btn.setForeground(fg);
+        btn.setBackground(bg);
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btn.setPreferredSize(new Dimension(80, 36));
+
+        btn.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(hoverBg);
+                btn.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(bg);
+                btn.repaint();
+            }
+        });
+        return btn;
+    }
+
+    private static class RoundedBorder extends AbstractBorder {
+        private final int radius;
+        private final Color color;
+
+        RoundedBorder(int radius, Color color) {
+            this.radius = radius;
+            this.color = color;
+        }
+
+        @Override
+        public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(color);
+            g2.drawRoundRect(x, y, width - 1, height - 1, radius, radius);
+            g2.dispose();
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return new Insets(1, 1, 1, 1);
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c, Insets insets) {
+            insets.set(1, 1, 1, 1);
+            return insets;
+        }
     }
 }

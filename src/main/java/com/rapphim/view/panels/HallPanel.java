@@ -254,7 +254,8 @@ public class HallPanel extends JPanel {
         Color fg = isBroken ? WHITE : (type == SeatType.VIP ? new Color(90, 60, 0) : WHITE);
 
         // Nạp icon tương ứng
-        String iconPath = type == SeatType.VIP ? "/images/icons/Yellow Chair.png" : "/images/icons/chair.png";
+        String iconPath = isBroken ? "/images/icons/wrench.png"
+                : (type == SeatType.VIP ? "/images/icons/Yellow Chair.png" : "/images/icons/chair.png");
         java.net.URL imgUrl = getClass().getResource(iconPath);
         final Image seatImg = (imgUrl != null) ? new ImageIcon(imgUrl).getImage() : null;
 
@@ -263,19 +264,28 @@ public class HallPanel extends JPanel {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
                 if (seatImg != null) {
-                    // Nếu là ghế hỏng, vẽ nền xám đè lên hoặc vẽ hình xám
-                    if (isBroken) {
-                        g2.setColor(SEAT_FAULTY);
-                        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
-                    } else {
-                        // Nếu đang hover, có thể vẽ hiệu ứng sáng hơn
-                        if (getModel().isRollover()) {
+                    // Cân đối kích thước ảnh không bị méo (giữ aspect ratio)
+                    int imgW = seatImg.getWidth(null);
+                    int imgH = seatImg.getHeight(null);
+                    if (imgW > 0 && imgH > 0) {
+                        double scale = Math.min((double) getWidth() / imgW, (double) getHeight() / imgH);
+                        int drawW = (int) (imgW * scale);
+                        int drawH = (int) (imgH * scale);
+                        int drawX = (getWidth() - drawW) / 2;
+                        int drawY = (getHeight() - drawH) / 2;
+
+                        // Nếu đang hover và không hỏng, vẽ hiệu ứng (tùy chọn)
+                        if (getModel().isRollover() && !isBroken) {
                             g2.setColor(type == SeatType.VIP ? SEAT_HOVER_VIP : SEAT_HOVER_REG);
                             g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
                         }
+
                         // Vẽ ảnh ghế
+                        g2.drawImage(seatImg, drawX, drawY, drawW, drawH, this);
+                    } else {
                         g2.drawImage(seatImg, 0, 0, getWidth(), getHeight(), this);
                     }
                 } else {
@@ -288,19 +298,21 @@ public class HallPanel extends JPanel {
                     g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
                 }
 
-                // Vẽ text (số ghế hoặc 'X')
-                String text = isBroken ? "X" : String.valueOf(col);
-                g2.setFont(FONT_SEAT);
-                g2.setColor(fg);
-                FontMetrics fm = g2.getFontMetrics();
-                int x = (getWidth() - fm.stringWidth(text)) / 2;
-                int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
-                g2.drawString(text, x, y - 2); // Điều chỉnh vị trí Y một chút để cân đối với icon
+                // Vẽ text (số ghế hoặc không vẽ nếu là ghế hỏng)
+                if (!isBroken) {
+                    String text = String.valueOf(col);
+                    g2.setFont(FONT_SEAT);
+                    g2.setColor(fg);
+                    FontMetrics fm = g2.getFontMetrics();
+                    int x = (getWidth() - fm.stringWidth(text)) / 2;
+                    int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+                    g2.drawString(text, x, y - 2); // Điều chỉnh vị trí Y một chút để cân đối với icon
+                }
 
                 g2.dispose();
             }
         };
-        btn.setPreferredSize(new Dimension(34, 30));
+        btn.setPreferredSize(new Dimension(32, 32));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.setToolTipText(row + col + " – " + type.name());
         btn.setContentAreaFilled(false);
@@ -323,7 +335,26 @@ public class HallPanel extends JPanel {
                 boolean newStatus = !seat.isBroken();
                 seat.setBroken(newStatus);
                 modifiedSeats.add(seat);
-                btn.repaint();
+
+                // Cần rebuild lại nút khi click vì icon phải tải lại (mờ / cờ lê)
+                // Tuy nhiên ta chỉ có thể đổi icon trên btn bằng cách repaint nếu ta thiết lập
+                // lại iconPath bên trong hoặc reload
+                Container parent = btn.getParent();
+                if (parent != null) {
+                    int index = -1;
+                    for (int i = 0; i < parent.getComponentCount(); i++) {
+                        if (parent.getComponent(i) == btn) {
+                            index = i;
+                            break;
+                        }
+                    }
+                    if (index != -1) {
+                        parent.remove(index);
+                        parent.add(buildSeatBtn(row, col, seat), index);
+                        parent.revalidate();
+                        parent.repaint();
+                    }
+                }
             }
         });
         return btn;
@@ -334,14 +365,14 @@ public class HallPanel extends JPanel {
         legend.setOpaque(false);
         legend.add(legendItemImage("/images/icons/chair.png", "Phổ thông"));
         legend.add(legendItemImage("/images/icons/Yellow Chair.png", "Vip"));
-        legend.add(legendItemColor(SEAT_FAULTY, "Hỏng"));
+        legend.add(legendItemImage("/images/icons/wrench.png", "Hỏng"));
         return legend;
     }
 
     private JPanel legendItemImage(String iconPath, String label) {
         JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         item.setOpaque(false);
-        
+
         java.net.URL imgUrl = getClass().getResource(iconPath);
         final Image seatImg = (imgUrl != null) ? new ImageIcon(imgUrl).getImage() : null;
 
@@ -349,7 +380,23 @@ public class HallPanel extends JPanel {
             @Override
             protected void paintComponent(Graphics g) {
                 if (seatImg != null) {
-                    g.drawImage(seatImg, 0, 0, 18, 18, this);
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+                    int imgW = seatImg.getWidth(null);
+                    int imgH = seatImg.getHeight(null);
+                    if (imgW > 0 && imgH > 0) {
+                        double scale = Math.min(18.0 / imgW, 18.0 / imgH);
+                        int drawW = (int) (imgW * scale);
+                        int drawH = (int) (imgH * scale);
+                        int drawX = (18 - drawW) / 2;
+                        int drawY = (18 - drawH) / 2;
+                        g2.drawImage(seatImg, drawX, drawY, drawW, drawH, this);
+                    } else {
+                        g2.drawImage(seatImg, 0, 0, 18, 18, this);
+                    }
+                    g2.dispose();
                 } else {
                     g.setColor(Color.GRAY);
                     g.fillRect(0, 0, 18, 18);
@@ -357,11 +404,11 @@ public class HallPanel extends JPanel {
             }
         };
         icon.setPreferredSize(new Dimension(18, 18));
-        
+
         JLabel lbl = new JLabel(label);
         lbl.setFont(new Font("Segoe UI", Font.BOLD, 11));
         lbl.setForeground(new Color(80, 85, 100));
-        
+
         item.add(icon);
         item.add(lbl);
         return item;
@@ -486,7 +533,7 @@ public class HallPanel extends JPanel {
         CinemaHallStatus curStatus = (currentHall != null && currentHall.getStatus() != null)
                 ? currentHall.getStatus()
                 : CinemaHallStatus.ACTIVE;
-        cmbStatus = new JComboBox<>(new String[] { "ACTIVE", "INACTIVE" });
+        cmbStatus = new JComboBox<>(new String[] { "Đang hoạt động", "Không hoạt động" });
         cmbStatus.setFont(FONT_SUB);
         cmbStatus.setSelectedItem(curStatus.getValue());
         cmbStatus.setBorder(new LineBorder(new Color(210, 215, 225), 1, true));

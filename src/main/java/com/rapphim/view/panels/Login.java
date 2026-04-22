@@ -59,7 +59,6 @@ public class Login extends JFrame {
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weighty = 1.0;
 
-        // ── BannerPanel (7 phần) ───────────────────────────
         JPanel bannerPanel = new JPanel(new BorderLayout());
         bannerPanel.setBackground(Color.BLACK);
 
@@ -88,17 +87,14 @@ public class Login extends JFrame {
         gbc.weightx = 0.7;
         outer.add(bannerPanel, gbc);
 
-        // ── logPanelContainer (3 phần) ───────────────────────────
         JPanel logPanelContainer = new JPanel(new GridBagLayout());
         logPanelContainer.setBackground(Color.WHITE);
 
-        // ── logPanel (Bên trong Container) ─────────────────────────
         JPanel logPanel = new JPanel();
         logPanel.setLayout(new BoxLayout(logPanel, BoxLayout.Y_AXIS));
         logPanel.setBackground(Color.WHITE);
         logPanel.setBorder(new EmptyBorder(20, 20, 20, 20));
 
-        // ── Title ─────────────────────────────────────────────────────────
         JLabel title = new JLabel("Welcome Back", SwingConstants.LEFT);
         title.setFont(new Font("Segoe UI", Font.BOLD, 28));
         title.setForeground(new Color(30, 30, 35));
@@ -107,7 +103,6 @@ public class Login extends JFrame {
         logPanel.add(title);
         logPanel.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        // ── Subtitle ──────────────────────────────────────────────────────
         JLabel subtitle = new JLabel("Sign in to access your account", SwingConstants.LEFT);
         subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 15));
         subtitle.setForeground(new Color(150, 155, 168));
@@ -116,7 +111,6 @@ public class Login extends JFrame {
         logPanel.add(subtitle);
         logPanel.add(Box.createRigidArea(new Dimension(0, 40)));
 
-        // ── Username label ──────────────────────────────────────────────
         JLabel accountLabel = new JLabel("Username");
         accountLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         accountLabel.setForeground(new Color(50, 55, 65));
@@ -125,7 +119,6 @@ public class Login extends JFrame {
         logPanel.add(accountLabel);
         logPanel.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        // ── Username field ──────────────────────────────────────────────
         JPanel accountRow = createInputRow("images/icons/User.png");
         usernameField = new JTextField();
         usernameField.setBorder(null);
@@ -136,7 +129,6 @@ public class Login extends JFrame {
         logPanel.add(accountRow);
         logPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // ── Password label ────────────────────────────────────────────────
         JLabel passwordLabel = new JLabel("Password");
         passwordLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
         passwordLabel.setForeground(new Color(50, 55, 65));
@@ -145,7 +137,6 @@ public class Login extends JFrame {
         logPanel.add(passwordLabel);
         logPanel.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        // ── Password field ────────────────────────────────────────────────
         JPanel passwordRow = createInputRow("images/icons/Password.png");
         pwField = new JPasswordField();
         pwField.setBorder(null);
@@ -156,7 +147,6 @@ public class Login extends JFrame {
         logPanel.add(passwordRow);
         logPanel.add(Box.createRigidArea(new Dimension(0, 30)));
 
-        // ── Sign In button ────────────────────────────────────────────────
         JButton signInBtn = new JButton("Sign In");
         signInBtn.setFont(new Font("Segoe UI", Font.BOLD, 15));
         signInBtn.setForeground(Color.WHITE);
@@ -171,7 +161,6 @@ public class Login extends JFrame {
         signInBtn.setMaximumSize(new Dimension(FIELD_W, 45));
         logPanel.add(signInBtn);
 
-        // ── Wire up LoginController ───────────────────────────────────────
         controller = new LoginController(this);
 
         // Click handler — DB chạy trên background thread trong controller

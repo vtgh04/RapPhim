@@ -19,7 +19,6 @@ import javax.swing.border.EmptyBorder;
 public class EditMovieDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
-    // ── Design tokens ────────────────────────────────────────────────────────
     private static final Color BG_COLOR = new Color(248, 249, 252);
     private static final Color WHITE = Color.WHITE;
     private static final Color TEXT_PRIMARY = new Color(30, 30, 35);
@@ -44,10 +43,6 @@ public class EditMovieDialog extends JDialog {
     private static final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 14);
     private static final Font FONT_WARN = new Font("Segoe UI", Font.ITALIC, 11);
 
-    // Regex: chỉ cho phép chữ cái Unicode, chữ số và khoảng trắng — không ký tự đặc
-    // biệt
-
-    // ── Fields ───────────────────────────────────────────────────────────────
     private JTextField txtMovieId;
     private JTextField txtTitle;
     private JTextField txtGenre;
@@ -60,7 +55,6 @@ public class EditMovieDialog extends JDialog {
     private JTextArea txtDescription;
     private JTextField txtPosterUrl;
 
-    // Warn labels (đặt ngay dưới field tương ứng)
     private JLabel warnTitle;
     private JLabel warnGenre;
     private JLabel warnDuration;
@@ -84,9 +78,6 @@ public class EditMovieDialog extends JDialog {
         return saved;
     }
 
-    // =====================================================================
-    // UI
-    // =====================================================================
     private void initUI() {
         setSize(520, 800);
         setLocationRelativeTo(getParent());
@@ -101,7 +92,6 @@ public class EditMovieDialog extends JDialog {
                 new RoundedBorder(16, BORDER_COLOR),
                 new EmptyBorder(28, 32, 28, 32)));
 
-        // ── Header ──────────────────────────────────────────────────────
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -581,7 +571,7 @@ public class EditMovieDialog extends JDialog {
             hasError = true;
         }
 
-        // — Release Date — 
+        // — Release Date —
         if (dateReleaseDate.getDate() == null) {
             warnDate.setText("Vui lòng chọn ngày phát hành.");
             hasError = true;

@@ -15,31 +15,21 @@ import java.util.List;
 
 public class HallDao {
 
-    private static final String SQL_FIND_ALL_HALLS =
-            "SELECT hall_id, name, hall_type, total_rows, total_cols, status FROM cinema_halls ORDER BY hall_id";
+    private static final String SQL_FIND_ALL_HALLS = "SELECT hall_id, name, hall_type, total_rows, total_cols, status FROM cinema_halls ORDER BY hall_id";
 
-    private static final String SQL_FIND_HALL_BY_ID =
-            "SELECT hall_id, name, hall_type, total_rows, total_cols, status FROM cinema_halls WHERE hall_id = ?";
+    private static final String SQL_FIND_HALL_BY_ID = "SELECT hall_id, name, hall_type, total_rows, total_cols, status FROM cinema_halls WHERE hall_id = ?";
 
-    private static final String SQL_FIND_SEATS_BY_HALL =
-            "SELECT seat_id, hall_id, row_char, col_number, seat_type, seat_price, is_broken FROM seats WHERE hall_id = ? ORDER BY row_char, col_number";
+    private static final String SQL_FIND_SEATS_BY_HALL = "SELECT seat_id, hall_id, row_char, col_number, seat_type, seat_price, is_broken FROM seats WHERE hall_id = ? ORDER BY row_char, col_number";
 
-    private static final String SQL_UPDATE_SEAT_PRICE_BY_TYPE =
-            "UPDATE seats SET seat_price = ? WHERE hall_id = ? AND seat_type = ?";
+    private static final String SQL_UPDATE_SEAT_PRICE_BY_TYPE = "UPDATE seats SET seat_price = ? WHERE hall_id = ? AND seat_type = ?";
 
-    private static final String SQL_UPDATE_HALL_INFO =
-            "UPDATE cinema_halls SET name = ?, hall_type = ? WHERE hall_id = ?";
+    private static final String SQL_UPDATE_HALL_INFO = "UPDATE cinema_halls SET name = ?, hall_type = ? WHERE hall_id = ?";
 
-    // ─────────────────────────────────────────────────────────────
-    // CinemaHall queries
-    // ─────────────────────────────────────────────────────────────
-
-    /** Lấy tất cả phòng chiếu. */
     public List<CinemaHall> findAllHalls() throws SQLException {
         List<CinemaHall> halls = new ArrayList<>();
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_ALL_HALLS);
-             ResultSet rs = ps.executeQuery()) {
+                ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 halls.add(mapHall(rs));
             }
@@ -47,7 +37,6 @@ public class HallDao {
         return halls;
     }
 
-    /** Lấy phòng chiếu theo ID. */
     public CinemaHall findHallById(String hallId) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_HALL_BY_ID)) {
@@ -61,7 +50,6 @@ public class HallDao {
         return null;
     }
 
-    /** Cập nhật thông tin rạp chiếu (Tên, Loại phòng) */
     public void updateHallInfo(String hallId, String name, String hallType) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_HALL_INFO)) {
@@ -72,14 +60,6 @@ public class HallDao {
         }
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // Seat queries
-    // ─────────────────────────────────────────────────────────────
-
-    /**
-     * Lấy danh sách ghế của một phòng chiếu.
-     * Màu ghế (VIP / REGULAR) được xác định từ cột seat_type trong DB.
-     */
     public List<Seat> findSeatsByHall(String hallId) throws SQLException {
         List<Seat> seats = new ArrayList<>();
         Connection conn = DatabaseConnection.getInstance();
@@ -97,9 +77,9 @@ public class HallDao {
     /**
      * Cập nhật giá mặc định cho tất cả ghế cùng loại trong một phòng chiếu.
      *
-     * @param hallId    mã phòng chiếu
-     * @param seatType  loại ghế (REGULAR hoặc VIP)
-     * @param newPrice  giá mới (VND)
+     * @param hallId   mã phòng chiếu
+     * @param seatType loại ghế (REGULAR hoặc VIP)
+     * @param newPrice giá mới (VND)
      */
     public void updateSeatPriceByType(String hallId, SeatType seatType, double newPrice) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
@@ -138,8 +118,7 @@ public class HallDao {
                 rs.getString("hall_type"),
                 rs.getInt("total_rows"),
                 rs.getInt("total_cols"),
-                CinemaHallStatus.fromString(rs.getString("status"))
-        );
+                CinemaHallStatus.fromString(rs.getString("status")));
     }
 
     private Seat mapSeat(ResultSet rs) throws SQLException {
@@ -151,8 +130,7 @@ public class HallDao {
                 rs.getString("row_char").charAt(0),
                 rs.getInt("col_number"),
                 seatType,
-                rs.getDouble("seat_price")
-        );
+                rs.getDouble("seat_price"));
         seat.setBroken(rs.getBoolean("is_broken"));
         return seat;
     }

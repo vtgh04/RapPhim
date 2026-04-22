@@ -34,7 +34,6 @@ import javax.swing.border.MatteBorder;
 public class GeneralAdmin extends JPanel {
 
     private static final long serialVersionUID = 1L;
-    // ── Design tokens
     private static final Color PRIMARY_RED = new Color(220, 20, 20);
     private static final Color BG_COLOR = new Color(240, 242, 245);
     private static final Color SIDEBAR_BG = Color.WHITE;
@@ -53,16 +52,10 @@ public class GeneralAdmin extends JPanel {
     private String loggedInName = "";
     private Employee currentEmployee = null;
 
-    /** Constructor mặc định (dùng cho test UI độc lập). */
     public GeneralAdmin() {
         this(null);
     }
 
-    /**
-     * Constructor nhận Employee sau khi đăng nhập thành công.
-     *
-     * @param employee nhân viên đã xác thực (null = chế độ test)
-     */
     public GeneralAdmin(Employee employee) {
         this.currentEmployee = employee;
         if (employee != null) {
@@ -100,7 +93,6 @@ public class GeneralAdmin extends JPanel {
         sidebar.setPreferredSize(new Dimension(SIDEBAR_W, 0));
         sidebar.setBorder(new MatteBorder(0, 0, 0, 1, BORDER_COLOR));
 
-        // ── Logo
         JPanel logoPanel = new JPanel();
         logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.X_AXIS));
         logoPanel.setBackground(SIDEBAR_BG);
@@ -136,7 +128,6 @@ public class GeneralAdmin extends JPanel {
         sidebar.add(logoPanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // ── Navigation Buttons
         JButton dashBtn = createNavButton("Dashboard", "images/icons/dashboard.png", true);
         activeNavBtn = dashBtn;
         sidebar.add(dashBtn);
@@ -150,7 +141,6 @@ public class GeneralAdmin extends JPanel {
 
         sidebar.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        // ── F&B Management header
         JLabel fbHeader = new JLabel("F&B MANAGEMENT");
         fbHeader.setFont(FONT_BOLD_11);
         fbHeader.setForeground(TEXT_SECONDARY);
@@ -160,7 +150,6 @@ public class GeneralAdmin extends JPanel {
 
         sidebar.add(createNavButton("Products", "images/icons/Product.png", false));
 
-        // ── Spacer (đẩy các nút xuống cuối)
         sidebar.add(Box.createVerticalGlue());
 
         sidebar.add(createNavButton("Settings", "images/icons/Setting.png", false));
@@ -308,9 +297,6 @@ public class GeneralAdmin extends JPanel {
         rightPanel.repaint();
     }
 
-    /**
-     * Tạo một panel giữ chỗ (placeholder) đẹp cho các trang chưa triển khai.
-     */
     private JPanel createPlaceholderPanel(String title, String iconPath, String subtitle) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

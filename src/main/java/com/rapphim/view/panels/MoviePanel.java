@@ -34,7 +34,6 @@ public class MoviePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    // ── Colors ───────────────────────────────────────────────────────────────
     Color BG = new Color(240, 242, 245);
     Color WHITE = Color.WHITE;
     Color C_PRIMARY = new Color(30, 30, 35);
@@ -52,7 +51,6 @@ public class MoviePanel extends JPanel {
     Color INA_BG = new Color(254, 226, 226);
     Color INA_FG = new Color(185, 28, 28);
 
-    // ── Fonts ────────────────────────────────────────────────────────────────
     Font F_SECTION = new Font("Segoe UI", Font.BOLD, 11);
     Font F_TITLE = new Font("Segoe UI", Font.BOLD, 26);
     Font F_SUBTITLE = new Font("Segoe UI", Font.PLAIN, 13);
@@ -71,7 +69,6 @@ public class MoviePanel extends JPanel {
 
     String PLACEHOLDER = "Tìm kiếm theo tên, thể loại hoặc mã phim...";
 
-    // ── State ────────────────────────────────────────────────────────────────
     private List<Movie> allMovies = new ArrayList<>();
     private List<Movie> activeMovies = new ArrayList<>();
     private int featuredIdx = 0;
@@ -209,7 +206,6 @@ public class MoviePanel extends JPanel {
         return center;
     }
 
-    // ── banner ───────────────────────────────────────────────────────────────
     private void refreshBanner() {
         bannerHolder.removeAll();
         if (activeMovies.isEmpty()) {
@@ -323,7 +319,6 @@ public class MoviePanel extends JPanel {
         south.setBackground(BG);
         south.setBorder(new EmptyBorder(0, 32, 28, 32));
 
-        // ── filter bar ──────────────────────────────────────────────────────
         JPanel filterBar = new RoundedPanel(12, WHITE);
         filterBar.setLayout(new BoxLayout(filterBar, BoxLayout.X_AXIS));
         filterBar.setBorder(BorderFactory.createCompoundBorder(
@@ -425,7 +420,6 @@ public class MoviePanel extends JPanel {
         filterBar.add(Box.createRigidArea(new Dimension(12, 0)));
         filterBar.add(toggle);
 
-        // ── list holder ─────────────────────────────────────────────────────
         listHolder = new JPanel(new BorderLayout());
         listHolder.setOpaque(false);
 
@@ -466,7 +460,6 @@ public class MoviePanel extends JPanel {
         }).collect(Collectors.toList());
     }
 
-    // ── grid ─────────────────────────────────────────────────────────────────
     private JPanel buildGrid(List<Movie> movies) {
         final int COLS = 5;
         JPanel grid = new JPanel(new GridLayout(0, COLS, 16, 16));
@@ -672,7 +665,6 @@ public class MoviePanel extends JPanel {
         }
     }
 
-    // ── table ────────────────────────────────────────────────────────────────
     private static final String[] COLS = { "", "TITLE", "GENRE", "DURATION", "LANGUAGE", "STATUS", "RELEASE DATE" };
     private static final int[] CWS = { 60, 200, 120, 90, 80, 110, 110 };
 

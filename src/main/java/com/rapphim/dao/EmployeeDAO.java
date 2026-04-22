@@ -13,13 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * Data Access Object cho bảng {@code employees}.
- * <p>
- * Chỉ chứa các phương thức liên quan đến Employee.
- * Controller / Service không được truy cập JDBC trực tiếp.
- * </p>
- */
 public class EmployeeDAO {
 
     // TimKiem
@@ -53,14 +46,6 @@ public class EmployeeDAO {
     // Lay ma nhan vien tiep theo
     private static final String SQL_MAX_ID = "SELECT MAX(employee_id) AS max_id FROM employees";
 
-    // ── Public API ───────────────────────────────────────────────────────────
-
-    /**
-     * Lấy danh sách tất cả nhân viên.
-     *
-     * @return {@link List} chứa tất cả Employee
-     * @throws SQLException lỗi truy vấn DB
-     */
     public List<Employee> findAll() throws SQLException {
         List<Employee> employees = new ArrayList<>();
         Connection conn = DatabaseConnection.getInstance();
@@ -73,13 +58,6 @@ public class EmployeeDAO {
         return employees;
     }
 
-    /**
-     * Tìm nhân viên theo {@code username}.
-     *
-     * @param username tên đăng nhập
-     * @return {@link Optional} chứa Employee nếu tìm thấy, rỗng nếu không
-     * @throws SQLException lỗi truy vấn DB
-     */
     public Optional<Employee> findByUsername(String username) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_BY_USERNAME)) {
@@ -93,13 +71,6 @@ public class EmployeeDAO {
         return Optional.empty();
     }
 
-    /**
-     * Tìm nhân viên theo {@code employeeId}.
-     *
-     * @param id mã nhân viên
-     * @return {@link Optional} chứa Employee nếu tìm thấy, rỗng nếu không
-     * @throws SQLException lỗi truy vấn DB
-     */
     public Optional<Employee> findById(String id) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_BY_ID)) {
@@ -113,12 +84,6 @@ public class EmployeeDAO {
         return Optional.empty();
     }
 
-    /**
-     * Thêm nhân viên mới vào database.
-     *
-     * @param employee đối tượng Employee cần thêm
-     * @throws SQLException lỗi truy vấn DB
-     */
     public void insert(Employee employee) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_INSERT)) {
@@ -134,12 +99,6 @@ public class EmployeeDAO {
         }
     }
 
-    /**
-     * Cập nhật thông tin nhân viên (không thay đổi password).
-     *
-     * @param employee đối tượng Employee chứa thông tin mới
-     * @throws SQLException lỗi truy vấn DB
-     */
     public void update(Employee employee) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_UPDATE)) {
@@ -154,12 +113,6 @@ public class EmployeeDAO {
         }
     }
 
-    /**
-     * Xoá nhân viên theo mã nhân viên.
-     *
-     * @param employeeId mã nhân viên cần xoá
-     * @throws SQLException lỗi truy vấn DB
-     */
     public void delete(String employeeId) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_DELETE)) {
@@ -168,12 +121,6 @@ public class EmployeeDAO {
         }
     }
 
-    /**
-     * Tự động sinh mã nhân viên tiếp theo (EMP001, EMP002, ...).
-     *
-     * @return mã nhân viên mới, ví dụ "EMP005"
-     * @throws SQLException lỗi truy vấn DB
-     */
     public String getNextEmployeeId() throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_MAX_ID);
@@ -186,10 +133,9 @@ public class EmployeeDAO {
                 }
             }
         }
-        return "EMP001"; // Nếu chưa có nhân viên nào
+        return "EMP001";
     }
 
-    // ── Mapper ───────────────────────────────────────────────────────────────
     private Employee mapRow(ResultSet rs) throws SQLException {
         return new Employee(
                 rs.getString("employee_id"),

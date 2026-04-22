@@ -1,12 +1,5 @@
 package com.rapphim.model.enums;
 
-/**
- * Trạng thái tài khoản nhân viên.
- * <ul>
- * <li>ACTIVE – tài khoản hoạt động, được phép đăng nhập</li>
- * <li>RETIRED – nhân viên đã nghỉ việc, không được đăng nhập</li>
- * </ul>
- */
 public enum EmployeeStatus {
     ACTIVE("ACTIVE"),
     RETIRED("RETIRED");

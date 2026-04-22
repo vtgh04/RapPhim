@@ -15,9 +15,6 @@ import java.util.List;
 
 public class EmployeeExcelUtils {
 
-    /**
-     * Xuất danh sách nhân viên ra file Excel.
-     */
     public static void exportToExcel(List<Employee> employees, File file) throws Exception {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Employees");
@@ -29,7 +26,8 @@ public class EmployeeExcelUtils {
             headerStyle.setFont(headerFont);
 
             // Row 0: Header
-            String[] columns = {"Mã NV", "Họ Tên", "Tên Đăng Nhập", "Mật Khẩu", "Vai Trò", "Trạng Thái", "SĐT", "Email"};
+            String[] columns = { "Mã NV", "Họ Tên", "Tên Đăng Nhập", "Mật Khẩu", "Vai Trò", "Trạng Thái", "SĐT",
+                    "Email" };
             Row headerRow = sheet.createRow(0);
             for (int i = 0; i < columns.length; i++) {
                 Cell cell = headerRow.createCell(i);
@@ -65,21 +63,23 @@ public class EmployeeExcelUtils {
 
     /**
      * Nhập danh sách nhân viên từ file Excel.
-     * Cột dự kiến (0-7): Mã NV, Họ Tên, Tên Đăng Nhập, Mật Khẩu, Vai Trò, Trạng Thái, SĐT, Email
+     * Cột dự kiến (0-7): Mã NV, Họ Tên, Tên Đăng Nhập, Mật Khẩu, Vai Trò, Trạng
+     * Thái, SĐT, Email
      * Nếu không có Mã NV (hoặc rỗng), tự động sinh Mã NV mới.
      */
     public static List<Employee> importFromExcel(File file, EmployeeDAO dao) throws Exception {
         List<Employee> importedList = new ArrayList<>();
 
         try (FileInputStream in = new FileInputStream(file);
-             Workbook workbook = new XSSFWorkbook(in)) {
+                Workbook workbook = new XSSFWorkbook(in)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             int rowCount = sheet.getLastRowNum();
 
             for (int i = 1; i <= rowCount; i++) {
                 Row row = sheet.getRow(i);
-                if (row == null) continue;
+                if (row == null)
+                    continue;
 
                 String empId = getCellValue(row.getCell(0));
                 String fullName = getCellValue(row.getCell(1));
@@ -100,13 +100,15 @@ public class EmployeeExcelUtils {
                 }
 
                 EmployeeRole role = EmployeeRole.fromString(roleStr);
-                if (role == null) role = EmployeeRole.STAFF; // Default
+                if (role == null)
+                    role = EmployeeRole.STAFF; // Default
                 EmployeeStatus status = EmployeeStatus.fromString(statusStr);
-                if (status == null) status = EmployeeStatus.ACTIVE; // Default
+                if (status == null)
+                    status = EmployeeStatus.ACTIVE; // Default
 
                 Employee newEmp = new Employee(empId, fullName, username, password, role, status, phone, email);
                 importedList.add(newEmp);
-                
+
                 // Nếu sinh mã tự động, cần chèn ngay vào DB để tránh trùng mã ở bản ghi sau
                 dao.insert(newEmp);
             }
@@ -115,7 +117,8 @@ public class EmployeeExcelUtils {
     }
 
     private static String getCellValue(Cell cell) {
-        if (cell == null) return "";
+        if (cell == null)
+            return "";
         switch (cell.getCellType()) {
             case STRING:
                 return cell.getStringCellValue().trim();

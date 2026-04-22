@@ -60,7 +60,6 @@ public class EditEmployeeDialog extends JDialog {
     private static final Font FONT_INPUT = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 14);
 
-    // ── Fields ───────────────────────────────────────────────────────────────
     private JTextField txtEmployeeCode;
     private JTextField txtFullName;
     private JTextField txtUsername;
@@ -84,10 +83,6 @@ public class EditEmployeeDialog extends JDialog {
     public boolean isSaved() {
         return saved;
     }
-
-    // =====================================================================
-    // UI INITIALIZATION
-    // =====================================================================
 
     private void initUI() {
         setSize(480, 650);

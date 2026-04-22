@@ -20,52 +20,49 @@ public class AddMovieDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
     // ── Design tokens ────────────────────────────────────────────────────────
-    private static final Color BG_COLOR    = new Color(248, 249, 252);
-    private static final Color WHITE       = Color.WHITE;
+    private static final Color BG_COLOR = new Color(248, 249, 252);
+    private static final Color WHITE = Color.WHITE;
     private static final Color TEXT_PRIMARY = new Color(30, 30, 35);
-    private static final Color TEXT_HINT   = new Color(160, 165, 175);
+    private static final Color TEXT_HINT = new Color(160, 165, 175);
     private static final Color BORDER_COLOR = new Color(218, 222, 233);
-    private static final Color PRIMARY_RED  = new Color(220, 38, 38);
-    private static final Color HOVER_RED    = new Color(185, 28, 28);
-    private static final Color CANCEL_BG    = new Color(243, 244, 246);
+    private static final Color PRIMARY_RED = new Color(220, 38, 38);
+    private static final Color HOVER_RED = new Color(185, 28, 28);
+    private static final Color CANCEL_BG = new Color(243, 244, 246);
     private static final Color CANCEL_HOVER = new Color(229, 231, 235);
-    private static final Color CANCEL_TEXT  = new Color(55, 65, 81);
-    private static final Color AUTO_BG      = new Color(238, 242, 255);
-    private static final Color AUTO_TEXT    = new Color(99, 102, 241);
+    private static final Color CANCEL_TEXT = new Color(55, 65, 81);
+    private static final Color AUTO_BG = new Color(238, 242, 255);
+    private static final Color AUTO_TEXT = new Color(99, 102, 241);
     private static final Color CLOSE_NORMAL = new Color(160, 165, 175);
-    private static final Color CLOSE_HOVER  = new Color(220, 38, 38);
-    private static final Color SUCCESS_BG   = new Color(240, 253, 244);
-    private static final Color SUCCESS_FG   = new Color(22, 163, 74);
-    private static final Color WARN_COLOR   = new Color(220, 38, 38);
+    private static final Color CLOSE_HOVER = new Color(220, 38, 38);
+    private static final Color SUCCESS_BG = new Color(240, 253, 244);
+    private static final Color SUCCESS_FG = new Color(22, 163, 74);
+    private static final Color WARN_COLOR = new Color(220, 38, 38);
 
     private static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 20);
     private static final Font FONT_LABEL = new Font("Segoe UI", Font.BOLD, 13);
     private static final Font FONT_INPUT = new Font("Segoe UI", Font.PLAIN, 14);
-    private static final Font FONT_BTN   = new Font("Segoe UI", Font.BOLD, 14);
-    private static final Font FONT_WARN  = new Font("Segoe UI", Font.ITALIC, 11);
+    private static final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 14);
+    private static final Font FONT_WARN = new Font("Segoe UI", Font.ITALIC, 11);
 
-
-    // ── Fields ───────────────────────────────────────────────────────────────
-    private JTextField       txtMovieId;
-    private JTextField       txtTitle;
-    private JTextField       txtGenre;
+    private JTextField txtMovieId;
+    private JTextField txtTitle;
+    private JTextField txtGenre;
     private JComboBox<String> cmbRating;
-    private JSpinner          spnDuration;
+    private JSpinner spnDuration;
     private JComboBox<String> cmbFormat;
     private JComboBox<String> cmbLanguage;
-    private JDateChooser      dateReleaseDate;
+    private JDateChooser dateReleaseDate;
     private JComboBox<String> cmbStatus;
-    private JTextArea         txtDescription;
-    private JTextField        txtPosterUrl;
+    private JTextArea txtDescription;
+    private JTextField txtPosterUrl;
 
-    // Warn labels (đặt ngay dưới field tương ứng)
     private JLabel warnTitle;
     private JLabel warnGenre;
     private JLabel warnDuration;
     private JLabel warnDate;
     private JLabel warnDesc;
     private JLabel warnPoster;
-    private JLabel lblSystemError; // chỉ cho lỗi DB
+    private JLabel lblSystemError;
 
     private final MovieDAO movieDAO = new MovieDAO();
     private Movie movie;
@@ -85,11 +82,10 @@ public class AddMovieDialog extends JDialog {
         populateFields();
     }
 
-    public boolean isSaved() { return saved; }
+    public boolean isSaved() {
+        return saved;
+    }
 
-    // =====================================================================
-    // UI
-    // =====================================================================
     private void initUI() {
         setSize(520, 800);
         setLocationRelativeTo(getParent());
@@ -104,7 +100,6 @@ public class AddMovieDialog extends JDialog {
                 new RoundedBorder(16, BORDER_COLOR),
                 new EmptyBorder(28, 32, 28, 32)));
 
-        // ── Header ──────────────────────────────────────────────────────
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -117,7 +112,6 @@ public class AddMovieDialog extends JDialog {
         main.add(header);
         main.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        // separator
         JPanel sep = new JPanel();
         sep.setBackground(BORDER_COLOR);
         sep.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
@@ -125,7 +119,6 @@ public class AddMovieDialog extends JDialog {
         main.add(sep);
         main.add(Box.createRigidArea(new Dimension(0, 16)));
 
-        // ── Movie ID (read-only) ─────────────────────────────────────────
         txtMovieId = styledField("");
         txtMovieId.setEditable(false);
         txtMovieId.setBackground(AUTO_BG);
@@ -133,20 +126,21 @@ public class AddMovieDialog extends JDialog {
         txtMovieId.setFont(new Font("Segoe UI", Font.BOLD, 14));
         main.add(fieldRow("Movie ID", txtMovieId, null));
 
-        // ── Title ────────────────────────────────────────────────────────
         txtTitle = styledField("Nhập tên phim...");
         warnTitle = createWarnLabel();
         main.add(fieldRow("Tên phim *", txtTitle, warnTitle));
 
-        // ── Genre + Rating side-by-side ───────────────────────────────────
         txtGenre = styledField("Click để chọn thể loại...");
         txtGenre.setEditable(false);
         txtGenre.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         txtGenre.addMouseListener(new MouseAdapter() {
-            @Override public void mouseClicked(MouseEvent e) { showGenrePopup(txtGenre); }
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                showGenrePopup(txtGenre);
+            }
         });
 
-        cmbRating = new JComboBox<>(new String[]{"P", "K", "T13", "T16", "T18"});
+        cmbRating = new JComboBox<>(new String[] { "P", "K", "T13", "T16", "T18" });
         cmbRating.setFont(FONT_INPUT);
         cmbRating.setBackground(WHITE);
         cmbRating.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -154,12 +148,10 @@ public class AddMovieDialog extends JDialog {
         warnGenre = createWarnLabel();
         main.add(twoColRow("Thể loại *", txtGenre, "Phân loại *", cmbRating, warnGenre, null));
 
-        // ── Duration + Format ─────────────────────────────────────────────
-        // Duration: phải > 90 phút (min = 91)
         spnDuration = new JSpinner(new SpinnerNumberModel(91, 1, 600, 1));
         spnDuration.setFont(FONT_INPUT);
 
-        cmbFormat = new JComboBox<>(new String[]{"2D", "3D", "IMAX"});
+        cmbFormat = new JComboBox<>(new String[] { "2D", "3D", "IMAX" });
         cmbFormat.setFont(FONT_INPUT);
         cmbFormat.setBackground(WHITE);
         cmbFormat.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -168,8 +160,7 @@ public class AddMovieDialog extends JDialog {
         warnDuration = createWarnLabel();
         main.add(twoColRow("Thời lượng (phút) *", spnDuration, "Định dạng *", cmbFormat, warnDuration, null));
 
-        // ── Language + Release Date ───────────────────────────────────────
-        cmbLanguage = new JComboBox<>(new String[]{"2D Lồng tiếng", "2D Phụ đề"});
+        cmbLanguage = new JComboBox<>(new String[] { "2D Lồng tiếng", "2D Phụ đề" });
         cmbLanguage.setFont(FONT_INPUT);
         cmbLanguage.setBackground(WHITE);
         cmbLanguage.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -182,14 +173,12 @@ public class AddMovieDialog extends JDialog {
         warnDate = createWarnLabel();
         main.add(twoColRow("Ngôn ngữ *", cmbLanguage, "Ngày phát hành *", dateReleaseDate, null, warnDate));
 
-        // ── Status ───────────────────────────────────────────────────────
-        cmbStatus = new JComboBox<>(new String[]{"Active", "Inactive"});
+        cmbStatus = new JComboBox<>(new String[] { "Active", "Inactive" });
         cmbStatus.setFont(FONT_INPUT);
         cmbStatus.setBackground(WHITE);
         cmbStatus.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         main.add(fieldRow("Trạng thái *", cmbStatus, null));
 
-        // ── Description ──────────────────────────────────────────────────
         txtDescription = new JTextArea(3, 20);
         txtDescription.setFont(FONT_INPUT);
         txtDescription.setForeground(TEXT_PRIMARY);
@@ -205,7 +194,6 @@ public class AddMovieDialog extends JDialog {
         warnDesc = createWarnLabel();
         main.add(fieldRow("Mô tả *", descScroll, warnDesc));
 
-        // ── Poster URL ────────────────────────────────────────────────────
         JPanel posterPanel = new JPanel(new BorderLayout(5, 0));
         posterPanel.setOpaque(false);
         posterPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
@@ -223,7 +211,8 @@ public class AddMovieDialog extends JDialog {
                 File f = chooser.getSelectedFile();
                 String path = f.getAbsolutePath();
                 int idx = path.indexOf("images\\movies");
-                if (idx != -1) path = path.substring(idx).replace("\\", "/");
+                if (idx != -1)
+                    path = path.substring(idx).replace("\\", "/");
                 txtPosterUrl.setText(path);
                 txtPosterUrl.setForeground(TEXT_PRIMARY);
             }
@@ -235,7 +224,6 @@ public class AddMovieDialog extends JDialog {
 
         main.add(Box.createRigidArea(new Dimension(0, 4)));
 
-        // Lỗi hệ thống (DB)
         lblSystemError = new JLabel(" ");
         lblSystemError.setFont(FONT_WARN);
         lblSystemError.setForeground(WARN_COLOR);
@@ -243,7 +231,6 @@ public class AddMovieDialog extends JDialog {
         main.add(lblSystemError);
         main.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        // ── Buttons ──────────────────────────────────────────────────────
         main.add(buttonRow());
 
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -253,18 +240,10 @@ public class AddMovieDialog extends JDialog {
         setContentPane(wrapper);
     }
 
-    // =====================================================================
-    // POPULATE
-    // =====================================================================
     private void populateFields() {
         txtMovieId.setText(movie.getMovieId());
     }
 
-    // =====================================================================
-    // FIELD BUILDERS
-    // =====================================================================
-
-    /** Row đơn: label → input → [warnLabel optional] */
     private JPanel fieldRow(String label, Component input, JLabel warn) {
         JPanel p = new JPanel();
         p.setLayout(new BoxLayout(p, BoxLayout.Y_AXIS));
@@ -292,14 +271,8 @@ public class AddMovieDialog extends JDialog {
         return p;
     }
 
-    /**
-     * Row 2 cột: mỗi cột có label + input.
-     * warnLeft hiện dưới cột trái, warnRight hiện dưới cột phải.
-     * Warn labels được đặt bên NGOÀI row (thêm vào main), nhưng để đơn giản
-     * ta gộp 2 warn vào 1 hàng phụ bên dưới (warnLeft | warnRight).
-     */
     private JPanel twoColRow(String lbl1, JComponent f1, String lbl2, JComponent f2,
-                              JLabel warnLeft, JLabel warnRight) {
+            JLabel warnLeft, JLabel warnRight) {
         JPanel outer = new JPanel();
         outer.setLayout(new BoxLayout(outer, BoxLayout.Y_AXIS));
         outer.setOpaque(false);
@@ -318,33 +291,36 @@ public class AddMovieDialog extends JDialog {
         p1.setLayout(new BoxLayout(p1, BoxLayout.Y_AXIS));
         p1.setOpaque(false);
         JLabel l1 = new JLabel(lbl1);
-        l1.setFont(FONT_LABEL); l1.setForeground(TEXT_PRIMARY);
+        l1.setFont(FONT_LABEL);
+        l1.setForeground(TEXT_PRIMARY);
         l1.setAlignmentX(Component.LEFT_ALIGNMENT);
         f1.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         f1.setAlignmentX(Component.LEFT_ALIGNMENT);
         p1.add(l1);
         p1.add(Box.createRigidArea(new Dimension(0, 5)));
         p1.add(f1);
-        gbc.gridx = 0; gbc.weightx = 0.5;
+        gbc.gridx = 0;
+        gbc.weightx = 0.5;
         row.add(p1, gbc);
 
         JPanel p2 = new JPanel();
         p2.setLayout(new BoxLayout(p2, BoxLayout.Y_AXIS));
         p2.setOpaque(false);
         JLabel l2 = new JLabel(lbl2);
-        l2.setFont(FONT_LABEL); l2.setForeground(TEXT_PRIMARY);
+        l2.setFont(FONT_LABEL);
+        l2.setForeground(TEXT_PRIMARY);
         l2.setAlignmentX(Component.LEFT_ALIGNMENT);
         f2.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
         f2.setAlignmentX(Component.LEFT_ALIGNMENT);
         p2.add(l2);
         p2.add(Box.createRigidArea(new Dimension(0, 5)));
         p2.add(f2);
-        gbc.gridx = 1; gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.gridx = 1;
+        gbc.insets = new Insets(0, 0, 0, 0);
         row.add(p2, gbc);
 
         outer.add(row);
 
-        // Hàng warn bên dưới (2 cột)
         if (warnLeft != null || warnRight != null) {
             JPanel warnRow = new JPanel(new GridLayout(1, 2, 12, 0));
             warnRow.setOpaque(false);
@@ -360,8 +336,8 @@ public class AddMovieDialog extends JDialog {
 
     private void showGenrePopup(JTextField field) {
         JPopupMenu popup = new JPopupMenu();
-        String[] genres = {"Action", "Adventure", "Animation", "Comedy", "Crime",
-                           "Drama", "Family", "Fantasy", "Horror", "Romance", "Sci-Fi", "Thriller"};
+        String[] genres = { "Action", "Adventure", "Animation", "Comedy", "Crime",
+                "Drama", "Family", "Fantasy", "Horror", "Romance", "Sci-Fi", "Thriller" };
         String current = field.getText();
         for (String g : genres) {
             JCheckBox cb = new JCheckBox(g);
@@ -376,7 +352,8 @@ public class AddMovieDialog extends JDialog {
                 }
                 field.setText(String.join(", ", selected));
                 field.setForeground(TEXT_PRIMARY);
-                if (warnGenre != null) warnGenre.setText(" ");
+                if (warnGenre != null)
+                    warnGenre.setText(" ");
             });
             popup.add(cb);
         }
@@ -395,20 +372,20 @@ public class AddMovieDialog extends JDialog {
 
         JButton cancelBtn = roundedBtn("Hủy", CANCEL_BG, CANCEL_TEXT, CANCEL_HOVER);
         cancelBtn.addActionListener(e -> dispose());
-        gbc.gridx = 0; gbc.weightx = 0.4;
+        gbc.gridx = 0;
+        gbc.weightx = 0.4;
         panel.add(cancelBtn, gbc);
 
         JButton saveBtn = roundedBtn("Thêm phim", PRIMARY_RED, WHITE, HOVER_RED);
         saveBtn.addActionListener(e -> handleSave());
-        gbc.gridx = 1; gbc.weightx = 0.6; gbc.insets = new Insets(0, 0, 0, 0);
+        gbc.gridx = 1;
+        gbc.weightx = 0.6;
+        gbc.insets = new Insets(0, 0, 0, 0);
         panel.add(saveBtn, gbc);
 
         return panel;
     }
 
-    // =====================================================================
-    // COMPONENT FACTORY
-    // =====================================================================
     private JTextField styledField(String placeholder) {
         JTextField field = new JTextField() {
             @Override
@@ -437,6 +414,7 @@ public class AddMovieDialog extends JDialog {
                     field.setForeground(TEXT_PRIMARY);
                 }
             }
+
             public void focusLost(java.awt.event.FocusEvent evt) {
                 if (field.getText().isEmpty()) {
                     field.setForeground(TEXT_HINT);
@@ -472,13 +450,24 @@ public class AddMovieDialog extends JDialog {
         };
         btn.setForeground(CLOSE_NORMAL);
         btn.setPreferredSize(new Dimension(30, 30));
-        btn.setOpaque(false); btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false); btn.setFocusPainted(false);
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.addActionListener(e -> dispose());
         btn.addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) { btn.setForeground(CLOSE_HOVER); btn.repaint(); }
-            @Override public void mouseExited(MouseEvent e)  { btn.setForeground(CLOSE_NORMAL); btn.repaint(); }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setForeground(CLOSE_HOVER);
+                btn.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setForeground(CLOSE_NORMAL);
+                btn.repaint();
+            }
         });
         return btn;
     }
@@ -495,14 +484,27 @@ public class AddMovieDialog extends JDialog {
                 super.paintComponent(g);
             }
         };
-        btn.setFont(FONT_BTN); btn.setForeground(fg); btn.setBackground(bg);
-        btn.setOpaque(false); btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false); btn.setFocusPainted(false);
+        btn.setFont(FONT_BTN);
+        btn.setForeground(fg);
+        btn.setBackground(bg);
+        btn.setOpaque(false);
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.setPreferredSize(new Dimension(0, 44));
         btn.addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) { btn.setBackground(hover); btn.repaint(); }
-            @Override public void mouseExited(MouseEvent e)  { btn.setBackground(bg); btn.repaint(); }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(hover);
+                btn.repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(bg);
+                btn.repaint();
+            }
         });
         return btn;
     }
@@ -516,7 +518,8 @@ public class AddMovieDialog extends JDialog {
 
         // — Title —
         String title = txtTitle.getText().trim();
-        if (title.equals("Nhập tên phim...")) title = "";
+        if (title.equals("Nhập tên phim..."))
+            title = "";
         if (title.isEmpty()) {
             warnTitle.setText("Vui lòng nhập tên phim.");
             hasError = true;
@@ -527,7 +530,8 @@ public class AddMovieDialog extends JDialog {
 
         // — Genre —
         String genre = txtGenre.getText().trim();
-        if (genre.equals("Click để chọn thể loại...")) genre = "";
+        if (genre.equals("Click để chọn thể loại..."))
+            genre = "";
         if (genre.isEmpty()) {
             warnGenre.setText("Vui lòng chọn ít nhất một thể loại.");
             hasError = true;
@@ -560,12 +564,13 @@ public class AddMovieDialog extends JDialog {
             hasError = true;
         }
 
-        if (hasError) return;
+        if (hasError)
+            return;
 
         // — Build model —
-        String format   = (String) cmbFormat.getSelectedItem();
+        String format = (String) cmbFormat.getSelectedItem();
         String language = (String) cmbLanguage.getSelectedItem();
-        String rating   = (String) cmbRating.getSelectedItem();
+        String rating = (String) cmbRating.getSelectedItem();
         String statusSel = (String) cmbStatus.getSelectedItem();
         LocalDate releaseDate = dateReleaseDate.getDate()
                 .toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
@@ -608,7 +613,8 @@ public class AddMovieDialog extends JDialog {
 
         // Icon tick
         JLabel ico = new JLabel("✓") {
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(SUCCESS_BG);
@@ -633,7 +639,8 @@ public class AddMovieDialog extends JDialog {
         panel.add(lbHead);
         panel.add(Box.createRigidArea(new Dimension(0, 6)));
 
-        JLabel lbSub = new JLabel("<html><div style='text-align:center'>\"" + movieTitle + "\"<br>đã được thêm vào danh sách phim.</div></html>");
+        JLabel lbSub = new JLabel("<html><div style='text-align:center'>\"" + movieTitle
+                + "\"<br>đã được thêm vào danh sách phim.</div></html>");
         lbSub.setFont(new Font("Segoe UI", Font.PLAIN, 12));
         lbSub.setForeground(new Color(100, 110, 120));
         lbSub.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -656,7 +663,8 @@ public class AddMovieDialog extends JDialog {
     }
 
     private void syncLanguageWithFormat() {
-        if (cmbFormat == null || cmbLanguage == null) return;
+        if (cmbFormat == null || cmbLanguage == null)
+            return;
         String format = (String) cmbFormat.getSelectedItem();
         cmbLanguage.removeAllItems();
         cmbLanguage.addItem(format + " Lồng tiếng");
@@ -673,13 +681,14 @@ public class AddMovieDialog extends JDialog {
         lblSystemError.setText(" ");
     }
 
-    // =====================================================================
-    // INNER CLASS
-    // =====================================================================
     private static class RoundedBorder extends AbstractBorder {
         private final int radius;
         private final Color color;
-        RoundedBorder(int r, Color c) { this.radius = r; this.color = c; }
+
+        RoundedBorder(int r, Color c) {
+            this.radius = r;
+            this.color = c;
+        }
 
         @Override
         public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
@@ -690,7 +699,15 @@ public class AddMovieDialog extends JDialog {
             g2.dispose();
         }
 
-        @Override public Insets getBorderInsets(Component c) { return new Insets(1, 1, 1, 1); }
-        @Override public Insets getBorderInsets(Component c, Insets i) { i.set(1,1,1,1); return i; }
+        @Override
+        public Insets getBorderInsets(Component c) {
+            return new Insets(1, 1, 1, 1);
+        }
+
+        @Override
+        public Insets getBorderInsets(Component c, Insets i) {
+            i.set(1, 1, 1, 1);
+            return i;
+        }
     }
 }

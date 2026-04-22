@@ -35,7 +35,6 @@ import javax.swing.border.MatteBorder;
 public class GeneralStaff extends JPanel {
 
     private static final long serialVersionUID = 1L;
-	// ── Design tokens
     private static final Color PRIMARY_RED = new Color(220, 20, 20);
     private static final Color BG_COLOR = new Color(240, 242, 245);
     private static final Color SIDEBAR_BG = Color.WHITE;
@@ -54,16 +53,10 @@ public class GeneralStaff extends JPanel {
     private final JPanel rightPanel;
     private String loggedInName = "";
 
-    /** Constructor mặc định (dùng cho test UI độc lập). */
     public GeneralStaff() {
         this(null);
     }
 
-    /**
-     * Constructor nhận Employee sau khi đăng nhập thành công.
-     *
-     * @param employee nhân viên đã xác thực (null = chế độ test)
-     */
     public GeneralStaff(Employee employee) {
         if (employee != null) {
             this.loggedInName = employee.getFullName();
@@ -78,10 +71,6 @@ public class GeneralStaff extends JPanel {
         add(rightPanel, BorderLayout.CENTER);
     }
 
-    /**
-     * Mở Staff Dashboard trong JFrame mới.
-     * Dùng bởi {@link com.rapphim.controller.LoginController}.
-     */
     public static void openAsFrame(Employee employee) {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Cinema Manager Pro – Staff");
@@ -100,7 +89,6 @@ public class GeneralStaff extends JPanel {
         sidebar.setPreferredSize(new Dimension(SIDEBAR_W, 0));
         sidebar.setBorder(new MatteBorder(0, 0, 0, 1, BORDER_COLOR));
 
-        // ── Logo
         JPanel logoPanel = new JPanel();
         logoPanel.setLayout(new BoxLayout(logoPanel, BoxLayout.Y_AXIS));
         logoPanel.setBackground(SIDEBAR_BG);
@@ -132,14 +120,12 @@ public class GeneralStaff extends JPanel {
         sidebar.add(logoPanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // ── Navigation Buttons 
         JButton dashBtn = createNavButton("Dashboard", "images/icons/dashboard.png", true);
         activeNavBtn = dashBtn;
         sidebar.add(dashBtn);
         sidebar.add(createNavButton("Bill", "images/icons/bill.png", false));
         sidebar.add(createNavButton("Products", "images/icons/Product.png", false));
 
-        // ── Spacer (đẩy các nút xuống cuối)
         sidebar.add(Box.createVerticalGlue());
 
         sidebar.add(createNavButton("Settings", "images/icons/Setting.png", false));
@@ -244,7 +230,8 @@ public class GeneralStaff extends JPanel {
      */
     private void handleNavigation(String page) {
         // Right now, it's just updating the placeholder label text.
-        // Later, this would swap out the content in rightPanel using CardLayout or by replacing components.
+        // Later, this would swap out the content in rightPanel using CardLayout or by
+        // replacing components.
         rightPanel.removeAll();
 
         if (page.equals("Dashboard")) {
@@ -303,7 +290,8 @@ public class GeneralStaff extends JPanel {
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ignored) {
+        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException
+                | UnsupportedLookAndFeelException ignored) {
         }
 
         SwingUtilities.invokeLater(() -> {

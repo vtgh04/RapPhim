@@ -92,7 +92,6 @@ public class EmployeePanel extends JPanel {
     private static final Font FONT_SEARCH = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Font FONT_PILL = new Font("Segoe UI", Font.BOLD, 11);
 
-    // ── Data ─────────────────────────────────────────────────────────────────
     private final EmployeeDAO employeeDAO = new EmployeeDAO();
     private JTable table;
     private DefaultTableModel tableModel;
@@ -100,7 +99,6 @@ public class EmployeePanel extends JPanel {
     private List<Employee> employees;
     private JComboBox<String> filterCombo;
 
-    // ── Column definition ────────────────────────────────────────────────────
     private static final String[] COLUMNS = {
             "MÃ NV", "TÊN", "USERNAME", "PASSWORD", "ROLE", "STATUS", "PHONE", "EMAIL", "ACTIONS"
     };
@@ -123,10 +121,6 @@ public class EmployeePanel extends JPanel {
         add(centerWrapper, BorderLayout.CENTER);
         loadData();
     }
-
-    // =====================================================================
-    // HEADER
-    // =====================================================================
 
     private JPanel createHeaderPanel() {
         JPanel header = new JPanel(new BorderLayout());
@@ -192,7 +186,6 @@ public class EmployeePanel extends JPanel {
             }
         });
 
-        // Icon optional
         ImageIcon icon = loadIcon("images/icons/download.png", 16, 16);
         if (icon != null) {
             btn.setIcon(icon);
@@ -230,7 +223,6 @@ public class EmployeePanel extends JPanel {
             }
         });
 
-        // Icon optional
         ImageIcon icon = loadIcon("images/icons/upload.png", 16, 16);
         if (icon != null) {
             btn.setIcon(icon);
@@ -323,10 +315,6 @@ public class EmployeePanel extends JPanel {
         btnAdd.addActionListener((ActionEvent e) -> handleAddEmployee());
         return btnAdd;
     }
-
-    // =====================================================================
-    // SEARCH BAR
-    // =====================================================================
 
     private JPanel createSearchPanel() {
         JPanel searchPanel = new RoundedPanel(14, WHITE);
@@ -430,10 +418,6 @@ public class EmployeePanel extends JPanel {
         return searchPanel;
     }
 
-    // =====================================================================
-    // TABLE
-    // =====================================================================
-
     private JPanel createTablePanel() {
         JPanel tableContainer = new RoundedPanel(14, WHITE);
         tableContainer.setLayout(new BorderLayout());
@@ -488,7 +472,6 @@ public class EmployeePanel extends JPanel {
             table.getColumnModel().getColumn(i).setPreferredWidth(widths[i]);
         }
 
-        // ── Centered default renderer ───────────────────────────────────
         DefaultTableCellRenderer centeredRenderer = new DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object value,
@@ -523,7 +506,6 @@ public class EmployeePanel extends JPanel {
             }
         });
 
-        // ── ROLE column — Pill JComboBox, no dropdown arrow ─────────────
         table.getColumnModel().getColumn(4).setCellRenderer(new TableCellRenderer() {
             private final JPanel panel = new JPanel(new java.awt.GridBagLayout());
             private final JComboBox<String> combo = new JComboBox<>(new String[] { "MANAGER", "STAFF" });
@@ -604,7 +586,6 @@ public class EmployeePanel extends JPanel {
             }
         });
 
-        // ── STATUS column — Pill JComboBox, no dropdown arrow ───────────
         table.getColumnModel().getColumn(5).setCellRenderer(new TableCellRenderer() {
             private final JPanel panel = new JPanel(new java.awt.GridBagLayout());
             private final JComboBox<String> combo = new JComboBox<>(new String[] { "ACTIVE", "RETIRED" });
@@ -685,7 +666,6 @@ public class EmployeePanel extends JPanel {
             }
         });
 
-        // ── ACTIONS column ───────────────────────────────────────────────
         ActionButtonRenderer actionRenderer = new ActionButtonRenderer();
         ActionButtonEditor actionEditor = new ActionButtonEditor();
         table.getColumnModel().getColumn(8).setCellRenderer(actionRenderer);
@@ -698,10 +678,6 @@ public class EmployeePanel extends JPanel {
         tableContainer.add(scrollPane, BorderLayout.CENTER);
         return tableContainer;
     }
-
-    // =====================================================================
-    // ACTION BUTTON RENDERER
-    // =====================================================================
 
     private class ActionButtonRenderer extends JPanel implements TableCellRenderer {
         ActionButtonRenderer() {
@@ -718,10 +694,6 @@ public class EmployeePanel extends JPanel {
             return this;
         }
     }
-
-    // =====================================================================
-    // ACTION BUTTON EDITOR
-    // =====================================================================
 
     private class ActionButtonEditor extends AbstractCellEditor implements TableCellEditor {
         private final JPanel panel;
@@ -769,10 +741,6 @@ public class EmployeePanel extends JPanel {
         }
     }
 
-    // =====================================================================
-    // EVENT HANDLERS
-    // =====================================================================
-
     private void handleAddEmployee() {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         AddEmployeeDialog dialog = new AddEmployeeDialog(parentFrame);
@@ -815,10 +783,6 @@ public class EmployeePanel extends JPanel {
             }
         }
     }
-
-    // =====================================================================
-    // MODERN DIALOGS
-    // =====================================================================
 
     private class DeleteEmployeeDialog extends JDialog {
         private boolean confirmed = false;
@@ -1102,10 +1066,6 @@ public class EmployeePanel extends JPanel {
         return btn;
     }
 
-    // =====================================================================
-    // DATA LOADING
-    // =====================================================================
-
     private void loadData() {
         try {
             employees = employeeDAO.findAll();
@@ -1137,10 +1097,6 @@ public class EmployeePanel extends JPanel {
         loadData();
     }
 
-    // =====================================================================
-    // FILTER LOGIC
-    // =====================================================================
-
     private void applyFilters(String searchText, String roleFilter) {
         List<RowFilter<Object, Object>> filters = new java.util.ArrayList<>();
         if (searchText != null && !searchText.isEmpty()) {
@@ -1151,10 +1107,6 @@ public class EmployeePanel extends JPanel {
         }
         sorter.setRowFilter(filters.isEmpty() ? null : RowFilter.andFilter(filters));
     }
-
-    // =====================================================================
-    // HELPERS
-    // =====================================================================
 
     private JButton createIconButton(String iconPath) {
         JButton btn = new JButton();
@@ -1176,10 +1128,6 @@ public class EmployeePanel extends JPanel {
             return null;
         return new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
     }
-
-    // =====================================================================
-    // CUSTOM PAINTING HELPERS
-    // =====================================================================
 
     private static class RoundedPanel extends JPanel {
         private final int radius;
@@ -1231,10 +1179,6 @@ public class EmployeePanel extends JPanel {
             return insets;
         }
     }
-
-    // =====================================================================
-    // MAIN (test UI độc lập)
-    // =====================================================================
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {

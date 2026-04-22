@@ -40,7 +40,6 @@ public class AddEmployeeDialog extends JDialog {
 
     private static final long serialVersionUID = 1L;
 
-    // ── Design tokens ────────────────────────────────────────────────────────
     private static final Color BG_COLOR = new Color(248, 249, 252);
     private static final Color WHITE = Color.WHITE;
     private static final Color TEXT_PRIMARY = new Color(30, 30, 35);
@@ -63,7 +62,6 @@ public class AddEmployeeDialog extends JDialog {
     private static final Font FONT_HINT = new Font("Segoe UI", Font.ITALIC, 11);
     private static final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 14);
 
-    // ── Fields ───────────────────────────────────────────────────────────────
     private JTextField txtEmployeeCode;
     private JTextField txtFullName;
     private JTextField txtUsername;
@@ -87,10 +85,6 @@ public class AddEmployeeDialog extends JDialog {
         return saved;
     }
 
-    // =====================================================================
-    // UI INITIALIZATION
-    // =====================================================================
-
     private void initUI() {
         setSize(480, 710);
         setLocationRelativeTo(getParent());
@@ -105,7 +99,6 @@ public class AddEmployeeDialog extends JDialog {
                 new RoundedBorder(16, BORDER_COLOR),
                 new EmptyBorder(28, 32, 28, 32)));
 
-        // ── Header ───────────────────────────────────────────────────────
         JPanel headerPanel = new JPanel(new BorderLayout());
         headerPanel.setOpaque(false);
         headerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -116,8 +109,6 @@ public class AddEmployeeDialog extends JDialog {
         titleLabel.setForeground(TEXT_PRIMARY);
         headerPanel.add(titleLabel, BorderLayout.WEST);
 
-        // ── Close button — tự vẽ dấu × bằng Graphics2D ──────────────────
-        // Không gọi super.paintComponent → loại bỏ hoàn toàn render L&F
         JButton closeBtn = new JButton() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -158,7 +149,6 @@ public class AddEmployeeDialog extends JDialog {
         mainPanel.add(headerPanel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        // ── Separator ────────────────────────────────────────────────────
         JPanel separator = new JPanel();
         separator.setBackground(BORDER_COLOR);
         separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
@@ -166,9 +156,6 @@ public class AddEmployeeDialog extends JDialog {
         mainPanel.add(separator);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // ── Form fields ──────────────────────────────────────────────────
-
-        // Employee Code (auto-generated, read-only)
         txtEmployeeCode = createStyledTextField("EMP...");
         txtEmployeeCode.setEditable(false);
         txtEmployeeCode.setBackground(AUTO_BG);
@@ -177,27 +164,21 @@ public class AddEmployeeDialog extends JDialog {
         mainPanel.add(createFieldPanel("Employee Code", txtEmployeeCode,
                 "Auto-generated based on previous EMP"));
 
-        // Full Name
         txtFullName = createStyledTextField("Enter employee name");
         mainPanel.add(createFieldPanel("Full Name", txtFullName, null));
 
-        // Username
         txtUsername = createStyledTextField("Enter username");
         mainPanel.add(createFieldPanel("Username", txtUsername, null));
 
-        // Password
         txtPassword = createStyledPasswordField("Enter password");
         mainPanel.add(createFieldPanel("Password", txtPassword, null));
 
-        // Role + Status (side by side)
         mainPanel.add(createRoleStatusRow());
         mainPanel.add(Box.createRigidArea(new Dimension(0, 14)));
 
-        // Phone Number
         txtPhone = createStyledTextField("e.g. 0901234567");
         mainPanel.add(createFieldPanel("Phone Number", txtPhone, null));
 
-        // Email Address
         txtEmail = createStyledTextField("employee@cinepro.com");
         mainPanel.add(createFieldPanel("Email Address", txtEmail, null));
 
@@ -210,7 +191,6 @@ public class AddEmployeeDialog extends JDialog {
         mainPanel.add(lblError);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        // ── Buttons ──────────────────────────────────────────────────────
         mainPanel.add(createButtonPanel());
 
         JPanel wrapper = new JPanel(new BorderLayout());
@@ -220,10 +200,6 @@ public class AddEmployeeDialog extends JDialog {
 
         setContentPane(wrapper);
     }
-
-    // =====================================================================
-    // FIELD BUILDERS
-    // =====================================================================
 
     private JPanel createFieldPanel(String labelText, Component inputField, String hintText) {
         JPanel panel = new JPanel();
@@ -347,10 +323,6 @@ public class AddEmployeeDialog extends JDialog {
 
         return btnPanel;
     }
-
-    // =====================================================================
-    // INPUT COMPONENT FACTORY
-    // =====================================================================
 
     private JTextField createStyledTextField(String placeholder) {
         JTextField field = new JTextField() {
@@ -482,10 +454,6 @@ public class AddEmployeeDialog extends JDialog {
         return btn;
     }
 
-    // =====================================================================
-    // LOGIC
-    // =====================================================================
-
     private void loadNextEmployeeId() {
         try {
             String nextId = employeeDAO.getNextEmployeeId();
@@ -597,10 +565,6 @@ public class AddEmployeeDialog extends JDialog {
     private void showError(String msg) {
         lblError.setText("<html>" + msg + "</html>");
     }
-
-    // =====================================================================
-    // CUSTOM PAINTING HELPERS
-    // =====================================================================
 
     private static class RoundedBorder extends AbstractBorder {
         private final int radius;

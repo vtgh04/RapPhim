@@ -340,9 +340,6 @@ public class HallPanel extends JPanel {
         item.add(icon);
         item.add(lbl);
         return item;
-    }
-
-    // ─── Sidebar ────────────────────────────────────────────────
     private JPanel buildSidebar() {
         JPanel sidebar = new JPanel();
         sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
@@ -533,9 +530,6 @@ public class HallPanel extends JPanel {
         card.add(title);
         card.add(Box.createRigidArea(new Dimension(0, 4)));
         card.add(hint);
-        card.add(Box.createRigidArea(new Dimension(0, 14)));
-
-        // ── STANDARD row ─────────────────────────────────────────
         SpinnerNumberModel stdModel = new SpinnerNumberModel(currentStd, 0, 10_000_000, 5_000);
         spnStdPrice = new JSpinner(stdModel);
         spnStdPrice.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -545,7 +539,6 @@ public class HallPanel extends JPanel {
         JSpinner.NumberEditor stdEditor = new JSpinner.NumberEditor(spnStdPrice, "#,### VND");
         spnStdPrice.setEditor(stdEditor);
 
-        // ── VIP row ───────────────────────────────────────────────
         SpinnerNumberModel vipModel = new SpinnerNumberModel(currentVip, 0, 10_000_000, 5_000);
         spnVipPrice = new JSpinner(vipModel);
         spnVipPrice.setFont(new Font("Segoe UI", Font.BOLD, 13));
@@ -559,7 +552,6 @@ public class HallPanel extends JPanel {
         card.add(pricingRow("Vip", true, spnVipPrice));
         card.add(Box.createRigidArea(new Dimension(0, 16)));
 
-        // ── Nút Cập nhật ──────────────────────────────────────────
         JButton btnUpdate = new JButton("Cập nhật giá");
         btnUpdate.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnUpdate.setBackground(ACCENT_RED);

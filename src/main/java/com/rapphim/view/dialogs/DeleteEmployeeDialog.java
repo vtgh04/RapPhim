@@ -51,12 +51,10 @@ public class DeleteEmployeeDialog extends JDialog {
         setLocationRelativeTo(parent);
         setBackground(new Color(0, 0, 0, 0));
 
-        // ── Outer wrapper (fake shadow via bg) ──────────────────────
         JPanel wrapper = new JPanel(new BorderLayout());
         wrapper.setBackground(BG_COLOR);
         wrapper.setBorder(new EmptyBorder(8, 8, 8, 8));
 
-        // ── Main card ───────────────────────────────────────────────
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
         card.setBackground(WHITE);
@@ -64,13 +62,10 @@ public class DeleteEmployeeDialog extends JDialog {
                 new RoundedBorder(16, BORDER_COLOR),
                 new EmptyBorder(26, 28, 22, 28)));
 
-        // ── Row 1: icon + title/subtitle ────────────────────────────
         JPanel topRow = new JPanel(new BorderLayout(16, 0));
         topRow.setOpaque(false);
         topRow.setAlignmentX(Component.LEFT_ALIGNMENT);
         topRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 60));
-
-        // icon box
         JPanel iconBox = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -167,8 +162,6 @@ public class DeleteEmployeeDialog extends JDialog {
     public boolean isConfirmed() {
         return confirmed;
     }
-
-    // ── Static helpers (no outer-class state needed) ─────────────────
 
     private static JPanel makeInfoRow(String label, String value) {
         JPanel row = new JPanel(new BorderLayout());

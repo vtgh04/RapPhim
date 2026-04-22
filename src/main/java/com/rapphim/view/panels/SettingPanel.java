@@ -14,7 +14,6 @@ public class SettingPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    // ── Colors ─────────────────────────────────────────────────────
     private static final Color BG = new Color(240, 242, 245);
     private static final Color WHITE = Color.WHITE;
     private static final Color C_PRIMARY = new Color(25, 30, 40);
@@ -25,14 +24,12 @@ public class SettingPanel extends JPanel {
     private static final Color C_ICON_FG = new Color(99, 102, 241);
     private static final Color C_HOVER = new Color(248, 249, 255);
 
-    // ── Fonts ──────────────────────────────────────────────────────
     private static final Font F_TITLE = new Font("Segoe UI", Font.BOLD, 22);
     private static final Font F_SUBTITLE = new Font("Segoe UI", Font.PLAIN, 13);
     private static final Font F_SECTION = new Font("Segoe UI", Font.BOLD, 11);
     private static final Font F_ITEM = new Font("Segoe UI", Font.BOLD, 14);
     private static final Font F_DESC = new Font("Segoe UI", Font.PLAIN, 12);
 
-    // ── Data ───────────────────────────────────────────────────────
     private final Employee employee;
     private int totalEmployees = 0;
     private int totalHalls = 0;
@@ -48,7 +45,6 @@ public class SettingPanel extends JPanel {
         buildUI();
     }
 
-    // ── Load DB stats ─────────────────────────────────────────────
     private void loadStats() {
         try {
             totalEmployees = new EmployeeDAO().findAll().size();
@@ -64,7 +60,6 @@ public class SettingPanel extends JPanel {
         }
     }
 
-    // ── Build UI ──────────────────────────────────────────────────
     private void buildUI() {
         setBackground(BG);
         setLayout(new BorderLayout());
@@ -74,7 +69,6 @@ public class SettingPanel extends JPanel {
         root.setOpaque(false);
         root.setBorder(new EmptyBorder(28, 32, 28, 32));
 
-        // ── Header
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(new EmptyBorder(0, 0, 20, 0));
@@ -97,7 +91,6 @@ public class SettingPanel extends JPanel {
         header.add(hdrText, BorderLayout.WEST);
         root.add(header, BorderLayout.NORTH);
 
-        // ── Main content
         JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setOpaque(false);
@@ -117,7 +110,6 @@ public class SettingPanel extends JPanel {
         add(scroll, BorderLayout.CENTER);
     }
 
-    // ── Profile Card ──────────────────────────────────────────────
     private JPanel buildProfileCard() {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -128,7 +120,6 @@ public class SettingPanel extends JPanel {
         card.setAlignmentX(Component.LEFT_ALIGNMENT);
         card.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
 
-        // ── Profile row: avatar + info trên cùng một hàng ──
         JPanel profileRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 16, 0));
         profileRow.setOpaque(false);
         profileRow.setBorder(new EmptyBorder(18, 24, 18, 24));
@@ -237,7 +228,6 @@ public class SettingPanel extends JPanel {
         return cell;
     }
 
-    // ── System Configuration Card ────────────────────────────────
     private JPanel buildConfigCard() {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -267,7 +257,6 @@ public class SettingPanel extends JPanel {
         return card;
     }
 
-    // ── Section header label ─────────────────────────────────────
     private JPanel buildSectionLabel(String text) {
         JPanel w = new JPanel(new FlowLayout(FlowLayout.LEFT, 24, 14));
         w.setOpaque(false);
@@ -279,7 +268,6 @@ public class SettingPanel extends JPanel {
         return w;
     }
 
-    // ── Setting row ───────────────────────────────────────────────
     private JPanel buildSettingRow(SettingItem item) {
         JPanel row = new JPanel(new BorderLayout(16, 0)) {
             @Override
@@ -367,7 +355,6 @@ public class SettingPanel extends JPanel {
         return row;
     }
 
-    // ── Separator ─────────────────────────────────────────────────
     private JPanel buildSep() {
         JPanel sep = new JPanel();
         sep.setBackground(C_SEP);
@@ -377,7 +364,6 @@ public class SettingPanel extends JPanel {
         return sep;
     }
 
-    // ── Click handler ─────────────────────────────────────────────
     private void onItemClicked(String key) {
         String msg = switch (key) {
             case "security" -> "Security Settings đang được phát triển.";
@@ -402,7 +388,6 @@ public class SettingPanel extends JPanel {
         return null;
     }
 
-    // ── Data class ────────────────────────────────────────────────
     private record SettingItem(String iconPath, String title, String desc, String key) {
     }
 }

@@ -19,12 +19,12 @@
 | Quản lý Phim          | Thêm, sửa, xóa, tìm kiếm thông tin phim |
 | Quản lý Phòng Chiếu | Quản lý phòng và sơ đồ ghế ngồi      |
 | Lịch Chiếu            | Tạo và quản lý lịch chiếu phim          |
-| Bán Vé                | Đặt vé, in vé, quản lý giao dịch       |
-| Quản lý Khách Hàng  | Thông tin khách hàng, thẻ thành viên    |
-| Quản lý Nhân Viên   | Ca làm việc, phân quyền                   |
+| Bán Vé                | Đặt vé, in vé,                            |
+| Hoá đơn              | Quản lý giao dịch                          |
+| Quản lý Nhân Viên   | Các thông tin cơ bản                      |
 | Dịch Vụ Ăn Uống     | Quản lý bắp rang, nước uống             |
 | Báo Cáo & Thống Kê  | Doanh thu, xuất Excel/PDF                    |
-| Phân Quyền            | Admin, Thu ngân, Quản lý                   |
+| Phân Quyền            | Quản lý nhân viên                         |
 
 ---
 

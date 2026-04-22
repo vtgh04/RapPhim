@@ -251,45 +251,70 @@ public class HallPanel extends JPanel {
     private JButton buildSeatBtn(String row, int col, Seat seat) {
         SeatType type = seat.getSeatType();
         boolean isBroken = seat.isBroken();
-        Color base = isBroken ? SEAT_FAULTY : (type == SeatType.VIP ? SEAT_VIP : SEAT_REGULAR);
         Color fg = isBroken ? WHITE : (type == SeatType.VIP ? new Color(90, 60, 0) : WHITE);
 
-        JButton btn = new JButton(isBroken ? "X" : String.valueOf(col)) {
+        // Nạp icon tương ứng
+        String iconPath = type == SeatType.VIP ? "/images/icons/Yellow Chair.png" : "/images/icons/chair.png";
+        java.net.URL imgUrl = getClass().getResource(iconPath);
+        final Image seatImg = (imgUrl != null) ? new ImageIcon(imgUrl).getImage() : null;
+
+        JButton btn = new JButton() {
             @Override
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2.setColor(getBackground());
-                g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+
+                if (seatImg != null) {
+                    // Nếu là ghế hỏng, vẽ nền xám đè lên hoặc vẽ hình xám
+                    if (isBroken) {
+                        g2.setColor(SEAT_FAULTY);
+                        g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                    } else {
+                        // Nếu đang hover, có thể vẽ hiệu ứng sáng hơn
+                        if (getModel().isRollover()) {
+                            g2.setColor(type == SeatType.VIP ? SEAT_HOVER_VIP : SEAT_HOVER_REG);
+                            g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                        }
+                        // Vẽ ảnh ghế
+                        g2.drawImage(seatImg, 0, 0, getWidth(), getHeight(), this);
+                    }
+                } else {
+                    // Fallback nếu không tìm thấy ảnh
+                    Color base = isBroken ? SEAT_FAULTY : (type == SeatType.VIP ? SEAT_VIP : SEAT_REGULAR);
+                    if (getModel().isRollover()) {
+                        base = isBroken ? SEAT_FAULTY : (type == SeatType.VIP ? SEAT_HOVER_VIP : SEAT_HOVER_REG);
+                    }
+                    g2.setColor(base);
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                }
+
+                // Vẽ text (số ghế hoặc 'X')
+                String text = isBroken ? "X" : String.valueOf(col);
+                g2.setFont(FONT_SEAT);
+                g2.setColor(fg);
+                FontMetrics fm = g2.getFontMetrics();
+                int x = (getWidth() - fm.stringWidth(text)) / 2;
+                int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+                g2.drawString(text, x, y - 2); // Điều chỉnh vị trí Y một chút để cân đối với icon
+
                 g2.dispose();
-                super.paintComponent(g);
             }
         };
-        btn.setFont(FONT_SEAT);
-        btn.setForeground(fg);
-        btn.setBackground(base);
-        btn.setOpaque(false);
-        btn.setContentAreaFilled(false);
-        btn.setBorderPainted(false);
-        btn.setFocusPainted(false);
         btn.setPreferredSize(new Dimension(34, 30));
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.setToolTipText(row + col + " – " + type.name());
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
 
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                Color hover = seat.isBroken() ? SEAT_FAULTY
-                        : (seat.getSeatType() == SeatType.VIP ? SEAT_HOVER_VIP : SEAT_HOVER_REG);
-                btn.setBackground(hover);
                 btn.repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                Color currentBase = seat.isBroken() ? SEAT_FAULTY
-                        : (seat.getSeatType() == SeatType.VIP ? SEAT_VIP : SEAT_REGULAR);
-                btn.setBackground(currentBase);
                 btn.repaint();
             }
 
@@ -298,14 +323,6 @@ public class HallPanel extends JPanel {
                 boolean newStatus = !seat.isBroken();
                 seat.setBroken(newStatus);
                 modifiedSeats.add(seat);
-
-                Color newBase = newStatus ? SEAT_FAULTY
-                        : (seat.getSeatType() == SeatType.VIP ? SEAT_VIP : SEAT_REGULAR);
-                Color newFg = newStatus ? WHITE : (seat.getSeatType() == SeatType.VIP ? new Color(90, 60, 0) : WHITE);
-
-                btn.setText(newStatus ? "X" : String.valueOf(col));
-                btn.setBackground(newBase);
-                btn.setForeground(newFg);
                 btn.repaint();
             }
         });
@@ -315,13 +332,42 @@ public class HallPanel extends JPanel {
     private JPanel buildLegend() {
         JPanel legend = new JPanel(new FlowLayout(FlowLayout.CENTER, 24, 8));
         legend.setOpaque(false);
-        legend.add(legendItem(SEAT_REGULAR, "Phổ thông"));
-        legend.add(legendItem(SEAT_VIP, "Vip"));
-        legend.add(legendItem(SEAT_FAULTY, "Hỏng"));
+        legend.add(legendItemImage("/images/icons/chair.png", "Phổ thông"));
+        legend.add(legendItemImage("/images/icons/Yellow Chair.png", "Vip"));
+        legend.add(legendItemColor(SEAT_FAULTY, "Hỏng"));
         return legend;
     }
 
-    private JPanel legendItem(Color color, String label) {
+    private JPanel legendItemImage(String iconPath, String label) {
+        JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        item.setOpaque(false);
+        
+        java.net.URL imgUrl = getClass().getResource(iconPath);
+        final Image seatImg = (imgUrl != null) ? new ImageIcon(imgUrl).getImage() : null;
+
+        JLabel icon = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (seatImg != null) {
+                    g.drawImage(seatImg, 0, 0, 18, 18, this);
+                } else {
+                    g.setColor(Color.GRAY);
+                    g.fillRect(0, 0, 18, 18);
+                }
+            }
+        };
+        icon.setPreferredSize(new Dimension(18, 18));
+        
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(new Font("Segoe UI", Font.BOLD, 11));
+        lbl.setForeground(new Color(80, 85, 100));
+        
+        item.add(icon);
+        item.add(lbl);
+        return item;
+    }
+
+    private JPanel legendItemColor(Color color, String label) {
         JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
         item.setOpaque(false);
         JLabel icon = new JLabel() {

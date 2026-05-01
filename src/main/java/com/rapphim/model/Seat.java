@@ -9,18 +9,18 @@ public class Seat implements Serializable {
     private char rowChar;
     private int colNumber;
     private SeatType seatType;
-    private double seatPrice;
+    private double seatFactor;
     private boolean isBroken;
 
     public Seat() {}
 
-    public Seat(String seatId, String hallId, char rowChar, int colNumber, SeatType seatType, double seatPrice) {
+    public Seat(String seatId, String hallId, char rowChar, int colNumber, SeatType seatType, double seatFactor) {
         this.seatId = seatId;
         this.hallId = hallId;
         this.rowChar = rowChar;
         this.colNumber = colNumber;
         this.seatType = seatType;
-        this.seatPrice = seatPrice;
+        this.seatFactor = seatFactor;
     }
 
     public String getSeatId() {
@@ -71,12 +71,12 @@ public class Seat implements Serializable {
         this.seatType = seatType;
     }
 
-    public double getSeatPrice() {
-        return seatPrice;
+    public double getSeatFactor() {
+        return seatFactor;
     }
 
-    public void setSeatPrice(double seatPrice) {
-        this.seatPrice = seatPrice;
+    public void setSeatFactor(double seatFactor) {
+        this.seatFactor = seatFactor;
     }
 
     /**
@@ -94,7 +94,7 @@ public class Seat implements Serializable {
                 ", rowChar=" + rowChar +
                 ", colNumber=" + colNumber +
                 ", seatType=" + seatType +
-                ", seatPrice=" + seatPrice +
+                ", seatFactor=" + seatFactor +
                 ", isBroken=" + isBroken +
                 '}';
     }

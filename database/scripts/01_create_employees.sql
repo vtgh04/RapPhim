@@ -76,7 +76,7 @@ CREATE TABLE dbo.employees (
 
     -- ── Ràng buộc miền giá trị ──────────────────────────────────────
     CONSTRAINT chk_employees_role    CHECK (role   IN ('MANAGER', 'STAFF')),
-    CONSTRAINT chk_employees_status  CHECK (status IN ('ACTIVE',  'RETIRED'))
+    CONSTRAINT chk_employees_status  CHECK (status IN ('ACTIVE',  'INACTIVE'))
 );
 GO
 

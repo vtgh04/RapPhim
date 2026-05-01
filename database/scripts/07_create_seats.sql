@@ -9,7 +9,7 @@ GO
 
 CREATE TABLE seats (
     seat_id VARCHAR(20) PRIMARY KEY,
-    hall_id VARCHAR(10) NOT NULL,
+    hall_id VARCHAR(20) NOT NULL,
     row_char CHAR(1) NOT NULL,
     col_number INT NOT NULL,
     seat_type VARCHAR(20) NOT NULL DEFAULT 'REGULAR',

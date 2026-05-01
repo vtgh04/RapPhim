@@ -58,9 +58,9 @@ public class HallPanel extends JPanel {
     private JComboBox<String> cmbStatus; // Active / Inactive
     private JPanel seatContainer;
 
-    // Giá mặc định theo loại ghế (đọc từ DB / fallback)
-    private JSpinner spnStdPrice;
-    private JSpinner spnVipPrice;
+    // Hệ số giá mặc định theo loại ghế
+    private JSpinner spnStdFactor;
+    private JSpinner spnVipFactor;
 
     public HallPanel() {
         loadHallsFromDB();
@@ -100,26 +100,26 @@ public class HallPanel extends JPanel {
     private void loadSeatsForHall(String hallId) {
         seatMap.clear();
         modifiedSeats.clear();
-        double stdPrice = 100_000;
-        double vipPrice = 110_000;
+        double stdFactor = 1.0;
+        double vipFactor = 1.5;
         try {
             List<Seat> seats = hallDao.findSeatsByHall(hallId);
             for (Seat s : seats) {
                 String key = String.valueOf(s.getRowChar()) + s.getColNumber();
                 seatMap.put(key, s);
-                if (s.getSeatType() == SeatType.REGULAR && s.getSeatPrice() > 0) {
-                    stdPrice = s.getSeatPrice();
-                } else if (s.getSeatType() == SeatType.VIP && s.getSeatPrice() > 0) {
-                    vipPrice = s.getSeatPrice();
+                if (s.getSeatType() == SeatType.REGULAR && s.getSeatFactor() > 0) {
+                    stdFactor = s.getSeatFactor();
+                } else if (s.getSeatType() == SeatType.VIP && s.getSeatFactor() > 0) {
+                    vipFactor = s.getSeatFactor();
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        if (spnStdPrice != null)
-            spnStdPrice.setValue((int) stdPrice);
-        if (spnVipPrice != null)
-            spnVipPrice.setValue((int) vipPrice);
+        if (spnStdFactor != null)
+            spnStdFactor.setValue(stdFactor);
+        if (spnVipFactor != null)
+            spnVipFactor.setValue(vipFactor);
     }
 
     private JPanel buildNorth() {
@@ -647,31 +647,31 @@ public class HallPanel extends JPanel {
     }
 
     private JPanel buildPricingCard() {
-        // Lấy giá hiện tại từ database thông qua seatMap đã load
-        int currentStd = 100_000;
-        int currentVip = 110_000;
-        if (spnStdPrice != null) {
-            currentStd = (int) spnStdPrice.getValue();
+        // Lấy hệ số hiện tại từ database thông qua seatMap đã load
+        double currentStd = 1.0;
+        double currentVip = 1.5;
+        if (spnStdFactor != null) {
+            currentStd = ((Number) spnStdFactor.getValue()).doubleValue();
         } else if (!seatMap.isEmpty()) {
             for (Seat s : seatMap.values()) {
-                if (s.getSeatType() == SeatType.REGULAR && s.getSeatPrice() > 0)
-                    currentStd = (int) s.getSeatPrice();
-                else if (s.getSeatType() == SeatType.VIP && s.getSeatPrice() > 0)
-                    currentVip = (int) s.getSeatPrice();
+                if (s.getSeatType() == SeatType.REGULAR && s.getSeatFactor() > 0)
+                    currentStd = s.getSeatFactor();
+                else if (s.getSeatType() == SeatType.VIP && s.getSeatFactor() > 0)
+                    currentVip = s.getSeatFactor();
             }
         }
-        if (spnVipPrice != null) {
-            currentVip = (int) spnVipPrice.getValue();
+        if (spnVipFactor != null) {
+            currentVip = ((Number) spnVipFactor.getValue()).doubleValue();
         }
 
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-        card.setBackground(WHITE);
+        card.setBackground(Color.WHITE);
         card.setBorder(new CompoundBorder(
                 new LineBorder(new Color(225, 228, 235), 1, true),
                 new EmptyBorder(18, 18, 18, 18)));
 
-        JLabel title = new JLabel("Giá ghế mặc định");
+        JLabel title = new JLabel("Hệ số giá ghế mặc định");
         title.setFont(new Font("Segoe UI", Font.BOLD, 17));
         title.setForeground(new Color(20, 25, 40));
         title.setAlignmentX(LEFT_ALIGNMENT);
@@ -684,26 +684,25 @@ public class HallPanel extends JPanel {
         card.add(title);
         card.add(Box.createRigidArea(new Dimension(0, 4)));
         card.add(hint);
-        SpinnerNumberModel stdModel = new SpinnerNumberModel(currentStd, 0, 10_000_000, 5_000);
-        spnStdPrice = new JSpinner(stdModel);
-        spnStdPrice.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        spnStdPrice.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-        spnStdPrice.setAlignmentX(LEFT_ALIGNMENT);
-        // Format editor không có suffix VND để tránh lỗi ParseException khi gõ tay
-        JSpinner.NumberEditor stdEditor = new JSpinner.NumberEditor(spnStdPrice, "#,###");
-        spnStdPrice.setEditor(stdEditor);
+        SpinnerNumberModel stdModel = new SpinnerNumberModel(currentStd, 0.0, 10.0, 0.1);
+        spnStdFactor = new JSpinner(stdModel);
+        spnStdFactor.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        spnStdFactor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        spnStdFactor.setAlignmentX(LEFT_ALIGNMENT);
+        JSpinner.NumberEditor stdEditor = new JSpinner.NumberEditor(spnStdFactor, "0.0");
+        spnStdFactor.setEditor(stdEditor);
 
-        SpinnerNumberModel vipModel = new SpinnerNumberModel(currentVip, 0, 10_000_000, 5_000);
-        spnVipPrice = new JSpinner(vipModel);
-        spnVipPrice.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        spnVipPrice.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
-        spnVipPrice.setAlignmentX(LEFT_ALIGNMENT);
-        JSpinner.NumberEditor vipEditor = new JSpinner.NumberEditor(spnVipPrice, "#,###");
-        spnVipPrice.setEditor(vipEditor);
+        SpinnerNumberModel vipModel = new SpinnerNumberModel(currentVip, 0.0, 10.0, 0.1);
+        spnVipFactor = new JSpinner(vipModel);
+        spnVipFactor.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        spnVipFactor.setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+        spnVipFactor.setAlignmentX(LEFT_ALIGNMENT);
+        JSpinner.NumberEditor vipEditor = new JSpinner.NumberEditor(spnVipFactor, "0.0");
+        spnVipFactor.setEditor(vipEditor);
 
-        card.add(pricingRow("Phổ thông", false, spnStdPrice));
+        card.add(pricingRow("Phổ thông", false, spnStdFactor));
         card.add(Box.createRigidArea(new Dimension(0, 8)));
-        card.add(pricingRow("Vip", true, spnVipPrice));
+        card.add(pricingRow("Vip", true, spnVipFactor));
         card.add(Box.createRigidArea(new Dimension(0, 16)));
 
         JButton btnUpdate = new JButton("Cập nhật giá");
@@ -728,29 +727,29 @@ public class HallPanel extends JPanel {
             return;
 
         try {
-            if (spnStdPrice != null)
-                spnStdPrice.commitEdit();
-            if (spnVipPrice != null)
-                spnVipPrice.commitEdit();
+            if (spnStdFactor != null)
+                spnStdFactor.commitEdit();
+            if (spnVipFactor != null)
+                spnVipFactor.commitEdit();
         } catch (java.text.ParseException pe) {
-            showModernMessageDialog("Lỗi nhập liệu", "Vui lòng nhập số tiền hợp lệ!", true);
+            showModernMessageDialog("Lỗi nhập liệu", "Vui lòng nhập hệ số hợp lệ!", true);
             return;
         }
 
-        double stdPrice = ((Number) spnStdPrice.getValue()).doubleValue();
-        double vipPrice = ((Number) spnVipPrice.getValue()).doubleValue();
+        double stdFactor = ((Number) spnStdFactor.getValue()).doubleValue();
+        double vipFactor = ((Number) spnVipFactor.getValue()).doubleValue();
         try {
-            hallDao.updateSeatPriceByType(currentHall.getHallId(), SeatType.REGULAR, stdPrice);
-            hallDao.updateSeatPriceByType(currentHall.getHallId(), SeatType.VIP, vipPrice);
+            hallDao.updateSeatFactorByType(currentHall.getHallId(), SeatType.REGULAR, stdFactor);
+            hallDao.updateSeatFactorByType(currentHall.getHallId(), SeatType.VIP, vipFactor);
             showModernMessageDialog("Thành công",
-                    String.format("Đã cập nhật giá thành công!%n  Phổ thông: %,.0f VND%n  Vip:      %,.0f VND",
-                            stdPrice, vipPrice),
+                    String.format("Đã cập nhật hệ số thành công!%n  Phổ thông: %.1f x%n  Vip:      %.1f x",
+                            stdFactor, vipFactor),
                     false);
             // Refresh loaded data so next reload reflects the correct prices
             loadSeatsForHall(currentHall.getHallId());
         } catch (SQLException ex) {
             ex.printStackTrace();
-            showModernMessageDialog("Lỗi", "Lỗi khi cập nhật giá:\n" + ex.getMessage(), true);
+            showModernMessageDialog("Lỗi", "Lỗi khi cập nhật hệ số:\n" + ex.getMessage(), true);
         }
     }
 
@@ -771,7 +770,7 @@ public class HallPanel extends JPanel {
         spinWrap.setOpaque(false);
         spinWrap.add(spinner, BorderLayout.CENTER);
 
-        JLabel lblVND = new JLabel("VND");
+        JLabel lblVND = new JLabel("x");
         lblVND.setFont(FONT_LABEL);
         lblVND.setForeground(new Color(130, 135, 155));
         spinWrap.add(lblVND, BorderLayout.EAST);
@@ -809,7 +808,7 @@ public class HallPanel extends JPanel {
             cmbType.setSelectedItem(currentHall.getHallType());
         if (cmbStatus != null) {
             CinemaHallStatus s = currentHall.getStatus();
-            cmbStatus.setSelectedItem(s != null ? s.getValue() : "ACTIVE");
+            cmbStatus.setSelectedItem(s == CinemaHallStatus.ACTIVE ? "Đang hoạt động" : "Không hoạt động");
         }
 
         // Rebuild grid ghế theo đúng số hàng/cột của phòng mới

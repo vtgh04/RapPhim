@@ -19,9 +19,9 @@ public class HallDao {
 
     private static final String SQL_FIND_HALL_BY_ID = "SELECT hall_id, name, hall_type, total_rows, total_cols, status FROM cinema_halls WHERE hall_id = ?";
 
-    private static final String SQL_FIND_SEATS_BY_HALL = "SELECT seat_id, hall_id, row_char, col_number, seat_type, seat_price, is_broken FROM seats WHERE hall_id = ? ORDER BY row_char, col_number";
+    private static final String SQL_FIND_SEATS_BY_HALL = "SELECT seat_id, hall_id, row_char, col_number, seat_type, seat_factor, is_broken FROM seats WHERE hall_id = ? ORDER BY row_char, col_number";
 
-    private static final String SQL_UPDATE_SEAT_PRICE_BY_TYPE = "UPDATE seats SET seat_price = ? WHERE hall_id = ? AND seat_type = ?";
+    private static final String SQL_UPDATE_SEAT_FACTOR_BY_TYPE = "UPDATE seats SET seat_factor = ? WHERE hall_id = ? AND seat_type = ?";
 
     private static final String SQL_UPDATE_HALL_INFO = "UPDATE cinema_halls SET name = ?, hall_type = ? WHERE hall_id = ?";
 
@@ -87,16 +87,16 @@ public class HallDao {
     }
 
     /**
-     * Cập nhật giá mặc định cho tất cả ghế cùng loại trong một phòng chiếu.
+     * Cập nhật hệ số giá mặc định cho tất cả ghế cùng loại trong một phòng chiếu.
      *
      * @param hallId   mã phòng chiếu
      * @param seatType loại ghế (REGULAR hoặc VIP)
-     * @param newPrice giá mới (VND)
+     * @param newFactor hệ số mới
      */
-    public void updateSeatPriceByType(String hallId, SeatType seatType, double newPrice) throws SQLException {
+    public void updateSeatFactorByType(String hallId, SeatType seatType, double newFactor) throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
-        try (PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_SEAT_PRICE_BY_TYPE)) {
-            ps.setDouble(1, newPrice);
+        try (PreparedStatement ps = conn.prepareStatement(SQL_UPDATE_SEAT_FACTOR_BY_TYPE)) {
+            ps.setDouble(1, newFactor);
             ps.setString(2, hallId);
             ps.setString(3, seatType.name()); // "REGULAR" hoặc "VIP"
             ps.executeUpdate();
@@ -142,7 +142,7 @@ public class HallDao {
                 rs.getString("row_char").charAt(0),
                 rs.getInt("col_number"),
                 seatType,
-                rs.getDouble("seat_price"));
+                rs.getDouble("seat_factor"));
         seat.setBroken(rs.getBoolean("is_broken"));
         return seat;
     }

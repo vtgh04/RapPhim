@@ -14,7 +14,7 @@
     DECLARE @c INT = 1;
     DECLARE @row_char CHAR(1);
     DECLARE @seat_type VARCHAR(20);
-    DECLARE @seat_price FLOAT;
+    DECLARE @seat_factor DECIMAL(4,2);
 
     WHILE @r <= @total_rows
     BEGIN
@@ -28,16 +28,16 @@
             IF @r >= 4 AND @r <= 8 AND @c >= 3 AND @c <= 6
             BEGIN
                 SET @seat_type = 'VIP';
-                SET @seat_price = 110000;
+                SET @seat_factor = 1.5;
             END
             ELSE
             BEGIN
                 SET @seat_type = 'REGULAR';
-                SET @seat_price = 100000;
+                SET @seat_factor = 1.0;
             END
 
-            INSERT INTO seats (seat_id, hall_id, row_char, col_number, seat_type, seat_price)
-            VALUES (@hall_id + '_' + @row_char + CAST(@c AS VARCHAR), @hall_id, @row_char, @c, @seat_type, @seat_price);
+            INSERT INTO seats (seat_id, hall_id, row_char, col_number, seat_type, seat_factor)
+            VALUES (@hall_id + '_' + @row_char + CAST(@c AS VARCHAR), @hall_id, @row_char, @c, @seat_type, @seat_factor);
             
             SET @c = @c + 1;
         END

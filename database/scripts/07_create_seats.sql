@@ -13,7 +13,7 @@ CREATE TABLE seats (
     row_char CHAR(1) NOT NULL,
     col_number INT NOT NULL,
     seat_type VARCHAR(20) NOT NULL DEFAULT 'REGULAR',
-    seat_price FLOAT NOT NULL,
+    seat_factor DECIMAL(4,2) NOT NULL DEFAULT 1.0,
     is_broken BIT DEFAULT 0,
     CONSTRAINT fk_seat_hall FOREIGN KEY (hall_id) REFERENCES cinema_halls(hall_id),
     CONSTRAINT uq_seat_hall_row_col UNIQUE (hall_id, row_char, col_number)

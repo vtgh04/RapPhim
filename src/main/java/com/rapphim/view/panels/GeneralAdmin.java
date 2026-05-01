@@ -1,7 +1,6 @@
 package com.rapphim.view.panels;
 
 import com.rapphim.model.Employee;
-// import com.rapphim.view.panels.EmployeePanel;
 
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
@@ -271,9 +270,7 @@ public class GeneralAdmin extends JPanel {
                     "Sales & POS", "images/icons/sales.png",
                     "Quản lý bán vé và điểm bán hàng tại quầy."), BorderLayout.CENTER);
             case "Transactions" -> rightPanel.add(new TransactionPanel(), BorderLayout.CENTER);
-            case "Showtimes" -> rightPanel.add(createPlaceholderPanel(
-                    "Showtimes", "images/icons/Showtimes.png",
-                    "Lập lịch và quản lý suất chiếu phim."), BorderLayout.CENTER);
+            case "Showtimes" -> rightPanel.add(new ShowtimesPanel(), BorderLayout.CENTER);
             case "Products" -> rightPanel.add(createPlaceholderPanel(
                     "Products", "images/icons/Product.png",
                     "Quản lý sản phẩm F&B: bắp rang, nước uống, combo."), BorderLayout.CENTER);

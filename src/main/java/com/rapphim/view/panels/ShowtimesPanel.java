@@ -454,9 +454,14 @@ public class ShowtimesPanel extends JPanel {
         JLabel kl = new JLabel(k);
         kl.setFont(F_NORM.deriveFont(11f));
         kl.setForeground(MUTED);
-        JLabel vl = new JLabel(v);
+        kl.setVerticalAlignment(SwingConstants.TOP);
+
+        // Wrap value if it's too long
+        JLabel vl = new JLabel("<html><p style='width: 115px; margin: 0; padding: 0;'>" + v + "</p></html>");
         vl.setFont(F_BOLD);
         vl.setForeground(TXT);
+        vl.setVerticalAlignment(SwingConstants.TOP);
+        
         p.add(kl);
         p.add(vl);
     }

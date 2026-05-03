@@ -6,6 +6,7 @@
 --  Nghiệp vụ:
 --    - Luồng: PENDING → (thêm tickets) → CONFIRMED | CANCELLED
 --    - total_amount = SUM(final_price) của tất cả tickets thuộc invoice
+--    - total_tickets = COUNT(tickets) thuộc invoice
 --    - Huỷ invoice → huỷ toàn bộ tickets + trả show_seats về AVAILABLE
 -- ============================================================
 
@@ -24,13 +25,15 @@ CREATE TABLE dbo.invoices (
     employee_id     VARCHAR(20)    NOT NULL,
     created_at      DATETIME       NOT NULL CONSTRAINT df_invoices_created_at DEFAULT GETDATE(),
     total_amount    DECIMAL(12,2)  NOT NULL CONSTRAINT df_invoices_total DEFAULT 0,
+    total_tickets   INT            NOT NULL CONSTRAINT df_invoices_tickets DEFAULT 0,
     payment_method  VARCHAR(20)    NOT NULL,
     status          VARCHAR(20)    NOT NULL CONSTRAINT df_invoices_status DEFAULT 'PENDING',
-    note            NTEXT          NULL,
+    note            NVARCHAR(MAX)  NULL,
 
     CONSTRAINT pk_invoices               PRIMARY KEY (invoice_id),
     CONSTRAINT fk_invoices_employee      FOREIGN KEY (employee_id) REFERENCES dbo.employees(employee_id),
     CONSTRAINT chk_invoices_total        CHECK (total_amount >= 0),
+    CONSTRAINT chk_invoices_tickets      CHECK (total_tickets >= 0),
     CONSTRAINT chk_invoices_payment      CHECK (payment_method IN ('CASH', 'CARD', 'TRANSFER')),
     CONSTRAINT chk_invoices_status       CHECK (status IN ('PENDING', 'CONFIRMED', 'CANCELLED'))
 );

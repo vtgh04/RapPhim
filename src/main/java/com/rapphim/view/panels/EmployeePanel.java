@@ -61,36 +61,37 @@ public class EmployeePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    // ── Design tokens ────────────────────────────────────────────────────────
+    // ── Design tokens (5 colours, 5 fonts) ────────────────────────────────────
     private static final Color BG_COLOR = new Color(240, 242, 245);
-    private static final Color WHITE = Color.WHITE;
+    private static final Color SURFACE = Color.WHITE;
     private static final Color TEXT_PRIMARY = new Color(30, 30, 35);
     private static final Color TEXT_SECONDARY = new Color(130, 135, 148);
-    private static final Color BORDER_COLOR = new Color(228, 228, 228);
-    private static final Color PRIMARY_RED = new Color(220, 38, 38);
-    private static final Color HOVER_RED = new Color(185, 28, 28);
-    private static final Color GREEN_BG = new Color(209, 250, 229);
-    private static final Color GREEN_TEXT = new Color(6, 95, 70);
-    private static final Color RED_BG = new Color(254, 226, 226);
-    private static final Color RED_TEXT = new Color(185, 28, 28);
-    private static final Color BLUE_BG = new Color(37, 99, 235);
-    private static final Color HOVER_BLUE = new Color(29, 78, 216);
-    private static final Color EXCEL_GREEN = new Color(16, 185, 129);
-    private static final Color HOVER_EXCEL = new Color(5, 150, 105);
-    private static final Color MANAGER_BG = new Color(255, 237, 213);
-    private static final Color MANAGER_TEXT = new Color(154, 52, 18);
-    private static final Color STAFF_BG = new Color(224, 231, 255);
-    private static final Color STAFF_TEXT = new Color(55, 48, 163);
-    private static final Color TABLE_HEADER_BG = new Color(249, 250, 251);
-    private static final Color TABLE_GRID_COLOR = new Color(243, 244, 246);
+    private static final Color ACCENT = new Color(220, 38, 38);
+
+    // Derived helpers (all computed from the 5 base colours)
+    private static final Color BORDER_COLOR = new Color(BG_COLOR.getRed() - 12, BG_COLOR.getGreen() - 14,
+            BG_COLOR.getBlue() - 17);
+    private static final Color ACCENT_HOVER = ACCENT.darker();
+    private static final Color ACCENT_LIGHT_BG = blend(ACCENT, Color.WHITE, 0.12f);
+    private static final Color SUCCESS = new Color(6, 95, 70);
+    private static final Color SUCCESS_LIGHT_BG = blend(new Color(6, 150, 70), Color.WHITE, 0.15f);
 
     private static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 24);
-    private static final Font FONT_SUBTITLE = new Font("Segoe UI", Font.PLAIN, 14);
+    private static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 14);
     private static final Font FONT_TABLE = new Font("Segoe UI", Font.PLAIN, 13);
     private static final Font FONT_HEADER = new Font("Segoe UI", Font.BOLD, 12);
     private static final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 13);
-    private static final Font FONT_SEARCH = new Font("Segoe UI", Font.PLAIN, 14);
-    private static final Font FONT_PILL = new Font("Segoe UI", Font.BOLD, 11);
+
+    /**
+     * Blend {@code fg} into {@code bg} by the given ratio (0 = all bg, 1 = all fg).
+     */
+    private static Color blend(Color fg, Color bg, float ratio) {
+        float inv = 1f - ratio;
+        return new Color(
+                Math.min(255, (int) (fg.getRed() * ratio + bg.getRed() * inv)),
+                Math.min(255, (int) (fg.getGreen() * ratio + bg.getGreen() * inv)),
+                Math.min(255, (int) (fg.getBlue() * ratio + bg.getBlue() * inv)));
+    }
 
     private final EmployeeDAO employeeDAO = new EmployeeDAO();
     private JTable table;
@@ -136,7 +137,7 @@ public class EmployeePanel extends JPanel {
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel subtitle = new JLabel("Manage staff access and roles");
-        subtitle.setFont(FONT_SUBTITLE);
+        subtitle.setFont(FONT_BODY);
         subtitle.setForeground(TEXT_SECONDARY);
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -163,8 +164,8 @@ public class EmployeePanel extends JPanel {
     private JButton createExportButton() {
         JButton btn = new JButton("Export Excel");
         btn.setFont(FONT_BTN);
-        btn.setForeground(Color.BLACK);
-        btn.setBackground(WHITE);
+        btn.setForeground(TEXT_PRIMARY);
+        btn.setBackground(SURFACE);
         btn.setOpaque(false);
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
@@ -175,13 +176,13 @@ public class EmployeePanel extends JPanel {
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                btn.setBackground(HOVER_BLUE);
+                btn.setBackground(BG_COLOR);
                 btn.repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                btn.setBackground(BLUE_BG);
+                btn.setBackground(SURFACE);
                 btn.repaint();
             }
         });
@@ -200,8 +201,8 @@ public class EmployeePanel extends JPanel {
         JButton btn = new JButton("Import Excel");
 
         btn.setFont(FONT_BTN);
-        btn.setForeground(Color.BLACK);
-        btn.setBackground(WHITE);
+        btn.setForeground(TEXT_PRIMARY);
+        btn.setBackground(SURFACE);
         btn.setOpaque(false);
         btn.setContentAreaFilled(false);
         btn.setBorderPainted(false);
@@ -212,13 +213,13 @@ public class EmployeePanel extends JPanel {
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                btn.setBackground(HOVER_EXCEL);
+                btn.setBackground(BG_COLOR);
                 btn.repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                btn.setBackground(EXCEL_GREEN);
+                btn.setBackground(SURFACE);
                 btn.repaint();
             }
         });
@@ -289,8 +290,8 @@ public class EmployeePanel extends JPanel {
             }
         };
         btnAdd.setFont(FONT_BTN);
-        btnAdd.setForeground(WHITE);
-        btnAdd.setBackground(PRIMARY_RED);
+        btnAdd.setForeground(SURFACE);
+        btnAdd.setBackground(ACCENT);
         btnAdd.setOpaque(false);
         btnAdd.setContentAreaFilled(false);
         btnAdd.setBorderPainted(false);
@@ -301,13 +302,13 @@ public class EmployeePanel extends JPanel {
         btnAdd.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                btnAdd.setBackground(HOVER_RED);
+                btnAdd.setBackground(ACCENT_HOVER);
                 btnAdd.repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                btnAdd.setBackground(PRIMARY_RED);
+                btnAdd.setBackground(ACCENT);
                 btnAdd.repaint();
             }
         });
@@ -317,7 +318,7 @@ public class EmployeePanel extends JPanel {
     }
 
     private JPanel createSearchPanel() {
-        JPanel searchPanel = new RoundedPanel(14, WHITE);
+        JPanel searchPanel = new RoundedPanel(14, SURFACE);
         searchPanel.setLayout(new BoxLayout(searchPanel, BoxLayout.X_AXIS));
         searchPanel.setBorder(BorderFactory.createCompoundBorder(
                 new RoundedBorder(14, BORDER_COLOR),
@@ -326,11 +327,11 @@ public class EmployeePanel extends JPanel {
         searchPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel searchIcon = new JLabel(loadIcon("images/icons/search.png", 20, 20));
-        searchIcon.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        searchIcon.setFont(FONT_BODY);
         searchIcon.setForeground(TEXT_SECONDARY);
 
         JTextField searchField = new JTextField();
-        searchField.setFont(FONT_SEARCH);
+        searchField.setFont(FONT_BODY);
         searchField.setForeground(TEXT_PRIMARY);
         searchField.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         searchField.setOpaque(false);
@@ -388,7 +389,7 @@ public class EmployeePanel extends JPanel {
         JButton filterBtn = new JButton("Filter");
         filterBtn.setFont(FONT_BTN);
         filterBtn.setForeground(TEXT_PRIMARY);
-        filterBtn.setBackground(WHITE);
+        filterBtn.setBackground(SURFACE);
         filterBtn.setOpaque(false);
         filterBtn.setContentAreaFilled(false);
         filterBtn.setFocusPainted(false);
@@ -405,7 +406,7 @@ public class EmployeePanel extends JPanel {
         filterCombo.setFont(FONT_TABLE);
         filterCombo.setPreferredSize(new Dimension(120, 30));
         filterCombo.setMaximumSize(new Dimension(120, 30));
-        filterCombo.setBackground(WHITE);
+        filterCombo.setBackground(SURFACE);
         filterCombo.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         filterCombo.addActionListener(e -> {
             String searchText = searchField.getText();
@@ -419,7 +420,7 @@ public class EmployeePanel extends JPanel {
     }
 
     private JPanel createTablePanel() {
-        JPanel tableContainer = new RoundedPanel(14, WHITE);
+        JPanel tableContainer = new RoundedPanel(14, SURFACE);
         tableContainer.setLayout(new BorderLayout());
         tableContainer.setBorder(BorderFactory.createCompoundBorder(
                 new RoundedBorder(14, BORDER_COLOR),
@@ -438,9 +439,9 @@ public class EmployeePanel extends JPanel {
         table.setRowHeight(60);
         table.setShowHorizontalLines(true);
         table.setShowVerticalLines(false);
-        table.setGridColor(TABLE_GRID_COLOR);
-        table.setBackground(WHITE);
-        table.setSelectionBackground(new Color(239, 246, 255));
+        table.setGridColor(BG_COLOR);
+        table.setBackground(SURFACE);
+        table.setSelectionBackground(blend(ACCENT, Color.WHITE, 0.06f));
         table.setSelectionForeground(TEXT_PRIMARY);
         table.setIntercellSpacing(new Dimension(0, 1));
         table.setFillsViewportHeight(true);
@@ -448,8 +449,8 @@ public class EmployeePanel extends JPanel {
         JTableHeader header = table.getTableHeader();
         header.setFont(FONT_HEADER);
         header.setForeground(TEXT_SECONDARY);
-        header.setBackground(TABLE_HEADER_BG);
-        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, TABLE_GRID_COLOR));
+        header.setBackground(BG_COLOR);
+        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, BG_COLOR));
         header.setPreferredSize(new Dimension(0, 45));
         header.setReorderingAllowed(false);
 
@@ -457,7 +458,7 @@ public class EmployeePanel extends JPanel {
         headerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
         headerRenderer.setFont(FONT_HEADER);
         headerRenderer.setForeground(TEXT_SECONDARY);
-        headerRenderer.setBackground(TABLE_HEADER_BG);
+        headerRenderer.setBackground(BG_COLOR);
         headerRenderer.setBorder(new EmptyBorder(0, 0, 0, 0));
         for (int i = 0; i < COLUMNS.length; i++) {
             table.getColumnModel().getColumn(i).setHeaderRenderer(headerRenderer);
@@ -482,7 +483,7 @@ public class EmployeePanel extends JPanel {
                 setForeground(TEXT_PRIMARY);
                 setFont(FONT_TABLE);
                 if (!isSelected)
-                    setBackground(WHITE);
+                    setBackground(SURFACE);
                 return this;
             }
         };
@@ -501,7 +502,7 @@ public class EmployeePanel extends JPanel {
                 setForeground(TEXT_SECONDARY);
                 setFont(FONT_TABLE);
                 if (!isSelected)
-                    setBackground(WHITE);
+                    setBackground(SURFACE);
                 return this;
             }
         });
@@ -534,7 +535,7 @@ public class EmployeePanel extends JPanel {
                     }
                 });
 
-                combo.setFont(FONT_PILL);
+                combo.setFont(FONT_TABLE);
                 combo.setPreferredSize(new Dimension(100, 26));
                 combo.setMinimumSize(new Dimension(100, 26));
                 combo.setMaximumSize(new Dimension(100, 26));
@@ -549,14 +550,14 @@ public class EmployeePanel extends JPanel {
                         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                         setHorizontalAlignment(SwingConstants.CENTER);
                         setVerticalAlignment(SwingConstants.CENTER);
-                        setFont(FONT_PILL);
+                        setFont(FONT_TABLE);
                         if (value != null) {
                             if (value.toString().equalsIgnoreCase("MANAGER")) {
-                                setBackground(isSelected ? MANAGER_TEXT : MANAGER_BG);
-                                setForeground(isSelected ? WHITE : MANAGER_TEXT);
+                                setBackground(isSelected ? ACCENT : ACCENT_LIGHT_BG);
+                                setForeground(isSelected ? SURFACE : ACCENT);
                             } else {
-                                setBackground(isSelected ? STAFF_TEXT : STAFF_BG);
-                                setForeground(isSelected ? WHITE : STAFF_TEXT);
+                                setBackground(isSelected ? TEXT_SECONDARY : blend(TEXT_SECONDARY, Color.WHITE, 0.12f));
+                                setForeground(isSelected ? SURFACE : TEXT_SECONDARY);
                             }
                         }
                         setBorder(BorderFactory.createEmptyBorder()); // avoid shift
@@ -572,15 +573,15 @@ public class EmployeePanel extends JPanel {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object value,
                     boolean isSelected, boolean hasFocus, int row, int col) {
-                panel.setBackground(isSelected ? t.getSelectionBackground() : WHITE);
+                panel.setBackground(isSelected ? t.getSelectionBackground() : SURFACE);
                 String role = value != null ? value.toString().toUpperCase() : "STAFF";
                 combo.setSelectedItem(role);
                 if (role.equals("MANAGER")) {
-                    combo.setBackground(MANAGER_BG);
-                    combo.setForeground(MANAGER_TEXT);
+                    combo.setBackground(ACCENT_LIGHT_BG);
+                    combo.setForeground(ACCENT);
                 } else {
-                    combo.setBackground(STAFF_BG);
-                    combo.setForeground(STAFF_TEXT);
+                    combo.setBackground(blend(TEXT_SECONDARY, Color.WHITE, 0.12f));
+                    combo.setForeground(TEXT_SECONDARY);
                 }
                 return panel;
             }
@@ -614,7 +615,7 @@ public class EmployeePanel extends JPanel {
                     }
                 });
 
-                combo.setFont(FONT_PILL);
+                combo.setFont(FONT_TABLE);
                 combo.setPreferredSize(new Dimension(100, 26));
                 combo.setMinimumSize(new Dimension(100, 26));
                 combo.setMaximumSize(new Dimension(100, 26));
@@ -629,14 +630,14 @@ public class EmployeePanel extends JPanel {
                         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                         setHorizontalAlignment(SwingConstants.CENTER);
                         setVerticalAlignment(SwingConstants.CENTER);
-                        setFont(FONT_PILL);
+                        setFont(FONT_TABLE);
                         if (value != null) {
                             if (value.toString().equalsIgnoreCase("ACTIVE")) {
-                                setBackground(isSelected ? GREEN_TEXT : GREEN_BG);
-                                setForeground(isSelected ? WHITE : GREEN_TEXT);
+                                setBackground(isSelected ? SUCCESS : SUCCESS_LIGHT_BG);
+                                setForeground(isSelected ? SURFACE : SUCCESS);
                             } else {
-                                setBackground(isSelected ? RED_TEXT : RED_BG);
-                                setForeground(isSelected ? WHITE : RED_TEXT);
+                                setBackground(isSelected ? ACCENT : ACCENT_LIGHT_BG);
+                                setForeground(isSelected ? SURFACE : ACCENT);
                             }
                         }
                         setBorder(BorderFactory.createEmptyBorder()); // avoid shift
@@ -652,15 +653,15 @@ public class EmployeePanel extends JPanel {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object value,
                     boolean isSelected, boolean hasFocus, int row, int col) {
-                panel.setBackground(isSelected ? t.getSelectionBackground() : WHITE);
+                panel.setBackground(isSelected ? t.getSelectionBackground() : SURFACE);
                 String status = value != null ? value.toString().toUpperCase() : "ACTIVE";
                 combo.setSelectedItem(status);
                 if (status.equals("ACTIVE")) {
-                    combo.setBackground(GREEN_BG);
-                    combo.setForeground(GREEN_TEXT);
+                    combo.setBackground(SUCCESS_LIGHT_BG);
+                    combo.setForeground(SUCCESS);
                 } else {
-                    combo.setBackground(RED_BG);
-                    combo.setForeground(RED_TEXT);
+                    combo.setBackground(ACCENT_LIGHT_BG);
+                    combo.setForeground(ACCENT);
                 }
                 return panel;
             }
@@ -673,7 +674,7 @@ public class EmployeePanel extends JPanel {
 
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        scrollPane.getViewport().setBackground(WHITE);
+        scrollPane.getViewport().setBackground(SURFACE);
 
         tableContainer.add(scrollPane, BorderLayout.CENTER);
         return tableContainer;
@@ -690,7 +691,7 @@ public class EmployeePanel extends JPanel {
         @Override
         public Component getTableCellRendererComponent(JTable t, Object value,
                 boolean isSelected, boolean hasFocus, int row, int col) {
-            setBackground(isSelected ? t.getSelectionBackground() : WHITE);
+            setBackground(isSelected ? t.getSelectionBackground() : SURFACE);
             return this;
         }
     }
@@ -731,7 +732,7 @@ public class EmployeePanel extends JPanel {
         public Component getTableCellEditorComponent(JTable t, Object value,
                 boolean isSelected, int row, int col) {
             currentRow = row;
-            panel.setBackground(isSelected ? t.getSelectionBackground() : WHITE);
+            panel.setBackground(isSelected ? t.getSelectionBackground() : SURFACE);
             return panel;
         }
 
@@ -800,7 +801,7 @@ public class EmployeePanel extends JPanel {
 
             JPanel card = new JPanel();
             card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-            card.setBackground(WHITE);
+            card.setBackground(SURFACE);
             card.setBorder(BorderFactory.createCompoundBorder(
                     new RoundedBorder(16, BORDER_COLOR),
                     new EmptyBorder(26, 28, 22, 28)));
@@ -815,7 +816,7 @@ public class EmployeePanel extends JPanel {
                 protected void paintComponent(Graphics g) {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                    g2.setColor(RED_BG);
+                    g2.setColor(ACCENT_LIGHT_BG);
                     g2.fillRoundRect(0, 0, getWidth(), getHeight(), 12, 12);
                     g2.dispose();
                     super.paintComponent(g);
@@ -840,12 +841,12 @@ public class EmployeePanel extends JPanel {
             titleGroup.setOpaque(false);
 
             JLabel title = new JLabel("Xoá nhân viên");
-            title.setFont(new Font("Segoe UI", Font.BOLD, 17));
+            title.setFont(FONT_BTN.deriveFont(17f));
             title.setForeground(TEXT_PRIMARY);
 
             JLabel subtitle = new JLabel(
                     "<html><body style='width:280px'>Hành động này không thể hoàn tác. ");
-            subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+            subtitle.setFont(FONT_TABLE);
             subtitle.setForeground(TEXT_SECONDARY);
 
             titleGroup.add(title);
@@ -857,7 +858,7 @@ public class EmployeePanel extends JPanel {
 
             JPanel infoCard = new JPanel();
             infoCard.setLayout(new BoxLayout(infoCard, BoxLayout.Y_AXIS));
-            infoCard.setBackground(TABLE_HEADER_BG);
+            infoCard.setBackground(BG_COLOR);
             infoCard.setBorder(BorderFactory.createCompoundBorder(
                     new RoundedBorder(10, BORDER_COLOR),
                     new EmptyBorder(12, 14, 12, 14)));
@@ -874,11 +875,11 @@ public class EmployeePanel extends JPanel {
             btnRow.setOpaque(false);
             btnRow.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            JButton cancelBtn = makeButton("Huỷ", new Color(243, 244, 246), TEXT_PRIMARY, new Color(229, 231, 235),
+            JButton cancelBtn = makeButton("Huỷ", BG_COLOR, TEXT_PRIMARY, BORDER_COLOR,
                     false);
             cancelBtn.addActionListener(e -> dispose());
 
-            JButton deleteBtn = makeButton("Xoá nhân viên", PRIMARY_RED, WHITE, HOVER_RED, true);
+            JButton deleteBtn = makeButton("Xoá nhân viên", ACCENT, SURFACE, ACCENT_HOVER, true);
             deleteBtn.addActionListener(e -> {
                 confirmed = true;
                 dispose();
@@ -905,10 +906,10 @@ public class EmployeePanel extends JPanel {
             JPanel row = new JPanel(new BorderLayout());
             row.setOpaque(false);
             JLabel lbl = new JLabel(label);
-            lbl.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+            lbl.setFont(FONT_HEADER.deriveFont(Font.PLAIN));
             lbl.setForeground(TEXT_SECONDARY);
             JLabel val = new JLabel(value);
-            val.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            val.setFont(FONT_BTN);
             val.setForeground(TEXT_PRIMARY);
             row.add(lbl, BorderLayout.WEST);
             row.add(val, BorderLayout.EAST);
@@ -947,7 +948,7 @@ public class EmployeePanel extends JPanel {
                     btn.setIcon(icon);
                 btn.setIconTextGap(6);
             }
-            btn.setFont(new Font("Segoe UI", Font.BOLD, 13));
+            btn.setFont(FONT_BTN);
             btn.setForeground(fg);
             btn.setBackground(bg);
             btn.setOpaque(false);
@@ -984,20 +985,20 @@ public class EmployeePanel extends JPanel {
 
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
-        mainPanel.setBackground(WHITE);
-        Color borderColor = isError ? PRIMARY_RED : GREEN_TEXT;
+        mainPanel.setBackground(SURFACE);
+        Color borderColor = isError ? ACCENT : SUCCESS;
         mainPanel.setBorder(BorderFactory.createCompoundBorder(
                 new RoundedBorder(16, borderColor),
                 new EmptyBorder(25, 30, 25, 30)));
 
         JLabel titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+        titleLabel.setFont(FONT_TITLE.deriveFont(18f));
         titleLabel.setForeground(borderColor);
         titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         JLabel messageLabel = new JLabel("<html><body style='width: 400px; word-wrap: break-word;'>"
                 + message.replace("\n", "<br>") + "</body></html>");
-        messageLabel.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        messageLabel.setFont(FONT_BODY);
         messageLabel.setForeground(TEXT_SECONDARY);
         messageLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
@@ -1010,16 +1011,16 @@ public class EmployeePanel extends JPanel {
         btnPanel.setOpaque(false);
         btnPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        Color btnBg = isError ? PRIMARY_RED : GREEN_TEXT;
-        Color btnHover = isError ? HOVER_RED : new Color(4, 120, 87);
-        JButton okBtn = createRoundedButton("OK", btnBg, WHITE, btnHover);
+        Color btnBg = isError ? ACCENT : SUCCESS;
+        Color btnHover = isError ? ACCENT_HOVER : SUCCESS.darker();
+        JButton okBtn = createRoundedButton("OK", btnBg, SURFACE, btnHover);
         okBtn.addActionListener(e -> dialog.dispose());
         btnPanel.add(okBtn);
 
         mainPanel.add(btnPanel);
         wrapper.add(mainPanel, BorderLayout.CENTER);
 
-        dialog.getContentPane().setBackground(WHITE);
+        dialog.getContentPane().setBackground(SURFACE);
         dialog.setContentPane(wrapper);
         dialog.pack();
         dialog.setSize(400, 250);

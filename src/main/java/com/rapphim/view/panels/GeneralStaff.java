@@ -75,7 +75,7 @@ public class GeneralStaff extends JPanel {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Cinema Manager Pro – Staff");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 750);
+            frame.setSize(1600, 800);
             frame.setLocationRelativeTo(null);
             frame.setContentPane(new GeneralStaff(employee));
             frame.setVisible(true);
@@ -249,15 +249,9 @@ public class GeneralStaff extends JPanel {
                 welcomeLabel.setForeground(TEXT_PRIMARY);
                 rightPanel.add(welcomeLabel);
             }
-            case "Sales & POS" -> rightPanel.add(createPlaceholderPanel(
-                    "Sales & POS", "images/icons/sales.png",
-                    "Quản lý bán vé và điểm bán hàng tại quầy."), BorderLayout.CENTER);
-            case "Transactions" -> rightPanel.add(createPlaceholderPanel(
-                    "Transactions", "images/icons/transactions.png",
-                    "Xem lịch sử và thống kê giao dịch."), BorderLayout.CENTER);
-            case "Showtimes" -> rightPanel.add(createPlaceholderPanel(
-                    "Showtimes", "images/icons/Showtimes.png",
-                    "Lập lịch và quản lý suất chiếu phim."), BorderLayout.CENTER);
+            case "Sales & POS" -> rightPanel.add(new StaffSalePanel(), BorderLayout.CENTER);
+            case "Transactions" -> rightPanel.add(new StaffTransactionPanel(), BorderLayout.CENTER);
+            case "Showtimes" -> rightPanel.add(new StaffShowPanel(), BorderLayout.CENTER);
             case "Settings" -> rightPanel.add(new SettingPanel(currentEmployee), BorderLayout.CENTER);
             default -> {
                 rightPanel.setLayout(new GridBagLayout());

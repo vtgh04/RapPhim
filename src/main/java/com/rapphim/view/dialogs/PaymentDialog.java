@@ -137,11 +137,11 @@ public class PaymentDialog extends JDialog {
             }
         }
 
-        PaymentCard cardCredit = new PaymentCard("CARD", "CREDIT CARD", "/images/icons/credit-card.png");
         PaymentCard cardCash = new PaymentCard("CASH", "CASH", "/images/icons/money.png");
+        PaymentCard cardCredit = new PaymentCard("CARD", "CREDIT CARD", "/images/icons/credit-card.png");
         PaymentCard cardBank = new PaymentCard("TRANSFER", "BANK", "/images/icons/transfer.png");
 
-        List<PaymentCard> allCards = Arrays.asList(cardCredit, cardCash, cardBank);
+        List<PaymentCard> allCards = Arrays.asList(cardCash, cardCredit, cardBank);
 
         for (PaymentCard c : allCards) {
             cardsPanel.add(c);

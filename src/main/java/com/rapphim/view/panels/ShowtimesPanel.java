@@ -25,21 +25,21 @@ import com.toedter.calendar.JDateChooser;
 
 public class ShowtimesPanel extends JPanel {
 
-    private static final Color BG = new Color(240, 242, 245);
-    private static final Color TXT = new Color(25, 25, 35);
-    private static final Color MUTED = new Color(120, 125, 140);
-    private static final Color BORDER = new Color(225, 228, 235);
-    private static final Color RED = new Color(220, 38, 38);
+    private Color BG = new Color(240, 242, 245);
+    private Color TXT = new Color(25, 25, 35);
+    private Color MUTED = new Color(120, 125, 140);
+    private Color BORDER = new Color(225, 228, 235);
+    private Color RED = new Color(220, 38, 38);
 
-    private static final Font F_NORM = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font F_BOLD = new Font("Segoe UI", Font.BOLD, 14);
-    private static final Font F_MONO = new Font("Consolas", Font.BOLD, 18);
+    private Font F_NORM = new Font("Segoe UI", Font.PLAIN, 13);
+    private Font F_BOLD = new Font("Segoe UI", Font.BOLD, 14);
+    private Font F_MONO = new Font("Consolas", Font.BOLD, 18);
 
-    private static final DateTimeFormatter TF = DateTimeFormatter.ofPattern("HH:mm");
-    private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private DateTimeFormatter TF = DateTimeFormatter.ofPattern("HH:mm");
+    private DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final ShowtimeDAO stDao = new ShowtimeDAO();
-    private final MovieDAO mvDao = new MovieDAO();
+    private ShowtimeDAO stDao = new ShowtimeDAO();
+    private MovieDAO mvDao = new MovieDAO();
     private Map<String, Movie> movieCache = new HashMap<>();
     private List<Showtime> todayList = new ArrayList<>();
     private Showtime selected;
@@ -59,7 +59,7 @@ public class ShowtimesPanel extends JPanel {
         add(buildNorth(), BorderLayout.NORTH);
         add(buildCenter(), BorderLayout.CENTER);
 
-        // F5 refresh
+        // Làm mới dữ liệu khi bấm F5
         getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("F5"), "refresh");
         getActionMap().put("refresh", new AbstractAction() {
             @Override
@@ -92,13 +92,13 @@ public class ShowtimesPanel extends JPanel {
         return movieCache.getOrDefault(movieId, null);
     }
 
-    // ════════════ NORTH ════════════
+    // Phần pNorth
     private JPanel buildNorth() {
         JPanel n = new JPanel(new BorderLayout(0, 14));
         n.setOpaque(false);
         n.setBorder(new EmptyBorder(0, 0, 18, 0));
 
-        // Title row
+        // Dòng tiêu đề
         JPanel tr = new JPanel(new BorderLayout());
         tr.setOpaque(false);
         JPanel tb = new JPanel();
@@ -146,13 +146,13 @@ public class ShowtimesPanel extends JPanel {
         tr.add(btnRow, BorderLayout.EAST);
         n.add(tr, BorderLayout.NORTH);
 
-        // Stats row
+        // Dòng thống kê
         statsRow = new JPanel(new GridLayout(1, 3, 14, 0));
         statsRow.setOpaque(false);
         updateStatsUI();
         n.add(statsRow, BorderLayout.CENTER);
 
-        // Search and Date row
+        // Dòng tìm kiếm và chọn ngày
         JPanel sRow = new JPanel(new BorderLayout(14, 0));
         sRow.setOpaque(false);
         sRow.setBorder(new EmptyBorder(10, 0, 0, 0));
@@ -232,7 +232,7 @@ public class ShowtimesPanel extends JPanel {
         return c;
     }
 
-    // ════════════ CENTER ════════════
+    // pCenter
     private JPanel buildCenter() {
         centerCardLayout = new CardLayout();
         centerCardPanel = new JPanel(centerCardLayout);
@@ -241,10 +241,8 @@ public class ShowtimesPanel extends JPanel {
         JPanel ctr = new JPanel(new BorderLayout(12, 0));
         ctr.setOpaque(false);
 
-        // pLeft scrolls independently
         ctr.add(buildLeft(), BorderLayout.CENTER);
 
-        // pRight (detailPanel) is fixed/sticky – not inside any scroll
         JPanel rightWrap = buildRight();
         rightWrap.setPreferredSize(new Dimension(320, 0));
         ctr.add(rightWrap, BorderLayout.EAST);
@@ -253,7 +251,7 @@ public class ShowtimesPanel extends JPanel {
         return centerCardPanel;
     }
 
-    // ════════════ LEFT ════════════
+    // LEFT
     private JPanel buildLeft() {
         JPanel w = new JPanel(new BorderLayout(0, 10));
         w.setOpaque(false);
@@ -425,7 +423,7 @@ public class ShowtimesPanel extends JPanel {
         return card;
     }
 
-    // ════════════ RIGHT ════════════
+    // RIGHT
     private JPanel buildRight() {
         detailPanel = new JPanel();
         detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
@@ -539,7 +537,6 @@ public class ShowtimesPanel extends JPanel {
         kl.setVerticalAlignment(SwingConstants.TOP);
         kl.setPreferredSize(new Dimension(65, 20));
 
-        // Use JTextArea for dynamic word wrapping to the exact container edge
         JTextArea vl = new JTextArea(v);
         vl.setFont(F_BOLD);
         vl.setForeground(TXT);
@@ -562,7 +559,6 @@ public class ShowtimesPanel extends JPanel {
         seatView.setBackground(Color.WHITE);
         seatView.setBorder(new CompoundBorder(new LineBorder(BORDER, 1, true), new EmptyBorder(20, 20, 20, 20)));
 
-        // Top header with Back Button
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
         header.setBorder(new EmptyBorder(0, 0, 20, 0));
@@ -790,7 +786,7 @@ public class ShowtimesPanel extends JPanel {
         return btn;
     }
 
-    // ════════════ ACTIONS ════════════
+    // ACTIONS
     private void selectST(Showtime st) {
         selected = st;
         populateList(searchField != null ? searchField.getText().trim() : "");
@@ -896,7 +892,7 @@ public class ShowtimesPanel extends JPanel {
         return b;
     }
 
-    private JButton mkBtn(String text, Color bg, Color hover) {
+    protected JButton mkBtn(String text, Color bg, Color hover) {
         JButton btn = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {

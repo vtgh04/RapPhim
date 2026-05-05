@@ -32,20 +32,16 @@ import com.rapphim.controller.LoginController;
 
 public class Login extends JFrame {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 1;
     private final int FIELD_W = 310;
     private final int FIELD_H = 40;
 
-    // Fields exposed to controller
     private JTextField usernameField;
     private JPasswordField pwField;
     private LoginController controller;
 
     public Login() {
-        setTitle("Cinema Manager Pro");
+        setTitle("Cinema  Pro");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1200, 650);
         setLocationRelativeTo(null);
@@ -68,7 +64,6 @@ public class Login extends JFrame {
             bannerLabel.setIcon(bannerIcon);
             bannerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
-            // Add title over the banner
             bannerLabel.setLayout(new GridBagLayout());
             JLabel titleBanner = new JLabel("RẠP PHIM CINEMAPRO");
             titleBanner.setFont(new Font("Segoe UI", Font.BOLD, 40));
@@ -163,17 +158,14 @@ public class Login extends JFrame {
 
         controller = new LoginController(this);
 
-        // Click handler — DB chạy trên background thread trong controller
         signInBtn.addActionListener(e -> {
             String username = usernameField.getText().trim();
             String password = new String(pwField.getPassword()).trim();
             controller.handleLogin(username, password, signInBtn);
         });
 
-        // Allow pressing Enter in password field to trigger login
         pwField.addActionListener(e -> signInBtn.doClick());
 
-        // Thêm logPanel vào giữa logPanelContainer
         logPanelContainer.add(logPanel);
 
         gbc.gridx = 1;
@@ -183,9 +175,6 @@ public class Login extends JFrame {
 
     }
 
-    /**
-     * Tạo một hàng input có icon bên trái.
-     */
     private JPanel createInputRow(String iconPath) {
         JPanel panel = new JPanel(new BorderLayout(8, 0));
         panel.setBackground(Color.WHITE);

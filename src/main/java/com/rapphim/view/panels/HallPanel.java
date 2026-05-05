@@ -45,7 +45,6 @@ public class HallPanel extends JPanel {
     private final HallDao hallDao = new HallDao();
     private List<CinemaHall> allHalls = new ArrayList<>();
 
-    // Dữ liệu phòng hiện tại
     private CinemaHall currentHall;
     private boolean isUpdatingCombo = false;
     private final Map<String, Seat> seatMap = new HashMap<>();
@@ -55,10 +54,9 @@ public class HallPanel extends JPanel {
     private JTextField txtHallName;
     private JTextField txtCap;
     private JComboBox<String> cmbType;
-    private JComboBox<String> cmbStatus; // Active / Inactive
+    private JComboBox<String> cmbStatus;
     private JPanel seatContainer;
 
-    // Hệ số giá mặc định theo loại ghế
     private JSpinner spnStdFactor;
     private JSpinner spnVipFactor;
 
@@ -334,10 +332,6 @@ public class HallPanel extends JPanel {
                 boolean newStatus = !seat.isBroken();
                 seat.setBroken(newStatus);
                 modifiedSeats.add(seat);
-
-                // Cần rebuild lại nút khi click vì icon phải tải lại (mờ / cờ lê)
-                // Tuy nhiên ta chỉ có thể đổi icon trên btn bằng cách repaint nếu ta thiết lập
-                // lại iconPath bên trong hoặc reload
                 Container parent = btn.getParent();
                 if (parent != null) {
                     int index = -1;
@@ -630,7 +624,7 @@ public class HallPanel extends JPanel {
         }
     }
 
-    /** Enable/disable seat clicking based on hall status. */
+    // Click khi sửa thông tin ghế
     private void refreshSeatInteractivity() {
         if (seatContainer == null)
             return;
@@ -647,7 +641,6 @@ public class HallPanel extends JPanel {
     }
 
     private JPanel buildPricingCard() {
-        // Lấy hệ số hiện tại từ database thông qua seatMap đã load
         double currentStd = 1.0;
         double currentVip = 1.5;
         if (spnStdFactor != null) {
@@ -819,13 +812,9 @@ public class HallPanel extends JPanel {
             seatContainer.repaint();
         }
 
-        // Refresh seat interactivity based on new hall status
         refreshSeatInteractivity();
     }
 
-    // =====================================================================
-    // CUSTOM MODERN DIALOG
-    // =====================================================================
     private void showModernMessageDialog(String title, String message, boolean isError) {
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
         JDialog dialog = new JDialog(parentFrame, title, true);

@@ -35,7 +35,7 @@ public class SettingPanel extends JPanel {
     private int totalHalls = 0;
     private int totalMovies = 0;
 
-    // CardLayout for sub-page navigation
+    // Sử dụng CardLayout
     private CardLayout cardLayout;
     private JPanel cardHost;
 
@@ -70,7 +70,7 @@ public class SettingPanel extends JPanel {
         cardHost = new JPanel(cardLayout);
         cardHost.setBackground(BG);
 
-        // ── Main settings page ─────────────────────────────────────────
+        // mainPanel Settings
         JPanel root = new JPanel(new BorderLayout());
         root.setOpaque(false);
         root.setBorder(new EmptyBorder(28, 32, 28, 32));
@@ -114,7 +114,7 @@ public class SettingPanel extends JPanel {
         scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(12);
 
-        // ── SecurityProfilePanel ───────────────────────────────────────
+        // securityPanel
         SecurityProfilePanel securityPanel = new SecurityProfilePanel(employee, () -> navigate("main"));
 
         cardHost.add(scroll, "main");
@@ -124,7 +124,7 @@ public class SettingPanel extends JPanel {
         add(cardHost, BorderLayout.CENTER);
     }
 
-    /** Navigate between setting sub-pages. */
+    /** Hàm chuyển giữa các trang cấu hình con. */
     private void navigate(String card) {
         cardLayout.show(cardHost, card);
     }
@@ -144,7 +144,7 @@ public class SettingPanel extends JPanel {
         profileRow.setBorder(new EmptyBorder(18, 24, 18, 24));
         profileRow.setMaximumSize(new Dimension(Integer.MAX_VALUE, 90));
 
-        // Avatar circle
+        // Hình tròn bao quanh Avatar
         JPanel avatar = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -171,7 +171,7 @@ public class SettingPanel extends JPanel {
         ico.setForeground(new Color(107, 114, 128));
         avatar.add(ico);
 
-        // Info stacked vertically centered
+        // Thông tin được xếp dọc nằm ở giữa
         JPanel info = new JPanel();
         info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
         info.setOpaque(false);
@@ -202,10 +202,9 @@ public class SettingPanel extends JPanel {
         profileRow.add(info);
         card.add(profileRow);
 
-        // Divider
         card.add(buildSep());
 
-        // Stats row
+        // Dòng hiển thị thống kê
         JPanel statsRow = new JPanel(new GridLayout(1, 3));
         statsRow.setOpaque(false);
         statsRow.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -312,7 +311,7 @@ public class SettingPanel extends JPanel {
             }
         });
 
-        // Icon box
+        // Ô chứa Icon
         JPanel iconBox = new JPanel(new GridBagLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -335,7 +334,7 @@ public class SettingPanel extends JPanel {
                 : null;
         JLabel emojiLbl = new JLabel(itemIcon != null ? itemIcon : null);
         if (itemIcon == null) {
-            emojiLbl.setText(item.iconPath); // Fallback to iconPath text if icon not found
+            emojiLbl.setText(item.iconPath); // Hiển thị text thay thế nếu không tìm thấy icon
             emojiLbl.setFont(new Font("Segoe UI", Font.PLAIN, 18));
         }
         emojiLbl.setForeground(C_ICON_FG);

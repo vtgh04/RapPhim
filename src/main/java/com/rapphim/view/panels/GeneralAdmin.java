@@ -41,7 +41,6 @@ public class GeneralAdmin extends JPanel {
     private static final Color BORDER_COLOR = new Color(228, 228, 228);
 
     private static final Font FONT_PLAIN_13 = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font FONT_BOLD_11 = new Font("Segoe UI", Font.BOLD, 11);
     private static final Font FONT_BOLD_26 = new Font("Segoe UI", Font.BOLD, 26);
 
     private static final int SIDEBAR_W = 200;
@@ -78,7 +77,7 @@ public class GeneralAdmin extends JPanel {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Ứng dụng bán vé tại rạp chiếu phim");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1600, 900);
+            frame.setSize(1600, 800);
             frame.setLocationRelativeTo(null);
             frame.setContentPane(new GeneralAdmin(employee));
             frame.setVisible(true);
@@ -136,17 +135,6 @@ public class GeneralAdmin extends JPanel {
         sidebar.add(createNavButton("Showtimes", "images/icons/Showtimes.png", false));
         sidebar.add(createNavButton("Halls & Seats", "images/icons/hall.png", false));
         sidebar.add(createNavButton("Employees", "images/icons/employees.png", false));
-
-        sidebar.add(Box.createRigidArea(new Dimension(0, 15)));
-
-        JLabel fbHeader = new JLabel("F&B MANAGEMENT");
-        fbHeader.setFont(FONT_BOLD_11);
-        fbHeader.setForeground(TEXT_SECONDARY);
-        fbHeader.setAlignmentX(Component.CENTER_ALIGNMENT);
-        fbHeader.setBorder(new EmptyBorder(10, 0, 10, 0));
-        sidebar.add(fbHeader);
-
-        sidebar.add(createNavButton("Products", "images/icons/Product.png", false));
 
         sidebar.add(Box.createVerticalGlue());
 
@@ -248,7 +236,7 @@ public class GeneralAdmin extends JPanel {
     }
 
     /**
-     * Display RightPanel content based on the navigation item clicked.
+     * Hiển thị nội dung pCenter (RightPanel) dựa trên menu (page) được chọn.
      */
     private void handleNavigation(String page) {
         rightPanel.removeAll();
@@ -269,9 +257,6 @@ public class GeneralAdmin extends JPanel {
             case "Sales & POS" -> rightPanel.add(new SalePanel(), BorderLayout.CENTER);
             case "Transactions" -> rightPanel.add(new TransactionPanel(), BorderLayout.CENTER);
             case "Showtimes" -> rightPanel.add(new ShowtimesPanel(), BorderLayout.CENTER);
-            case "Products" -> rightPanel.add(createPlaceholderPanel(
-                    "Products", "images/icons/Product.png",
-                    "Quản lý sản phẩm F&B: bắp rang, nước uống, combo."), BorderLayout.CENTER);
             case "Settings" -> rightPanel.add(new SettingPanel(currentEmployee), BorderLayout.CENTER);
             default -> {
                 rightPanel.setLayout(new GridBagLayout());
@@ -343,7 +328,6 @@ public class GeneralAdmin extends JPanel {
             case "Showtimes" -> "images/icons/Showtimes.png";
             case "Halls & Seats" -> "images/icons/hall.png";
             case "Employees" -> "images/icons/employees.png";
-            case "Products" -> "images/icons/Product.png";
             case "Settings" -> "images/icons/Setting.png";
             case "Logout" -> "images/icons/logout.png";
             default -> "";

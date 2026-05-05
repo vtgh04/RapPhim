@@ -15,7 +15,6 @@ public class SecurityProfilePanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    // ── Colors ─────────────────────────────────────────────────────────────
     private static final Color BG = new Color(240, 242, 245);
     private static final Color WHITE = Color.WHITE;
     private static final Color C_PRIMARY = new Color(17, 24, 39);
@@ -94,7 +93,7 @@ public class SecurityProfilePanel extends JPanel {
         return bar;
     }
 
-    // ── Main edit card ─────────────────────────────────────────────────────
+    // Panel chính để chỉnh sửa
     private JPanel buildEditCard() {
         JPanel card = new JPanel();
         card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
@@ -104,7 +103,7 @@ public class SecurityProfilePanel extends JPanel {
                 new EmptyBorder(28, 28, 28, 28)));
         card.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        // ── Section: Edit Information ─────────────────────────────────────
+        // Phần: Chỉnh sửa thông tin
         JLabel secEdit = new JLabel("Chỉnh sửa thông tin");
         secEdit.setFont(F_SECTION);
         secEdit.setForeground(C_PRIMARY);
@@ -119,7 +118,7 @@ public class SecurityProfilePanel extends JPanel {
         card.add(secSub);
         card.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // Row 1: Full Name + Username
+        // Dòng 1: Họ tên + Tên đăng nhập
         String nameVal = employee != null && employee.getFullName() != null ? employee.getFullName() : "";
         String userVal = employee != null && employee.getUsername() != null ? employee.getUsername() : "";
         txtFullName = styledField(nameVal, false);
@@ -127,7 +126,7 @@ public class SecurityProfilePanel extends JPanel {
         card.add(buildFieldRow("Họ và tên", txtFullName, "Username", txtUsername));
         card.add(Box.createRigidArea(new Dimension(0, 14)));
 
-        // Row 2: Email + Phone
+        // Dòng 2: Email + Số điện thoại
         String emailVal = employee != null && employee.getEmail() != null ? employee.getEmail() : "";
         String phoneVal = employee != null && employee.getPhone() != null ? employee.getPhone() : "";
         txtEmail = styledField(emailVal, false);
@@ -135,11 +134,11 @@ public class SecurityProfilePanel extends JPanel {
         card.add(buildFieldRow("Email", txtEmail, "Số điện thoại", txtPhone));
         card.add(Box.createRigidArea(new Dimension(0, 28)));
 
-        // Separator
+        // Đường kẻ ngang
         card.add(buildSep());
         card.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // ── Section: Change Password ──────────────────────────────────────
+        // Thay đổi mật khẩu
         JLabel secPwd = new JLabel("Thay mật khẩu");
         secPwd.setFont(F_SECTION);
         secPwd.setForeground(C_PRIMARY);
@@ -180,7 +179,7 @@ public class SecurityProfilePanel extends JPanel {
         return card;
     }
 
-    // ── 2-column field row ─────────────────────────────────────────────────
+    // Dòng chứa 2 cột nhập liệu
     private JPanel buildFieldRow(String lbl1, JComponent f1, String lbl2, JComponent f2) {
         JPanel row = new JPanel(new GridLayout(1, 2, 16, 0));
         row.setOpaque(false);
@@ -221,7 +220,7 @@ public class SecurityProfilePanel extends JPanel {
         return box;
     }
 
-    // ── Styled input field ─────────────────────────────────────────────────
+    // Cấu hình ô nhập liệu
     private JTextField styledField(String value, boolean readOnly) {
         JTextField tf = new JTextField(value);
         tf.setFont(F_INPUT);
@@ -257,7 +256,7 @@ public class SecurityProfilePanel extends JPanel {
         return sep;
     }
 
-    // ── Save handler ───────────────────────────────────────────────────────
+    // ─ Hàm xử lý khi lưu
     // Regex đồng bộ với AddEmployeeDialog
     private static final String REGEX_FULLNAME = "^[a-zA-Z\\p{L}\\s]{1,25}$";
     private static final String REGEX_PHONE = "^\\d{10}$";
@@ -311,7 +310,7 @@ public class SecurityProfilePanel extends JPanel {
             }
         }
 
-        // ── Persist to DB ──────────────────────────────────────────────────
+        // Lưu vào cơ sở dữ liệu
         try {
             Connection conn = DatabaseConnection.getInstance();
             if (!newPwd.isEmpty()) {
@@ -335,7 +334,7 @@ public class SecurityProfilePanel extends JPanel {
                 }
             }
 
-            // Update in-memory employee object
+            // Cập nhật lại đối tượng nhân viên
             employee.setFullName(newName);
             employee.setEmail(newEmail.isEmpty() ? null : newEmail);
             employee.setPhone(newPhone.isEmpty() ? null : newPhone);
@@ -346,7 +345,6 @@ public class SecurityProfilePanel extends JPanel {
             JOptionPane.showMessageDialog(this,
                     "Đã lưu thông tin thành công!", "Thành công", JOptionPane.INFORMATION_MESSAGE);
 
-            // ── Quay lại Settings sau khi lưu thành công ──────────────────
             onBack.run();
 
         } catch (SQLException ex) {

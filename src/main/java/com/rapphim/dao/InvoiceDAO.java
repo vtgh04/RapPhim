@@ -45,6 +45,17 @@ public class InvoiceDAO {
     // ── Update status ────────────────────────────────────────────────────────
     private static final String SQL_UPDATE_STATUS = "UPDATE invoices SET status = ? WHERE invoice_id = ?";
 
+    // ── Find by date range + employee ────────────────────────────────────────
+    private static final String SQL_FIND_BY_DATE_AND_EMP =
+            "SELECT i.invoice_id, i.employee_id, e.full_name, " +
+            "       i.created_at, i.total_amount, i.total_tickets, " +
+            "       i.payment_method, i.status, i.note " +
+            "FROM invoices i " +
+            "JOIN employees e ON i.employee_id = e.employee_id " +
+            "WHERE CAST(i.created_at AS DATE) BETWEEN ? AND ? AND i.employee_id = ? " +
+            "ORDER BY i.created_at DESC";
+
+
     // ═════════════════════════════════════════════════════════════════════════
 
     public List<Invoice> findAll() throws SQLException {
@@ -71,6 +82,21 @@ public class InvoiceDAO {
         }
         return list;
     }
+
+    public List<Invoice> findByDateAndEmployee(Date from, Date to, String employeeId) throws SQLException {
+        List<Invoice> list = new ArrayList<>();
+        Connection conn = DatabaseConnection.getInstance();
+        try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_BY_DATE_AND_EMP)) {
+            ps.setDate(1, from);
+            ps.setDate(2, to);
+            ps.setString(3, employeeId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(map(rs));
+            }
+        }
+        return list;
+    }
+
 
     public List<String[]> findInvoiceDetails(String invoiceId) throws SQLException {
         List<String[]> list = new ArrayList<>();

@@ -65,7 +65,6 @@ public class SalePanel extends JPanel {
     private Movie selectedMovie;
     private Showtime selectedShowtime;
     private java.util.List<Seat> selectedSeats = new ArrayList<>();
-    // A temporary cart model: Seat -> Price
     private Map<Seat, Double> cartMap = new LinkedHashMap<>();
 
     public SalePanel() {
@@ -96,20 +95,19 @@ public class SalePanel extends JPanel {
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = 0.6; // 60%
+        gbc.weightx = 0.6;
         gbc.weighty = 1.0;
         gbc.insets = new Insets(0, 0, 0, 16);
         add(leftCardPanel, gbc);
 
-        // --- RIGHT PANEL (Cart Sidebar) ---
         rightPanel = buildRightPanel();
 
-        gbc.weightx = 0.4; // 40%
+        gbc.weightx = 0.4;
         gbc.insets = new Insets(0, 0, 0, 0);
         add(rightPanel, gbc);
     }
 
-    // ================== MOVIE VIEW ==================
+    // MOVIE VIEW
     private JPanel buildMovieView() {
         JPanel wrap = new JPanel(new BorderLayout());
         wrap.setBackground(BG_PANEL);
@@ -117,7 +115,7 @@ public class SalePanel extends JPanel {
 
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        JLabel title = new JLabel("SELECT MOVIE");
+        JLabel title = new JLabel("SELECT MOIVE");
         title.setFont(F_H1);
         title.setForeground(TXT_DARK);
         header.add(title, BorderLayout.WEST);
@@ -484,7 +482,7 @@ public class SalePanel extends JPanel {
 
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        JButton btnBack = new JButton("< SELECT SEATS");
+        JButton btnBack = new JButton("<- SELECT SEATS");
         btnBack.setFont(F_H1);
         btnBack.setContentAreaFilled(false);
         btnBack.setBorderPainted(false);
@@ -728,7 +726,7 @@ public class SalePanel extends JPanel {
         // Header
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
-        JLabel lblOrder = new JLabel("CURRENT ORDER");
+        JLabel lblOrder = new JLabel("Giỏ hàng");
         lblOrder.setFont(F_H1);
         lblOrder.setForeground(TXT_DARK);
         header.add(lblOrder, BorderLayout.WEST);
@@ -805,10 +803,10 @@ public class SalePanel extends JPanel {
         lblTotal.setFont(F_H1);
         lblTotal.setForeground(PRIMARY);
 
-        bottom.add(totalRow("SUBTOTAL", lblSubtotal, F_NORM, TXT_DARK));
-        bottom.add(totalRow("TAX (10%)", lblTax, F_NORM, MUTED));
+        bottom.add(totalRow("Tạm tính", lblSubtotal, F_NORM, TXT_DARK));
+        bottom.add(totalRow("Thuế (10%)", lblTax, F_NORM, MUTED));
         bottom.add(Box.createRigidArea(new Dimension(0, 8)));
-        bottom.add(totalRow("TOTAL", lblTotal, F_H1, TXT_DARK));
+        bottom.add(totalRow("Tổng cộng", lblTotal, F_H1, TXT_DARK));
         bottom.add(Box.createRigidArea(new Dimension(0, 16)));
 
         JButton btnCheckout = new JButton("Thanh toán");
@@ -849,7 +847,7 @@ public class SalePanel extends JPanel {
         }
 
         if ("CARD".equals(method)) {
-            // Mock waiting for card swipe
+
             int choice = JOptionPane.showConfirmDialog(this,
                     "Đang chờ khách quẹt thẻ trên máy POS...\nKhách đã quẹt thẻ thành công chưa?",
                     "Máy POS Quẹt Thẻ", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
@@ -857,7 +855,8 @@ public class SalePanel extends JPanel {
                 return; // Khách hủy hoặc quẹt lỗi
             }
         } else if ("TRANSFER".equals(method)) {
-            com.rapphim.view.dialogs.TransferDialog transferDialog = new com.rapphim.view.dialogs.TransferDialog(SwingUtilities.getWindowAncestor(this), total);
+            com.rapphim.view.dialogs.TransferDialog transferDialog = new com.rapphim.view.dialogs.TransferDialog(
+                    SwingUtilities.getWindowAncestor(this), total);
             transferDialog.setVisible(true);
             if (!transferDialog.isPaid()) {
                 return; // Thu ngân xác nhận chưa nhận được tiền hoặc Hủy
@@ -870,8 +869,7 @@ public class SalePanel extends JPanel {
                     cartMap,
                     total,
                     method,
-                    "CONFIRMED"
-            );
+                    "CONFIRMED");
 
             if (success) {
                 JOptionPane.showMessageDialog(this, "Thanh toán thành công!");
@@ -907,7 +905,7 @@ public class SalePanel extends JPanel {
         double subtotal = 0;
 
         if (cartMap.isEmpty()) {
-            JLabel empty = new JLabel("CART IS EMPTY", SwingConstants.CENTER);
+            JLabel empty = new JLabel("GIỎ HÀNG TRỐNG", SwingConstants.CENTER);
             empty.setForeground(new Color(203, 213, 225));
             empty.setFont(F_BOLD);
             empty.setAlignmentX(CENTER_ALIGNMENT);

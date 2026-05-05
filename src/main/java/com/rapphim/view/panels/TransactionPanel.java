@@ -28,7 +28,7 @@ public class TransactionPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
-    // DESIGN TOKENS 
+    // Khai báo màu sắc và font chữ
     private static final Color BG_COLOR = new Color(240, 242, 245);
     private static final Color WHITE = Color.WHITE;
     private static final Color TEXT_PRIMARY = new Color(30, 30, 35);
@@ -52,16 +52,16 @@ public class TransactionPanel extends JPanel {
     private static final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 13);
 
     private JTable table;
-    private DefaultTableModel tableModel;
-    private TableRowSorter<DefaultTableModel> sorter;
+    protected DefaultTableModel tableModel;
+    protected TableRowSorter<DefaultTableModel> sorter;
 
     private JTextField searchField;
     private JComboBox<String> statusFilter;
-    private JDateChooser fromDate;
-    private JDateChooser toDate;
+    protected JDateChooser fromDate;
+    protected JDateChooser toDate;
 
-    private final InvoiceService invoiceService = new InvoiceService();
-    private List<Invoice> invoices = new ArrayList<>();
+    protected final InvoiceService invoiceService = new InvoiceService();
+    protected List<Invoice> invoices = new ArrayList<>();
 
     private static final String[] COLUMNS = {
             "INVOICE ID", "STAFF", "STAFF NAME", "DATE", "TICKETS", "TOTAL", "STATUS", "NOTE"
@@ -88,7 +88,7 @@ public class TransactionPanel extends JPanel {
         loadData();
     }
 
-    // HEADER 
+    // Phần pNorth (Tiêu đề)
     private JPanel createHeaderPanel() {
         JPanel header = new JPanel(new BorderLayout());
         header.setOpaque(false);
@@ -128,7 +128,7 @@ public class TransactionPanel extends JPanel {
         return header;
     }
 
-    // SEARCH 
+    // Phần pCenter (Tìm kiếm)
     private JPanel createSearchPanel() {
         JPanel panel = new RoundedPanel(14, WHITE);
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -145,17 +145,19 @@ public class TransactionPanel extends JPanel {
         searchField.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         searchField.setOpaque(false);
 
-        // Placeholder behaviour
         final String PLACEHOLDER = "Search invoices...";
         searchField.setText(PLACEHOLDER);
         searchField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override public void focusGained(java.awt.event.FocusEvent e) {
+            @Override
+            public void focusGained(java.awt.event.FocusEvent e) {
                 if (searchField.getText().equals(PLACEHOLDER)) {
                     searchField.setText("");
                     searchField.setForeground(TEXT_PRIMARY);
                 }
             }
-            @Override public void focusLost(java.awt.event.FocusEvent e) {
+
+            @Override
+            public void focusLost(java.awt.event.FocusEvent e) {
                 if (searchField.getText().isEmpty()) {
                     searchField.setText(PLACEHOLDER);
                     searchField.setForeground(TEXT_SECONDARY);
@@ -165,10 +167,16 @@ public class TransactionPanel extends JPanel {
 
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
-                if (!searchField.getText().equals(PLACEHOLDER)) applyFilters();
+                if (!searchField.getText().equals(PLACEHOLDER))
+                    applyFilters();
             }
-            public void removeUpdate(DocumentEvent e) { applyFilters(); }
-            public void changedUpdate(DocumentEvent e) {}
+
+            public void removeUpdate(DocumentEvent e) {
+                applyFilters();
+            }
+
+            public void changedUpdate(DocumentEvent e) {
+            }
         });
 
         fromDate = createDateChooser();
@@ -183,10 +191,10 @@ public class TransactionPanel extends JPanel {
         lblTo.setFont(FONT_TABLE);
         lblTo.setForeground(TEXT_PRIMARY);
 
-        statusFilter = new JComboBox<>(new String[]{"All Status",
+        statusFilter = new JComboBox<>(new String[] { "All Status",
                 InvoiceStatus.CONFIRMED.getValue(),
                 InvoiceStatus.PENDING.getValue(),
-                InvoiceStatus.CANCELLED.getValue()});
+                InvoiceStatus.CANCELLED.getValue() });
         statusFilter.setFont(FONT_TABLE);
         statusFilter.addActionListener(e -> applyFilters());
 
@@ -218,14 +226,17 @@ public class TransactionPanel extends JPanel {
         toDate.setDate(today);
     }
 
-    // TABLE 
+    // Phần bảng dữ liệu (Table)
     private JPanel createTablePanel() {
         JPanel tableContainer = new RoundedPanel(14, WHITE);
         tableContainer.setLayout(new BorderLayout());
         tableContainer.setBorder(new RoundedBorder(14, BORDER_COLOR));
 
         tableModel = new DefaultTableModel(COLUMNS, 0) {
-            @Override public boolean isCellEditable(int r, int c) { return false; }
+            @Override
+            public boolean isCellEditable(int r, int c) {
+                return false;
+            }
         };
 
         table = new JTable(tableModel);
@@ -260,22 +271,23 @@ public class TransactionPanel extends JPanel {
         return tableContainer;
     }
 
-    // LOGIC 
-    private void loadData() {
+    // Xử lý logic tải dữ liệu
+    protected void loadData() {
         new SwingWorker<List<Invoice>, Void>() {
             @Override
             protected List<Invoice> doInBackground() throws Exception {
                 Date from = new Date(fromDate.getDate().getTime());
-                Date to   = new Date(toDate.getDate().getTime());
+                Date to = new Date(toDate.getDate().getTime());
                 return invoiceService.getInvoicesByDate(from, to);
             }
+
             @Override
             protected void done() {
                 try {
                     invoices = get();
                     tableModel.setRowCount(0);
                     for (Invoice inv : invoices) {
-                        tableModel.addRow(new Object[]{
+                        tableModel.addRow(new Object[] {
                                 inv.getInvoiceId(),
                                 inv.getEmployeeId(),
                                 inv.getStaffName(),
@@ -307,7 +319,8 @@ public class TransactionPanel extends JPanel {
         if (!query.isEmpty() && !query.equals(PLACEHOLDER)) {
             try {
                 filters.add(RowFilter.regexFilter("(?i)" + query));
-            } catch (java.util.regex.PatternSyntaxException ignored) {}
+            } catch (java.util.regex.PatternSyntaxException ignored) {
+            }
         }
 
         if (!"All Status".equals(statusFilter.getSelectedItem())) {
@@ -323,8 +336,7 @@ public class TransactionPanel extends JPanel {
             new InvoiceDetailDialog(
                     parent,
                     invoiceId,
-                    invoiceService.getInvoiceDetails(invoiceId)
-            ).setVisible(true);
+                    invoiceService.getInvoiceDetails(invoiceId)).setVisible(true);
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
                     "Lỗi tải chi tiết hóa đơn:\n" + e.getMessage(),
@@ -332,7 +344,6 @@ public class TransactionPanel extends JPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
     }
-    
 
     private void handleExportExcel() {
         JFileChooser chooser = new JFileChooser();
@@ -349,17 +360,24 @@ public class TransactionPanel extends JPanel {
         }
     }
 
-    // UI HELPERS
+    // Các class hỗ trợ giao diện (Helpers)
     private ImageIcon loadIcon(String path, int w, int h) {
         URL url = getClass().getClassLoader().getResource(path);
-        if (url == null) return null;
+        if (url == null)
+            return null;
         return new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
     }
 
     private static class RoundedPanel extends JPanel {
         private final int radius;
         private final Color bg;
-        RoundedPanel(int r, Color b) { radius = r; bg = b; setOpaque(false); }
+
+        RoundedPanel(int r, Color b) {
+            radius = r;
+            bg = b;
+            setOpaque(false);
+        }
+
         protected void paintComponent(Graphics g) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
@@ -373,7 +391,12 @@ public class TransactionPanel extends JPanel {
     private static class RoundedBorder extends AbstractBorder {
         private final int r;
         private final Color c;
-        RoundedBorder(int r, Color c) { this.r = r; this.c = c; }
+
+        RoundedBorder(int r, Color c) {
+            this.r = r;
+            this.c = c;
+        }
+
         public void paintBorder(Component cpn, Graphics g, int x, int y, int w, int h) {
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setColor(c);
@@ -383,8 +406,9 @@ public class TransactionPanel extends JPanel {
     }
 
     private static class TotalRenderer extends DefaultTableCellRenderer {
-        private static final java.text.NumberFormat FMT =
-                java.text.NumberFormat.getNumberInstance(new java.util.Locale("vi", "VN"));
+        private static final java.text.NumberFormat FMT = java.text.NumberFormat
+                .getNumberInstance(new java.util.Locale("vi", "VN"));
+
         public Component getTableCellRendererComponent(JTable t, Object v, boolean s, boolean f, int r, int c) {
             String text = (v instanceof Number)
                     ? FMT.format(((Number) v).longValue()) + " ₫"
@@ -409,11 +433,17 @@ public class TransactionPanel extends JPanel {
             lbl.setBorder(new EmptyBorder(6, 14, 6, 14));
             switch (val) {
                 case "CONFIRMED":
-                    lbl.setBackground(GREEN_BG);  lbl.setForeground(GREEN_TEXT); break;
+                    lbl.setBackground(GREEN_BG);
+                    lbl.setForeground(GREEN_TEXT);
+                    break;
                 case "PENDING":
-                    lbl.setBackground(AMBER_BG);  lbl.setForeground(AMBER_TX);  break;
+                    lbl.setBackground(AMBER_BG);
+                    lbl.setForeground(AMBER_TX);
+                    break;
                 default: // CANCELLED
-                    lbl.setBackground(RED_BG);    lbl.setForeground(RED_TEXT);  break;
+                    lbl.setBackground(RED_BG);
+                    lbl.setForeground(RED_TEXT);
+                    break;
             }
             return lbl;
         }

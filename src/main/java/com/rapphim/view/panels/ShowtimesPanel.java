@@ -1,5 +1,6 @@
 package com.rapphim.view.panels;
 
+import com.rapphim.view.dialogs.AddShowTimeDialog;
 import com.rapphim.dao.MovieDAO;
 import com.rapphim.dao.ShowtimeDAO;
 import com.rapphim.model.Movie;
@@ -14,9 +15,13 @@ import java.awt.event.*;
 import java.io.File;
 import java.sql.SQLException;
 import java.text.NumberFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import com.toedter.calendar.JDateChooser;
 
 public class ShowtimesPanel extends JPanel {
 
@@ -30,7 +35,7 @@ public class ShowtimesPanel extends JPanel {
     private static final Font F_BOLD = new Font("Segoe UI", Font.BOLD, 14);
     private static final Font F_MONO = new Font("Consolas", Font.BOLD, 18);
 
-    private static final DateTimeFormatter TF = DateTimeFormatter.ofPattern("h:mm a");
+    private static final DateTimeFormatter TF = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     private final ShowtimeDAO stDao = new ShowtimeDAO();
@@ -38,6 +43,10 @@ public class ShowtimesPanel extends JPanel {
     private Map<String, Movie> movieCache = new HashMap<>();
     private List<Showtime> todayList = new ArrayList<>();
     private Showtime selected;
+    private LocalDate selectedDate = LocalDate.now();
+    private JPanel statsRow;
+    private CardLayout centerCardLayout;
+    private JPanel centerCardPanel;
     private JPanel listPanel, detailPanel;
     private JTextField searchField, priceField;
 
@@ -56,6 +65,7 @@ public class ShowtimesPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 loadData();
+                updateStatsUI();
                 selected = null;
                 populateList("");
                 showEmpty();
@@ -65,7 +75,10 @@ public class ShowtimesPanel extends JPanel {
 
     private void loadData() {
         try {
-            todayList = stDao.findTodayShowtimes();
+            stDao.autoUpdateStatuses(LocalDateTime.now());
+            LocalDateTime from = selectedDate.atTime(0, 0);
+            LocalDateTime to = from.plusDays(1);
+            todayList = stDao.findByDateRange(from, to);
             List<Movie> movies = mvDao.findAll();
             movieCache.clear();
             for (Movie m : movies)
@@ -94,7 +107,7 @@ public class ShowtimesPanel extends JPanel {
         JLabel t1 = new JLabel("Lịch Chiếu Phim");
         t1.setFont(F_BOLD.deriveFont(22f));
         t1.setForeground(TXT);
-        JLabel t2 = new JLabel("Quản lý suất chiếu trong ngày hôm nay");
+        JLabel t2 = new JLabel("Quản lý suất chiếu theo ngày");
         t2.setFont(F_NORM);
         t2.setForeground(MUTED);
         tb.add(t1);
@@ -104,43 +117,48 @@ public class ShowtimesPanel extends JPanel {
         JPanel btnRow = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
         btnRow.setOpaque(false);
 
-        JButton btnExport = mkBtn(" Export Excel", new Color(243, 244, 246), new Color(229, 231, 235));
+        JButton btnExport = mkBtn("Export Excel", new Color(243, 244, 246), new Color(229, 231, 235));
         btnExport.setForeground(TXT);
         btnExport.addActionListener(e -> handleExport());
         btnRow.add(btnExport);
 
-        JButton btnImport = mkBtn(" Import Excel", new Color(243, 244, 246), new Color(229, 231, 235));
+        JButton btnImport = mkBtn("Import Excel", new Color(243, 244, 246), new Color(229, 231, 235));
         btnImport.setForeground(TXT);
         btnImport.addActionListener(e -> handleImport());
         btnRow.add(btnImport);
 
-        JButton btnAdd = mkBtn(" Tạo suất chiếu", RED, new Color(185, 28, 28));
+        JButton btnAdd = mkBtn("Tạo suất chiếu", RED, new Color(185, 28, 28));
         btnAdd.setPreferredSize(new Dimension(180, 38));
-        btnAdd.addActionListener(e -> showMsg("Tính năng đang phát triển.", false));
+        btnAdd.addActionListener(e -> {
+            JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(ShowtimesPanel.this);
+            AddShowTimeDialog dlg = new AddShowTimeDialog(parentFrame);
+            dlg.setVisible(true);
+            if (dlg.isSaved()) {
+                loadData();
+                updateStatsUI();
+                selected = null;
+                populateList("");
+                showEmpty();
+            }
+        });
         btnRow.add(btnAdd);
 
         tr.add(btnRow, BorderLayout.EAST);
         n.add(tr, BorderLayout.NORTH);
 
         // Stats row
-        JPanel sr = new JPanel(new GridLayout(1, 3, 14, 0));
-        sr.setOpaque(false);
-        int total = 0, sched = 0, halls = 0;
-        try {
-            total = stDao.countAll();
-            sched = stDao.countByStatus(ShowtimeStatus.SCHEDULED);
-            halls = stDao.countActiveHalls();
-        } catch (SQLException ignored) {
-        }
-        sr.add(statCard("Tổng suất chiếu", total, new Color(59, 130, 246)));
-        sr.add(statCard("Đã lên lịch", sched, new Color(245, 158, 11)));
-        sr.add(statCard("Phòng hoạt động", halls, new Color(16, 185, 129)));
-        n.add(sr, BorderLayout.CENTER);
+        statsRow = new JPanel(new GridLayout(1, 3, 14, 0));
+        statsRow.setOpaque(false);
+        updateStatsUI();
+        n.add(statsRow, BorderLayout.CENTER);
 
-        // Search row
-        JPanel sRow = new JPanel(new BorderLayout(8, 0));
+        // Search and Date row
+        JPanel sRow = new JPanel(new BorderLayout(14, 0));
         sRow.setOpaque(false);
         sRow.setBorder(new EmptyBorder(10, 0, 0, 0));
+
+        JPanel searchBox = new JPanel(new BorderLayout(8, 0));
+        searchBox.setOpaque(false);
         searchField = new JTextField();
         searchField.setFont(F_NORM);
         searchField.setBorder(new CompoundBorder(
@@ -152,11 +170,51 @@ public class ShowtimesPanel extends JPanel {
                 populateList(searchField.getText().trim());
             }
         });
-        sRow.add(new JLabel("🔍"), BorderLayout.WEST);
-        sRow.add(searchField, BorderLayout.CENTER);
+        searchBox.add(new JLabel("🔍"), BorderLayout.WEST);
+        searchBox.add(searchField, BorderLayout.CENTER);
+
+        JDateChooser dateChooser = new JDateChooser(java.sql.Date.valueOf(selectedDate));
+        dateChooser.setDateFormatString("dd/MM/yyyy");
+        dateChooser.setFont(F_NORM);
+        dateChooser.setPreferredSize(new Dimension(160, 36));
+        dateChooser.addPropertyChangeListener("date", e -> {
+            if (e.getNewValue() != null) {
+                java.util.Date d = (java.util.Date) e.getNewValue();
+                selectedDate = d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+                loadData();
+                updateStatsUI();
+                selected = null;
+                populateList(searchField.getText().trim());
+                showEmpty();
+            }
+        });
+
+        sRow.add(searchBox, BorderLayout.CENTER);
+        sRow.add(dateChooser, BorderLayout.EAST);
         n.add(sRow, BorderLayout.SOUTH);
 
         return n;
+    }
+
+    private void updateStatsUI() {
+        statsRow.removeAll();
+        int total = todayList.size();
+        int sched = 0;
+        Set<String> activeHalls = new HashSet<>();
+        for (Showtime st : todayList) {
+            if (st.getStatus() == ShowtimeStatus.SCHEDULED) {
+                sched++;
+            }
+            if (st.getStatus() == ShowtimeStatus.SCHEDULED || st.getStatus() == ShowtimeStatus.ONGOING) {
+                activeHalls.add(st.getHallId());
+            }
+        }
+        int halls = activeHalls.size();
+        statsRow.add(statCard("Tổng suất chiếu", total, new Color(59, 130, 246)));
+        statsRow.add(statCard("Đã lên lịch", sched, new Color(245, 158, 11)));
+        statsRow.add(statCard("Phòng hoạt động", halls, new Color(16, 185, 129)));
+        statsRow.revalidate();
+        statsRow.repaint();
     }
 
     private JPanel statCard(String label, int val, Color accent) {
@@ -176,6 +234,10 @@ public class ShowtimesPanel extends JPanel {
 
     // ════════════ CENTER ════════════
     private JPanel buildCenter() {
+        centerCardLayout = new CardLayout();
+        centerCardPanel = new JPanel(centerCardLayout);
+        centerCardPanel.setOpaque(false);
+
         JPanel ctr = new JPanel(new BorderLayout(12, 0));
         ctr.setOpaque(false);
 
@@ -186,7 +248,9 @@ public class ShowtimesPanel extends JPanel {
         JPanel rightWrap = buildRight();
         rightWrap.setPreferredSize(new Dimension(320, 0));
         ctr.add(rightWrap, BorderLayout.EAST);
-        return ctr;
+
+        centerCardPanel.add(ctr, "LIST_VIEW");
+        return centerCardPanel;
     }
 
     // ════════════ LEFT ════════════
@@ -366,7 +430,7 @@ public class ShowtimesPanel extends JPanel {
         detailPanel = new JPanel();
         detailPanel.setLayout(new BoxLayout(detailPanel, BoxLayout.Y_AXIS));
         detailPanel.setBackground(Color.WHITE);
-        detailPanel.setBorder(new CompoundBorder(new LineBorder(BORDER, 1, true), new EmptyBorder(18, 18, 18, 18)));
+        detailPanel.setBorder(new CompoundBorder(new LineBorder(BORDER, 1, true), new EmptyBorder(12, 14, 12, 14)));
         showEmpty();
         return detailPanel;
     }
@@ -403,24 +467,22 @@ public class ShowtimesPanel extends JPanel {
         detailPanel.add(Box.createRigidArea(new Dimension(0, 12)));
 
         // Info grid
-        JPanel info = new JPanel(new GridLayout(0, 2, 6, 6));
+        JPanel info = new JPanel();
+        info.setLayout(new BoxLayout(info, BoxLayout.Y_AXIS));
         info.setBackground(new Color(248, 249, 252));
-        info.setBorder(new CompoundBorder(new LineBorder(BORDER, 1, true), new EmptyBorder(12, 14, 12, 14)));
+        info.setBorder(new CompoundBorder(new LineBorder(BORDER, 1, true), new EmptyBorder(8, 12, 2, 12)));
         info.setAlignmentX(LEFT_ALIGNMENT);
-        info.setMaximumSize(new Dimension(Integer.MAX_VALUE, 300));
+        info.setMaximumSize(new Dimension(Integer.MAX_VALUE, 210));
 
         infoRow(info, "Movie:", mv != null ? mv.getTitle() : st.getMovieId());
         infoRow(info, "Hall:", "HALL " + st.getHallId().replaceAll("[^0-9]", ""));
-        infoRow(info, "Language:", mv != null ? mv.getLanguage() : "N/A");
-        infoRow(info, "Rating:", mv != null ? mv.getRating() : "N/A");
-        infoRow(info, "Duration:", mv != null ? mv.getDurationMins() + " mins" : "N/A");
         infoRow(info, "Start:", st.getStartTime().format(TF));
         infoRow(info, "End:", st.getEndTime().format(TF));
         infoRow(info, "Date:", st.getStartTime().format(DF));
         infoRow(info, "Status:", st.getStatus().getValue());
 
         detailPanel.add(info);
-        detailPanel.add(Box.createRigidArea(new Dimension(0, 14)));
+        detailPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
         // Price editor
         JLabel pl = new JLabel("Base Price (VND)");
@@ -446,24 +508,286 @@ public class ShowtimesPanel extends JPanel {
         btn.addActionListener(e -> handleUpdate(st));
         detailPanel.add(btn);
 
+        // Xem ghế button
+        detailPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        JButton btnSeatMap = mkBtn("Xem sơ đồ ghế", new Color(234, 179, 8), new Color(202, 138, 4));
+        btnSeatMap.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+        btnSeatMap.setAlignmentX(LEFT_ALIGNMENT);
+        btnSeatMap.addActionListener(e -> showSeatMap(st));
+        detailPanel.add(btnSeatMap);
+
+        if (st.getStatus() == ShowtimeStatus.SCHEDULED) {
+            detailPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+            JButton btnCancel = mkBtn("Hủy suất chiếu", new Color(156, 163, 175), new Color(107, 114, 128));
+            btnCancel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+            btnCancel.setAlignmentX(LEFT_ALIGNMENT);
+            btnCancel.addActionListener(e -> handleCancel(st));
+            detailPanel.add(btnCancel);
+        }
+
         detailPanel.revalidate();
         detailPanel.repaint();
     }
 
     private void infoRow(JPanel p, String k, String v) {
+        JPanel row = new JPanel(new BorderLayout(10, 0));
+        row.setOpaque(false);
+
         JLabel kl = new JLabel(k);
         kl.setFont(F_NORM.deriveFont(11f));
         kl.setForeground(MUTED);
         kl.setVerticalAlignment(SwingConstants.TOP);
+        kl.setPreferredSize(new Dimension(65, 20));
 
-        // Wrap value if it's too long
-        JLabel vl = new JLabel("<html><p style='width: 115px; margin: 0; padding: 0;'>" + v + "</p></html>");
+        // Use JTextArea for dynamic word wrapping to the exact container edge
+        JTextArea vl = new JTextArea(v);
         vl.setFont(F_BOLD);
         vl.setForeground(TXT);
-        vl.setVerticalAlignment(SwingConstants.TOP);
-        
-        p.add(kl);
-        p.add(vl);
+        vl.setLineWrap(true);
+        vl.setWrapStyleWord(true);
+        vl.setOpaque(false);
+        vl.setEditable(false);
+        vl.setFocusable(false);
+        vl.setBorder(BorderFactory.createEmptyBorder());
+
+        row.add(kl, BorderLayout.WEST);
+        row.add(vl, BorderLayout.CENTER);
+
+        p.add(row);
+        p.add(Box.createRigidArea(new Dimension(0, 10)));
+    }
+
+    private void showSeatMap(Showtime st) {
+        JPanel seatView = new JPanel(new BorderLayout());
+        seatView.setBackground(Color.WHITE);
+        seatView.setBorder(new CompoundBorder(new LineBorder(BORDER, 1, true), new EmptyBorder(20, 20, 20, 20)));
+
+        // Top header with Back Button
+        JPanel header = new JPanel(new BorderLayout());
+        header.setOpaque(false);
+        header.setBorder(new EmptyBorder(0, 0, 20, 0));
+
+        JButton btnBack = new JButton();
+        try {
+            ImageIcon icon = new ImageIcon(getClass().getResource("/images/icons/left-arrow.png"));
+            Image img = icon.getImage().getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+            btnBack.setIcon(new ImageIcon(img));
+        } catch (Exception e) {
+        }
+        btnBack.setToolTipText("Quay về");
+        btnBack.setContentAreaFilled(false);
+        btnBack.setBorderPainted(false);
+        btnBack.setFocusPainted(false);
+        btnBack.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        btnBack.addActionListener(e -> centerCardLayout.show(centerCardPanel, "LIST_VIEW"));
+        header.add(btnBack, BorderLayout.WEST);
+
+        JLabel title = new JLabel("Sơ đồ ghế - " + st.getShowtimeId() + " (" + st.getHallId() + ")",
+                SwingConstants.CENTER);
+        title.setFont(F_BOLD.deriveFont(18f));
+        title.setForeground(TXT);
+        header.add(title, BorderLayout.CENTER);
+
+        seatView.add(header, BorderLayout.NORTH);
+
+        // Fetch data
+        com.rapphim.dao.HallDao hallDao = new com.rapphim.dao.HallDao();
+        com.rapphim.model.CinemaHall hall = null;
+        java.util.List<com.rapphim.model.Seat> seats = null;
+        java.util.Map<String, com.rapphim.model.enums.ShowSeatStatus> statuses = null;
+        try {
+            hall = hallDao.findHallById(st.getHallId());
+            seats = hallDao.findSeatsByHall(st.getHallId());
+            statuses = stDao.getShowSeatStatuses(st.getShowtimeId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        if (hall != null && seats != null) {
+            JPanel mapWrapper = new JPanel(new BorderLayout());
+            mapWrapper.setOpaque(false);
+
+            // Screen bar
+            JPanel screenPanel = new JPanel() {
+                @Override
+                protected void paintComponent(Graphics g) {
+                    super.paintComponent(g);
+                    Graphics2D g2 = (Graphics2D) g.create();
+                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                    int w = getWidth(), h = getHeight();
+                    g2.setPaint(
+                            new GradientPaint(0, 0, new Color(255, 130, 130, 80), w, 0, new Color(255, 130, 130, 30)));
+                    g2.fillRoundRect(40, 4, w - 80, h - 8, 8, 8);
+                    g2.dispose();
+                    Graphics2D g3 = (Graphics2D) g.create();
+                    g3.setFont(new Font("Segoe UI", Font.BOLD, 10));
+                    g3.setColor(new Color(160, 60, 60));
+                    FontMetrics fm = g3.getFontMetrics();
+                    String txt = "Màn hình";
+                    g3.drawString(txt, (w - fm.stringWidth(txt)) / 2, h / 2 + 4);
+                    g3.dispose();
+                }
+            };
+            screenPanel.setOpaque(false);
+            screenPanel.setPreferredSize(new Dimension(0, 30));
+            mapWrapper.add(screenPanel, BorderLayout.NORTH);
+
+            // Grid
+            int rows = hall.getTotalRows();
+            int cols = hall.getTotalCols();
+            JPanel grid = new JPanel(new GridLayout(rows, cols + 2, 5, 6));
+            grid.setOpaque(false);
+            grid.setBorder(new EmptyBorder(16, 10, 16, 10));
+
+            java.util.Map<String, com.rapphim.model.Seat> seatMap = new java.util.HashMap<>();
+            for (com.rapphim.model.Seat s : seats) {
+                seatMap.put(s.getRowChar() + "" + s.getColNumber(), s);
+            }
+
+            for (int r = 1; r <= rows; r++) {
+                char rowChar = (char) ('A' + r - 1);
+                String rowStr = String.valueOf(rowChar);
+
+                JLabel rl1 = new JLabel(rowStr, SwingConstants.CENTER);
+                rl1.setFont(F_BOLD.deriveFont(12f));
+                rl1.setForeground(MUTED);
+                grid.add(rl1);
+
+                for (int c = 1; c <= cols; c++) {
+                    String key = rowStr + c;
+                    com.rapphim.model.Seat seat = seatMap.get(key);
+                    if (seat != null) {
+                        com.rapphim.model.enums.ShowSeatStatus sStatus = statuses != null
+                                ? statuses.get(seat.getSeatId())
+                                : com.rapphim.model.enums.ShowSeatStatus.AVAILABLE;
+                        grid.add(buildSeatButton(seat, sStatus, c));
+                    } else {
+                        grid.add(new JLabel(""));
+                    }
+                }
+
+                JLabel rl2 = new JLabel(rowStr, SwingConstants.CENTER);
+                rl2.setFont(F_BOLD.deriveFont(12f));
+                rl2.setForeground(MUTED);
+                grid.add(rl2);
+            }
+            JScrollPane scrollGrid = new JScrollPane(grid);
+            scrollGrid.setBorder(BorderFactory.createEmptyBorder());
+            scrollGrid.getViewport().setBackground(Color.WHITE);
+            mapWrapper.add(scrollGrid, BorderLayout.CENTER);
+
+            // Legend
+            JPanel legend = new JPanel(new FlowLayout(FlowLayout.CENTER, 24, 8));
+            legend.setOpaque(false);
+            legend.add(legendItem(new Color(255, 130, 130), "Phổ thông)"));
+            legend.add(legendItem(new Color(255, 255, 0), "Vip "));
+            legend.add(legendItem(new Color(156, 163, 175), "Đã bán"));
+            legend.add(legendItemImage("/images/icons/wrench.png", "Hỏng"));
+            mapWrapper.add(legend, BorderLayout.SOUTH);
+
+            seatView.add(mapWrapper, BorderLayout.CENTER);
+        } else {
+            JLabel err = new JLabel("Không thể tải sơ đồ ghế.", SwingConstants.CENTER);
+            seatView.add(err, BorderLayout.CENTER);
+        }
+
+        centerCardPanel.add(seatView, "SEAT_VIEW");
+        centerCardLayout.show(centerCardPanel, "SEAT_VIEW");
+    }
+
+    private JPanel legendItem(Color color, String label) {
+        JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        item.setOpaque(false);
+        JLabel icon = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.setColor(color);
+                g.fillRect(0, 0, 16, 16);
+            }
+        };
+        icon.setPreferredSize(new Dimension(16, 16));
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(F_NORM.deriveFont(11f));
+        lbl.setForeground(TXT);
+        item.add(icon);
+        item.add(lbl);
+        return item;
+    }
+
+    private JPanel legendItemImage(String iconPath, String label) {
+        JPanel item = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 0));
+        item.setOpaque(false);
+        java.net.URL imgUrl = getClass().getResource(iconPath);
+        final Image seatImg = (imgUrl != null) ? new ImageIcon(imgUrl).getImage() : null;
+        JLabel icon = new JLabel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                if (seatImg != null)
+                    g.drawImage(seatImg, 0, 0, 16, 16, this);
+            }
+        };
+        icon.setPreferredSize(new Dimension(16, 16));
+        JLabel lbl = new JLabel(label);
+        lbl.setFont(F_NORM.deriveFont(11f));
+        lbl.setForeground(TXT);
+        item.add(icon);
+        item.add(lbl);
+        return item;
+    }
+
+    private JButton buildSeatButton(com.rapphim.model.Seat seat, com.rapphim.model.enums.ShowSeatStatus sStatus,
+            int col) {
+        boolean isBroken = seat.isBroken();
+        boolean isBooked = sStatus == com.rapphim.model.enums.ShowSeatStatus.BOOKED;
+
+        String iconPath = isBroken ? "/images/icons/wrench.png"
+                : (isBooked ? null
+                        : (seat.getSeatType() == com.rapphim.model.enums.SeatType.VIP ? "/images/icons/Yellow Chair.png"
+                                : "/images/icons/chair.png"));
+        java.net.URL imgUrl = iconPath != null ? getClass().getResource(iconPath) : null;
+        final Image seatImg = (imgUrl != null) ? new ImageIcon(imgUrl).getImage() : null;
+
+        JButton btn = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+                if (seatImg != null) {
+                    int w = seatImg.getWidth(null), h = seatImg.getHeight(null);
+                    if (w > 0 && h > 0) {
+                        double scale = Math.min((double) getWidth() / w, (double) getHeight() / h);
+                        int drawW = (int) (w * scale), drawH = (int) (h * scale);
+                        int drawX = (getWidth() - drawW) / 2, drawY = (getHeight() - drawH) / 2;
+                        g2.drawImage(seatImg, drawX, drawY, drawW, drawH, this);
+                    } else {
+                        g2.drawImage(seatImg, 0, 0, getWidth(), getHeight(), this);
+                    }
+                } else {
+                    Color bg = isBooked ? new Color(156, 163, 175) : new Color(34, 197, 94);
+                    g2.setColor(bg);
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 8, 8);
+                }
+
+                if (!isBroken) {
+                    g2.setFont(F_BOLD.deriveFont(11f));
+                    g2.setColor(Color.WHITE);
+                    String text = String.valueOf(col);
+                    FontMetrics fm = g2.getFontMetrics();
+                    int x = (getWidth() - fm.stringWidth(text)) / 2;
+                    int y = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+                    g2.drawString(text, x, y - 2);
+                }
+                g2.dispose();
+            }
+        };
+        btn.setPreferredSize(new Dimension(32, 32));
+        btn.setContentAreaFilled(false);
+        btn.setBorderPainted(false);
+        btn.setFocusPainted(false);
+        btn.setToolTipText(seat.getRowChar() + "" + seat.getColNumber() + (isBooked ? " (Đã đặt)" : " (Trống)"));
+        return btn;
     }
 
     // ════════════ ACTIONS ════════════
@@ -488,6 +812,33 @@ public class ShowtimesPanel extends JPanel {
             populateList(searchField.getText().trim());
         } catch (Exception ex) {
             showMsg("Lỗi: " + ex.getMessage(), true);
+        }
+    }
+
+    private void handleCancel(Showtime st) {
+        LocalDateTime now = LocalDateTime.now();
+        if (now.plusDays(5).isAfter(st.getStartTime())) {
+            showMsg("Chỉ được hủy suất chiếu ít nhất 5 ngày trước giờ chiếu!", true);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(
+                SwingUtilities.getWindowAncestor(this),
+                "Bạn có chắc chắn muốn hủy suất chiếu này?",
+                "Xác nhận hủy",
+                JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                stDao.updateStatus(st.getShowtimeId(), ShowtimeStatus.CANCELLED);
+                st.setStatus(ShowtimeStatus.CANCELLED);
+                showMsg("Hủy suất chiếu thành công!", false);
+                updateStatsUI();
+                populateList(searchField != null ? searchField.getText().trim() : "");
+                showDetail(st);
+            } catch (SQLException ex) {
+                showMsg("Lỗi: " + ex.getMessage(), true);
+            }
         }
     }
 

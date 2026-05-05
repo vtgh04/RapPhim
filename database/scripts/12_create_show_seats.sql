@@ -1,4 +1,4 @@
-
+-- ============================================================
 --  Script : 12_create_show_seats.sql
 --  DBMS   : Microsoft SQL Server 2019+
 --  Mô tả  : Tạo bảng show_seats (trạng thái ghế trong từng suất chiếu)
@@ -43,4 +43,4 @@ CREATE INDEX idx_show_seats_held     ON dbo.show_seats (held_until) WHERE held_u
 GO
 
 PRINT N'[OK] Bảng dbo.show_seats đã được tạo thành công.';
-GOs
+GO

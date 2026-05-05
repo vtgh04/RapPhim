@@ -46,6 +46,7 @@ public class LoginController {
 
                 try {
                     Employee employee = get();
+                    com.rapphim.dao.EmployeeDAO.setLoggedInEmployee(employee.getEmployeeId());
                     openMainPage(employee);
                 } catch (java.util.concurrent.ExecutionException ee) {
                     Throwable cause = ee.getCause();

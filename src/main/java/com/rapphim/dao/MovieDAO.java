@@ -5,33 +5,48 @@ import com.rapphim.model.Movie;
 import com.rapphim.model.enums.MovieStatus;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 public class MovieDAO {
 
-    private static final String SQL_FIND_ALL = "SELECT movie_id, title, genre, duration_mins, format_movie, rating, language, release_date, status, description, poster_url FROM movies ORDER BY movie_id";
+    private static final String COLS =
+            "movie_id, title, genre, duration_mins, format_movie, rating, language," +
+            " release_date, status, description, poster_url";
 
-    private static final String SQL_FIND_BY_ID = "SELECT movie_id, title, genre, duration_mins, format_movie, rating, language, release_date, status, description, poster_url FROM movies WHERE movie_id = ?";
+    private static final String SQL_FIND_ALL =
+            "SELECT " + COLS + " FROM movies ORDER BY movie_id";
 
-    private static final String SQL_INSERT = "INSERT INTO movies (movie_id, title, genre, duration_mins, format_movie, rating, language, release_date, status, description, poster_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_FIND_BY_ID =
+            "SELECT " + COLS + " FROM movies WHERE movie_id = ?";
 
-    private static final String SQL_UPDATE = "UPDATE movies SET title = ?, genre = ?, duration_mins = ?, format_movie = ?, rating = ?, language = ?, release_date = ?, status = ?, description = ?, poster_url = ? WHERE movie_id = ?";
+    private static final String SQL_INSERT =
+            "INSERT INTO movies (" + COLS + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_MAX_ID = "SELECT MAX(movie_id) AS max_id FROM movies";
+    private static final String SQL_UPDATE =
+            "UPDATE movies SET title = ?, genre = ?, duration_mins = ?, format_movie = ?, rating = ?," +
+            " language = ?, release_date = ?, status = ?, description = ?, poster_url = ?" +
+            " WHERE movie_id = ?";
+
+    private static final String SQL_MAX_ID =
+            "SELECT MAX(movie_id) AS max_id FROM movies";
+
+    // ═════════════════════════════════════════════════════════════════════════
 
     public List<Movie> findAll() throws SQLException {
         List<Movie> movies = new ArrayList<>();
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_ALL);
-                ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                movies.add(mapRow(rs));
-            }
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) movies.add(mapRow(rs));
         }
         return movies;
     }
@@ -41,12 +56,9 @@ public class MovieDAO {
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_BY_ID)) {
             ps.setString(1, id);
             try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(mapRow(rs));
-                }
+                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
             }
         }
-        return Optional.empty();
     }
 
     public void insert(Movie movie) throws SQLException {
@@ -59,11 +71,7 @@ public class MovieDAO {
             ps.setString(5, movie.getFormatMovie());
             ps.setString(6, movie.getRating());
             ps.setNString(7, movie.getLanguage());
-            if (movie.getReleaseDate() != null) {
-                ps.setDate(8, java.sql.Date.valueOf(movie.getReleaseDate()));
-            } else {
-                ps.setNull(8, java.sql.Types.DATE);
-            }
+            setDateOrNull(ps, 8, movie.getReleaseDate());
             ps.setString(9, movie.getStatus().getValue());
             ps.setNString(10, movie.getDescription());
             ps.setString(11, movie.getPosterUrl());
@@ -80,11 +88,7 @@ public class MovieDAO {
             ps.setString(4, movie.getFormatMovie());
             ps.setString(5, movie.getRating());
             ps.setNString(6, movie.getLanguage());
-            if (movie.getReleaseDate() != null) {
-                ps.setDate(7, java.sql.Date.valueOf(movie.getReleaseDate()));
-            } else {
-                ps.setNull(7, java.sql.Types.DATE);
-            }
+            setDateOrNull(ps, 7, movie.getReleaseDate());
             ps.setString(8, movie.getStatus().getValue());
             ps.setNString(9, movie.getDescription());
             ps.setString(10, movie.getPosterUrl());
@@ -95,23 +99,28 @@ public class MovieDAO {
 
     public String getNextMovieId() throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
-        try (PreparedStatement ps = conn.prepareStatement(SQL_MAX_ID);
-                ResultSet rs = ps.executeQuery()) {
+        try (Statement st = conn.createStatement();
+             ResultSet rs = st.executeQuery(SQL_MAX_ID)) {
             if (rs.next()) {
                 String maxId = rs.getString("max_id");
                 if (maxId != null && maxId.startsWith("MOV")) {
-                    int num = Integer.parseInt(maxId.substring(3));
-                    return String.format("MOV%03d", num + 1);
+                    return String.format("MOV%03d", Integer.parseInt(maxId.substring(3)) + 1);
                 }
             }
         }
         return "MOV001";
     }
 
-    private Movie mapRow(ResultSet rs) throws SQLException {
-        java.sql.Date sqlDate = rs.getDate("release_date");
-        java.time.LocalDate releaseDate = sqlDate != null ? sqlDate.toLocalDate() : null;
+    // ── Helpers ──────────────────────────────────────────────────────────────
 
+    /** Sets a DATE parameter, or SQL NULL if the value is null. */
+    private static void setDateOrNull(PreparedStatement ps, int idx, LocalDate date) throws SQLException {
+        if (date != null) ps.setDate(idx, Date.valueOf(date));
+        else ps.setNull(idx, Types.DATE);
+    }
+
+    private Movie mapRow(ResultSet rs) throws SQLException {
+        Date sqlDate = rs.getDate("release_date");
         return new Movie(
                 rs.getString("movie_id"),
                 rs.getString("title"),
@@ -120,7 +129,7 @@ public class MovieDAO {
                 rs.getString("format_movie"),
                 rs.getString("rating"),
                 rs.getString("language"),
-                releaseDate,
+                sqlDate != null ? sqlDate.toLocalDate() : null,
                 MovieStatus.fromString(rs.getString("status")),
                 rs.getString("description"),
                 rs.getString("poster_url"));

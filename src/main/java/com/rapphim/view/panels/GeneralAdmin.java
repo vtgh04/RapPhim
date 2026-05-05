@@ -266,9 +266,7 @@ public class GeneralAdmin extends JPanel {
             case "Employees" -> rightPanel.add(new EmployeePanel(), BorderLayout.CENTER);
             case "Movies" -> rightPanel.add(new MoviePanel(), BorderLayout.CENTER);
             case "Halls & Seats" -> rightPanel.add(new HallPanel(), BorderLayout.CENTER);
-            case "Sales & POS" -> rightPanel.add(createPlaceholderPanel(
-                    "Sales & POS", "images/icons/sales.png",
-                    "Quản lý bán vé và điểm bán hàng tại quầy."), BorderLayout.CENTER);
+            case "Sales & POS" -> rightPanel.add(new SalePanel(), BorderLayout.CENTER);
             case "Transactions" -> rightPanel.add(new TransactionPanel(), BorderLayout.CENTER);
             case "Showtimes" -> rightPanel.add(new ShowtimesPanel(), BorderLayout.CENTER);
             case "Products" -> rightPanel.add(createPlaceholderPanel(

@@ -15,7 +15,7 @@ public class InvoiceDetailDialog extends JDialog {
         setLocationRelativeTo(parent);
 
         JTable table = new JTable(new DefaultTableModel(
-                new String[]{"Movie", "Seat", "Price"}, 0
+                new String[]{"Tên phim", "Mã phim", "Mã vé", "Ghế", "Giá"}, 0
         ));
         DefaultTableModel model = (DefaultTableModel) table.getModel();
         details.forEach(model::addRow);

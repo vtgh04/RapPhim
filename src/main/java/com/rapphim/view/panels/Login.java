@@ -71,7 +71,7 @@ public class Login extends JFrame {
             // Add title over the banner
             bannerLabel.setLayout(new GridBagLayout());
             JLabel titleBanner = new JLabel("RẠP PHIM CINEMAPRO");
-            titleBanner.setFont(new Font("Arrial", Font.BOLD, 40));
+            titleBanner.setFont(new Font("Segoe UI", Font.BOLD, 40));
             titleBanner.setForeground(Color.WHITE);
 
             GridBagConstraints titleGbc = new GridBagConstraints();

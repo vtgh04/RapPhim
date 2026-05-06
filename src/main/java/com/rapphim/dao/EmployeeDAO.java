@@ -27,35 +27,35 @@ public class EmployeeDAO {
     }
     // ------------------------------------------------
 
-    // ── Tìm kiếm theo tên đăng nhập ─────────────────────────────────────
+    // Tìm kiếm theo tên đăng nhập
     private static final String SQL_FIND_BY_USERNAME = "SELECT employee_id, full_name, username, password," +
             "       role, status, phone, email" +
             "  FROM employees" +
             " WHERE username = ?";
-    // ── Tìm kiếm theo mã nhân viên ──────────────────────────────────────
+    // Tìm kiếm theo mã nhân viên
     private static final String SQL_FIND_BY_ID = "SELECT employee_id, full_name, username, password," +
             "       role, status, phone, email" +
             "  FROM employees" +
             " WHERE employee_id = ?";
-    // ── Lấy toàn bộ nhân viên ───────────────────────────────────────────
+    // Lấy toàn bộ nhân viên
     private static final String SQL_FIND_ALL = "SELECT employee_id, full_name, username, password," +
             "       role, status, phone, email" +
             "  FROM employees" +
             " ORDER BY employee_id";
-    // ── Thêm nhân viên ─────────────────────────────────────────────────
+    // Thêm nhân viên
     private static final String SQL_INSERT = "INSERT INTO employees " +
             "(employee_id, full_name, username, password, role, status, phone, email) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-    // ── Cập nhật nhân viên ──────────────────────────────────────────────
+    // Cập nhật nhân viên
     private static final String SQL_UPDATE = "UPDATE employees SET " +
             "full_name = ?, username = ?, role = ?, status = ?, phone = ?, email = ? " +
             "WHERE employee_id = ?";
 
-    // ── Xoá nhân viên ──────────────────────────────────────────────────
+    // Xoá nhân viên
     private static final String SQL_DELETE = "DELETE FROM employees WHERE employee_id = ?";
 
-    // ── Lấy mã nhân viên tiếp theo ──────────────────────────────────────
+    // Lấy mã nhân viên tiếp theo ──────────────────────────────────────
     private static final String SQL_MAX_ID = "SELECT MAX(employee_id) AS max_id FROM employees";
 
     public List<Employee> findAll() throws SQLException {

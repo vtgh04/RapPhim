@@ -10,7 +10,6 @@ GO
 USE RapPhim;
 GO
 
--- Xóa các bảng cũ theo thứ tự ngược lại của Foreign Key
 IF OBJECT_ID(N'dbo.tickets', N'U') IS NOT NULL DROP TABLE dbo.tickets;
 IF OBJECT_ID(N'dbo.invoices', N'U') IS NOT NULL DROP TABLE dbo.invoices;
 IF OBJECT_ID(N'dbo.show_seats', N'U') IS NOT NULL DROP TABLE dbo.show_seats;

@@ -1007,10 +1007,6 @@ public class MoviePanel extends JPanel {
         }
     }
 
-    /**
-     * Modern minimal scrollbar — thin rounded thumb, no track border, no arrow
-     * buttons.
-     */
     private static class ModernScrollBarUI extends BasicScrollBarUI {
         private static final int THUMB_W = 8;
         private static final Color THUMB_COLOR = new Color(180, 185, 195);
@@ -1086,9 +1082,6 @@ public class MoviePanel extends JPanel {
         }
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    // EXPORT / IMPORT HANDLERS
-    // ════════════════════════════════════════════════════════════════════════
     private void handleExportExcel() {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setDialogTitle("Lưu file Excel");
@@ -1137,21 +1130,4 @@ public class MoviePanel extends JPanel {
         }
     }
 
-    // ════════════════════════════════════════════════════════════════════════
-    // MAIN
-    // ════════════════════════════════════════════════════════════════════════
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception ignored) {
-        }
-        SwingUtilities.invokeLater(() -> {
-            JFrame f = new JFrame("Movie Panel");
-            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            f.setSize(1280, 860);
-            f.setLocationRelativeTo(null);
-            f.add(new MoviePanel());
-            f.setVisible(true);
-        });
-    }
 }

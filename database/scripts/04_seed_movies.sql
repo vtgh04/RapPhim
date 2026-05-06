@@ -1,17 +1,9 @@
--- ============================================================
---  Script : 04_seed_movies.sql
---  DBMS   : Microsoft SQL Server 2019+
---  Mô tả  : Thêm dữ liệu mẫu vào bảng movies (Phù hợp với ảnh poster thực tế)
---           Rating: P=Phổ biến, K=Kids, T13=13+, T16=16+, T18=18+
--- ============================================================
+
 USE RapPhim;
 GO
--- Xoá dữ liệu cũ nếu muốn chạy lại seed
 DELETE FROM dbo.movies;
 GO
--- Seed dữ liệu — khớp với ảnh trong src/main/resources/images/movies/
 INSERT INTO dbo.movies (movie_id, title, genre, duration_mins, format_movie, rating, language, release_date, status, description, poster_url) VALUES
--- Mai.jpg / phim-mai-...02e-7077008.jpg
 ('MOV001', N'Mai', N'Drama, Romance', 131, '2D', 'T16',
  N'2D Lồng tiếng', '2024-02-10', 'ACTIVE',
  N'Câu chuyện cảm động về người phụ nữ tên Mai, vượt qua nghịch cảnh để tìm lại chính mình và hạnh phúc đích thực.',
@@ -66,6 +58,4 @@ INSERT INTO dbo.movies (movie_id, title, genre, duration_mins, format_movie, rat
  N'IMAX Lồng tiếng', '2019-04-26', 'INACTIVE',
  N'Sau thảm kịch của Infinity War, các Avengers sống sót tập hợp lần cuối để đảo ngược hành động của Thanos và khôi phục lại vũ trụ.',
  'images/movies/7DUjpg.jpg');
-GO
-PRINT N'[OK] Đã chèn 11 bộ phim mẫu phù hợp với ảnh poster thực tế.';
 GO

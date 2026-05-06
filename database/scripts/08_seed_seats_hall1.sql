@@ -1,46 +1,45 @@
-    USE RapPhim;
-    GO
 
-    -- Xoá dữ liệu cũ nếu muốn chạy lại seed
-    DELETE FROM seats WHERE hall_id = 'HAL001';
-    GO
+DECLARE @r INT, @c INT, @row_char CHAR(1);
+DECLARE @hall_type VARCHAR(10), @rows INT, @cols INT;
+DECLARE @seat_type VARCHAR(20), @seat_factor DECIMAL(4,2);
 
-    -- Seed dữ liệu ghế tự động bằng T-SQL cho HAL001 (12 hàng x 8 cột)
-    -- Khối VIP: Từ hàng D đến G (hàng 4 đến 7), cột từ 3 đến 7.
-    DECLARE @hall_id VARCHAR(10) = 'HAL001';
-    DECLARE @total_rows INT = 12;
-    DECLARE @total_cols INT = 8;
-    DECLARE @r INT = 1;
-    DECLARE @c INT = 1;
-    DECLARE @row_char CHAR(1);
-    DECLARE @seat_type VARCHAR(20);
-    DECLARE @seat_factor DECIMAL(4,2);
+DECLARE @Halls TABLE (hall_id VARCHAR(20), rows INT, cols INT, hall_type VARCHAR(10));
+INSERT INTO @Halls VALUES 
+('HAL001', 12, 8, '2D'), ('HAL002', 12, 8, '2D'), 
+('HAL003', 12, 8, '3D'), ('HAL004', 12, 8, '3D'),
+('HAL005', 9, 9, 'IMAX'), ('HAL006', 9, 9, 'IMAX'), 
+('HAL007', 12, 8, '2D'), ('HAL008', 12, 8, '3D');
 
-    WHILE @r <= @total_rows
+DECLARE @current_hall VARCHAR(20) = (SELECT MIN(hall_id) FROM @Halls);
+
+WHILE @current_hall IS NOT NULL
+BEGIN
+    SELECT @rows = rows, @cols = cols, @hall_type = hall_type 
+    FROM @Halls WHERE hall_id = @current_hall;
+    
+    SET @r = 1;
+    WHILE @r <= @rows
     BEGIN
-        -- Tính ký tự hàng: 1 -> A, 2 -> B... (Mã ASCII 64 + 1 = 65 là 'A')
-        SET @row_char = CHAR(64 + @r); 
+        SET @row_char = CHAR(64 + @r);
         SET @c = 1;
-        
-        WHILE @c <= @total_cols
+        WHILE @c <= @cols
         BEGIN
-            -- VIP = Hàng D(4) tới H(8) và Cột 3 tới 6
-            IF @r >= 4 AND @r <= 8 AND @c >= 3 AND @c <= 6
-            BEGIN
-                SET @seat_type = 'VIP';
-                SET @seat_factor = 1.5;
-            END
+            -- Quy tắc VIP
+            IF @hall_type = 'IMAX' AND @r BETWEEN 4 AND 6 AND @c BETWEEN 3 AND 7
+                SELECT @seat_type = 'VIP', @seat_factor = 1.5;
+            ELSE IF @hall_type IN ('2D', '3D') AND @r BETWEEN 4 AND 8 AND @c BETWEEN 3 AND 6
+                SELECT @seat_type = 'VIP', @seat_factor = 1.5;
             ELSE
-            BEGIN
-                SET @seat_type = 'REGULAR';
-                SET @seat_factor = 1.0;
-            END
+                SELECT @seat_type = 'REGULAR', @seat_factor = 1.0;
 
-            INSERT INTO seats (seat_id, hall_id, row_char, col_number, seat_type, seat_factor)
-            VALUES (@hall_id + '_' + @row_char + CAST(@c AS VARCHAR), @hall_id, @row_char, @c, @seat_type, @seat_factor);
-            
+            INSERT INTO dbo.seats (seat_id, hall_id, row_char, col_number, seat_type, seat_factor)
+            VALUES (@current_hall + '_' + @row_char + CAST(@c AS VARCHAR), @current_hall, @row_char, @c, @seat_type, @seat_factor);
+
             SET @c = @c + 1;
         END
         SET @r = @r + 1;
     END
-    GO
+
+    SET @current_hall = (SELECT MIN(hall_id) FROM @Halls WHERE hall_id > @current_hall);
+END
+GO

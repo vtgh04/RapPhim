@@ -7,11 +7,6 @@ import javax.swing.*;
 import java.sql.Date;
 import java.util.List;
 
-/**
- * Panel lịch sử giao dịch dành cho nhân viên (Staff).
- * Kế thừa giao diện từ TransactionPanel.
- * Override loadData() để chỉ hiển thị các hoá đơn do chính nhân viên đang đăng nhập tạo ra.
- */
 public class StaffTransactionPanel extends TransactionPanel {
 
     public StaffTransactionPanel() {

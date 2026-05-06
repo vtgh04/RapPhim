@@ -1181,14 +1181,4 @@ public class EmployeePanel extends JPanel {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Employee Panel Test");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 800);
-            frame.setLocationRelativeTo(null);
-            frame.add(new EmployeePanel());
-            frame.setVisible(true);
-        });
-    }
 }

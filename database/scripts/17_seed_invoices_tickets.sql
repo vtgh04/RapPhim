@@ -15,18 +15,10 @@ DELETE FROM dbo.tickets;
 DELETE FROM dbo.invoices;
 GO
 
--- ============================================================
--- Invoice 1: CONFIRMED — nhân viên EMP002, thanh toán CASH
--- Mua 2 vé suất SHW001 (MAI - Phòng 1)
--- ============================================================
 INSERT INTO dbo.invoices (invoice_id, employee_id, created_at, total_amount, total_tickets, payment_method, status, note)
 VALUES ('INV001', 'EMP002', '2026-04-27 10:00:00', 200000, 2, 'CASH', 'CONFIRMED', NULL);
-
--- Ticket 1: ghế A1 (REGULAR, 100k, không giảm giá)
 INSERT INTO dbo.tickets (ticket_id, invoice_id, show_seat_id, discount_id, barcode, original_price, discount_amount, final_price, issued_at, status)
 VALUES ('TKT001', 'INV001', 'SHW001_HAL001_A1', NULL, 'BC-TKT001-2026', 100000, 0, 100000, '2026-04-27 10:00:00', 'VALID');
-
--- Ticket 2: ghế A2 (REGULAR, 100k, không giảm giá)
 INSERT INTO dbo.tickets (ticket_id, invoice_id, show_seat_id, discount_id, barcode, original_price, discount_amount, final_price, issued_at, status)
 VALUES ('TKT002', 'INV001', 'SHW001_HAL001_A2', NULL, 'BC-TKT002-2026', 100000, 0, 100000, '2026-04-27 10:00:00', 'VALID');
 

@@ -40,14 +40,14 @@ public class SalePanel extends JPanel {
     private JPanel leftCardPanel;
     private JPanel rightPanel;
 
-    // View Panels
+    // View
     private JPanel movieView;
     private JPanel showtimeView;
     private JPanel showtimeGrid;
     private JPanel movieInfoContainer;
     private JPanel seatView;
 
-    // Cart Components
+    // gio hang
     private JPanel cartItemsPanel;
     private JLabel lblSubtotal;
     private JLabel lblTax;
@@ -55,13 +55,13 @@ public class SalePanel extends JPanel {
     private JTextField txtPromo;
     private JTextField searchField;
 
-    // Data
+    // dâta
     private MovieDAO movieDao = new MovieDAO();
     private ShowtimeDAO showtimeDao = new ShowtimeDAO();
     private HallDao hallDao = new HallDao();
     private InvoiceDAO invoiceDao = new InvoiceDAO();
 
-    // State
+    // luachon
     private Movie selectedMovie;
     private Showtime selectedShowtime;
     private java.util.List<Seat> selectedSeats = new ArrayList<>();
@@ -209,7 +209,6 @@ public class SalePanel extends JPanel {
         card.setBorder(new LineBorder(BORDER, 1, true));
         card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Placeholder for poster (Normally load from m.getPosterUrl())
         JLabel lblImg = new JLabel("<html><center>" + m.getTitle() + "</center></html>", SwingConstants.CENTER);
         try {
             java.net.URL url = getClass().getResource("/" + m.getPosterUrl());
@@ -245,7 +244,6 @@ public class SalePanel extends JPanel {
         return card;
     }
 
-    // ================== SHOWTIME VIEW ==================
     private JPanel buildShowtimeView() {
         JPanel wrap = new JPanel(new BorderLayout());
         wrap.setBackground(BG_PANEL);
@@ -292,7 +290,6 @@ public class SalePanel extends JPanel {
         showtimeGrid.removeAll();
         movieInfoContainer.removeAll();
 
-        // 1. Setup Movie Info Panel — modern clean look
         JLabel lblImg = new JLabel();
         lblImg.setPreferredSize(new Dimension(140, 200));
         try {
@@ -304,7 +301,6 @@ public class SalePanel extends JPanel {
         } catch (Exception e) {
         }
 
-        // Details: center aligned
         JPanel detailsPanel = new JPanel();
         detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
         detailsPanel.setOpaque(false);
@@ -336,7 +332,6 @@ public class SalePanel extends JPanel {
         detailsPanel.add(lblMeta);
         detailsPanel.add(txtDesc);
 
-        // Wrap with gray background + subtle border
         JPanel infoBox = new JPanel(new BorderLayout()) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -351,12 +346,11 @@ public class SalePanel extends JPanel {
         };
         infoBox.setOpaque(false);
         infoBox.setBackground(new Color(248, 249, 252));
-        infoBox.setBorder(new EmptyBorder(1, 1, 1, 1)); // space for border
+        infoBox.setBorder(new EmptyBorder(1, 1, 1, 1));
         infoBox.add(lblImg, BorderLayout.WEST);
         infoBox.add(detailsPanel, BorderLayout.CENTER);
         movieInfoContainer.add(infoBox, BorderLayout.CENTER);
 
-        // 2. Load Showtimes
         try {
             java.util.List<Showtime> sts = showtimeDao.findAll();
             java.time.LocalDate today = java.time.LocalDate.now();
@@ -403,7 +397,6 @@ public class SalePanel extends JPanel {
         card.setBorder(new EmptyBorder(14, 16, 14, 16));
         card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
-        // Top: Date badge
         java.time.format.DateTimeFormatter df = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
         JPanel badgePanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)) {
             @Override
@@ -429,7 +422,6 @@ public class SalePanel extends JPanel {
         topRow.add(badgePanel);
         card.add(topRow, BorderLayout.NORTH);
 
-        // Center: Time (big)
         java.time.format.DateTimeFormatter tf = java.time.format.DateTimeFormatter.ofPattern("HH:mm");
         String timeStr = st.getStartTime().format(tf) + " - " + st.getEndTime().format(tf);
         JLabel lblTime = new JLabel(timeStr, SwingConstants.LEFT);
@@ -437,7 +429,6 @@ public class SalePanel extends JPanel {
         lblTime.setForeground(TXT_DARK);
         card.add(lblTime, BorderLayout.CENTER);
 
-        // Bottom: Hall + Price
         JPanel bot = new JPanel(new BorderLayout());
         bot.setOpaque(false);
         JLabel lblHall = new JLabel("HALL " + st.getHallId().replaceAll("[^0-9]", ""));
@@ -450,7 +441,6 @@ public class SalePanel extends JPanel {
         bot.add(lblPrice, BorderLayout.EAST);
         card.add(bot, BorderLayout.SOUTH);
 
-        // Hover + Click
         card.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -474,7 +464,6 @@ public class SalePanel extends JPanel {
         return card;
     }
 
-    // ================== SEAT VIEW ==================
     private JPanel buildSeatView() {
         JPanel wrap = new JPanel(new BorderLayout());
         wrap.setBackground(BG_PANEL);

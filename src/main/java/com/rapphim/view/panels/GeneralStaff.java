@@ -27,8 +27,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
@@ -233,22 +231,12 @@ public class GeneralStaff extends JPanel {
         return btn;
     }
 
-    /**
-     * Display RightPanel content based on the navigation item clicked.
-     */
     private void handleNavigation(String page) {
         rightPanel.removeAll();
         rightPanel.setLayout(new BorderLayout());
 
         switch (page) {
-            case "Dashboard" -> {
-                rightPanel.setLayout(new GridBagLayout());
-                String name = loggedInName.isBlank() ? "!" : ", " + loggedInName + "!";
-                JLabel welcomeLabel = new JLabel("Welcome back" + name);
-                welcomeLabel.setFont(FONT_BOLD_26);
-                welcomeLabel.setForeground(TEXT_PRIMARY);
-                rightPanel.add(welcomeLabel);
-            }
+            case "Dashboard" -> rightPanel.add(new DashboardPanel(), BorderLayout.CENTER);
             case "Sales & POS" -> rightPanel.add(new StaffSalePanel(), BorderLayout.CENTER);
             case "Transactions" -> rightPanel.add(new StaffTransactionPanel(), BorderLayout.CENTER);
             case "Showtimes" -> rightPanel.add(new StaffShowPanel(), BorderLayout.CENTER);
@@ -266,16 +254,13 @@ public class GeneralStaff extends JPanel {
         rightPanel.repaint();
     }
 
-    /**
-     * Create a styled placeholder panel for modules under development.
-     */
     private JPanel createPlaceholderPanel(String title, String iconPath, String subtitle) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(BG_COLOR);
         panel.setBorder(new EmptyBorder(60, 0, 0, 0));
 
-        // Icon lớn
+        // Icon
         ImageIcon bigIcon = loadIcon(iconPath, 64, 64);
         if (bigIcon != null) {
             JLabel iconLbl = new JLabel(bigIcon);
@@ -299,16 +284,6 @@ public class GeneralStaff extends JPanel {
         subLbl.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(subLbl);
         panel.add(Box.createRigidArea(new Dimension(0, 30)));
-
-        // Badge "Đang phát triển"
-        JLabel badge = new JLabel("\uD83D\uDEA7  Tính năng đang được phát triển");
-        badge.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        badge.setForeground(new Color(180, 100, 0));
-        badge.setOpaque(true);
-        badge.setBackground(new Color(255, 237, 213));
-        badge.setBorder(new EmptyBorder(10, 24, 10, 24));
-        badge.setAlignmentX(Component.CENTER_ALIGNMENT);
-        panel.add(badge);
 
         // Bọc trong wrapper để căn giữa dọc
         JPanel wrapper = new JPanel(new GridBagLayout());
@@ -356,20 +331,4 @@ public class GeneralStaff extends JPanel {
         return new ImageIcon(bi);
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (ClassNotFoundException | IllegalAccessException | InstantiationException
-                | UnsupportedLookAndFeelException ignored) {
-        }
-
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("GeneralStaff Layout Test");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(1200, 750);
-            frame.setLocationRelativeTo(null);
-            frame.setContentPane(new GeneralStaff());
-            frame.setVisible(true);
-        });
-    }
 }

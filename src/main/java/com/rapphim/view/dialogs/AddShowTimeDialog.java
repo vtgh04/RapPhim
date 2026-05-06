@@ -23,29 +23,20 @@ import javax.swing.border.EmptyBorder;
 public class AddShowTimeDialog extends JDialog {
     private static final long serialVersionUID = 1L;
 
-    private static final Color BG_COLOR = new Color(248, 249, 252);
-    private static final Color WHITE = Color.WHITE;
+    private static final Color BG_COLOR = new Color(240, 242, 245);
+    private static final Color SURFACE = Color.WHITE;
     private static final Color TEXT_PRIMARY = new Color(30, 30, 35);
-    private static final Color TEXT_HINT = new Color(160, 165, 175);
-    private static final Color BORDER_COLOR = new Color(218, 222, 233);
-    private static final Color PRIMARY_DARK = new Color(30, 30, 45);
-    private static final Color HOVER_DARK = new Color(50, 50, 65);
-    private static final Color CANCEL_BG = new Color(243, 244, 246);
-    private static final Color CANCEL_HOVER = new Color(229, 231, 235);
-    private static final Color CANCEL_TEXT = new Color(55, 65, 81);
-    private static final Color AUTO_BG = new Color(238, 242, 255);
-    private static final Color AUTO_TEXT = new Color(99, 102, 241);
-    private static final Color CLOSE_NORMAL = new Color(160, 165, 175);
-    private static final Color CLOSE_HOVER = new Color(220, 38, 38);
-    private static final Color SUCCESS_FG = new Color(22, 163, 74);
-    private static final Color WARN_COLOR = new Color(220, 38, 38);
+    private static final Color TEXT_SECONDARY = new Color(130, 135, 148);
+    private static final Color ACCENT = new Color(220, 38, 38);
 
-    private static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 20);
-    private static final Font FONT_SUB = new Font("Segoe UI", Font.PLAIN, 13);
-    private static final Font FONT_LABEL = new Font("Segoe UI", Font.BOLD, 13);
-    private static final Font FONT_INPUT = new Font("Segoe UI", Font.PLAIN, 14);
-    private static final Font FONT_BTN = new Font("Segoe UI", Font.BOLD, 14);
-    private static final Font FONT_WARN = new Font("Segoe UI", Font.ITALIC, 11);
+    private static final Color BORDER_COLOR = new Color(225, 228, 235);
+    private static final Color SUCCESS = new Color(16, 185, 129);
+    private static final Color INFO = new Color(59, 130, 246);
+
+    private static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 22);
+    private static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 13);
+    private static final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 14);
+    private static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 11);
 
     private final ShowtimeDAO stDao = new ShowtimeDAO();
     private final MovieDAO mvDao = new MovieDAO();
@@ -61,7 +52,7 @@ public class AddShowTimeDialog extends JDialog {
     private JLabel lblSystemError;
 
     public AddShowTimeDialog(JFrame parent) {
-        super(parent, "Schedule Screening", true);
+        super(parent, "Lịch Chiếu", true);
         loadData();
         initUI();
     }
@@ -94,7 +85,7 @@ public class AddShowTimeDialog extends JDialog {
 
         JPanel main = new JPanel();
         main.setLayout(new BoxLayout(main, BoxLayout.Y_AXIS));
-        main.setBackground(WHITE);
+        main.setBackground(SURFACE);
         main.setBorder(BorderFactory.createCompoundBorder(
                 new RoundedBorder(16, BORDER_COLOR),
                 new EmptyBorder(28, 32, 28, 32)));
@@ -104,15 +95,19 @@ public class AddShowTimeDialog extends JDialog {
         header.setOpaque(false);
         header.setAlignmentX(LEFT_ALIGNMENT);
         header.setMaximumSize(new Dimension(Integer.MAX_VALUE, 50));
+
         JPanel titleBox = new JPanel();
         titleBox.setLayout(new BoxLayout(titleBox, BoxLayout.Y_AXIS));
         titleBox.setOpaque(false);
-        JLabel lbTitle = new JLabel("Schedule Screening");
+
+        JLabel lbTitle = new JLabel("Lịch Chiếu");
         lbTitle.setFont(FONT_TITLE);
         lbTitle.setForeground(TEXT_PRIMARY);
-        JLabel lbSub = new JLabel("Assign a movie to a hall and time slot.");
-        lbSub.setFont(FONT_SUB);
-        lbSub.setForeground(TEXT_HINT);
+
+        JLabel lbSub = new JLabel("Tạo phim vào phòng và khung giờ chiếu.");
+        lbSub.setFont(FONT_BODY);
+        lbSub.setForeground(TEXT_SECONDARY);
+
         titleBox.add(lbTitle);
         titleBox.add(lbSub);
         header.add(titleBox, BorderLayout.WEST);
@@ -129,35 +124,35 @@ public class AddShowTimeDialog extends JDialog {
         main.add(Box.createRigidArea(new Dimension(0, 16)));
 
         // Showtime ID (auto)
-        txtId = styledField("e.g. ST-2024-001");
+        txtId = styledField("Mã suất chiếu (Tự động)");
         txtId.setEditable(false);
-        txtId.setBackground(AUTO_BG);
-        txtId.setForeground(AUTO_TEXT);
-        txtId.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        txtId.setBackground(new Color(238, 242, 255));
+        txtId.setForeground(INFO);
+        txtId.setFont(FONT_BOLD);
         try {
             txtId.setText(stDao.getNextShowtimeId());
         } catch (SQLException e) {
-            txtId.setText("SHW001");
+            txtId.setText("");
         }
-        main.add(fieldRow("SHOWTIME ID (VARCHAR 20)", txtId, null));
+        main.add(fieldRow("MÃ SUẤT CHIẾU", txtId, null));
 
         // Movie combo
         cmbMovie = new JComboBox<>();
-        cmbMovie.addItem("Choose a movie...");
+        cmbMovie.addItem("Chọn phim...");
         for (Movie m : activeMovies)
             cmbMovie.addItem(m.getMovieId() + " - " + m.getTitle());
-        cmbMovie.setFont(FONT_INPUT);
-        cmbMovie.setBackground(WHITE);
+        cmbMovie.setFont(FONT_BODY.deriveFont(14f));
+        cmbMovie.setBackground(SURFACE);
         cmbMovie.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-        main.add(fieldRow("SELECT MOVIE", cmbMovie, null));
+        main.add(fieldRow("CHỌN PHIM", cmbMovie, null));
 
         // Hall + Start Time (two columns)
         cmbHall = new JComboBox<>();
-        cmbHall.addItem("Select Hall...");
+        cmbHall.addItem("Chọn phòng chiếu...");
         for (CinemaHall ch : activeHalls)
             cmbHall.addItem(ch.getHallId() + " - " + ch.getName());
-        cmbHall.setFont(FONT_INPUT);
-        cmbHall.setBackground(WHITE);
+        cmbHall.setFont(FONT_BODY.deriveFont(14f));
+        cmbHall.setBackground(SURFACE);
         cmbHall.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
         LocalDateTime now = LocalDateTime.now().plusHours(1).withMinute(0).withSecond(0);
@@ -177,21 +172,21 @@ public class AddShowTimeDialog extends JDialog {
         dtPanel.add(spnHour);
         dtPanel.add(lbl(":"));
         dtPanel.add(spnMin);
-        main.add(fieldRow("THEATER HALL", cmbHall, null));
-        main.add(fieldRow("START TIME (DATETIME)", dtPanel, null));
+        main.add(fieldRow("PHÒNG CHIẾU", cmbHall, null));
+        main.add(fieldRow("THỜI GIAN BẮT ĐẦU", dtPanel, null));
 
         // Base Price
         spnPrice = new JSpinner(new SpinnerNumberModel(120000, 0, 10000000, 10000));
-        spnPrice.setFont(FONT_INPUT);
+        spnPrice.setFont(FONT_BODY.deriveFont(14f));
         JComponent ed = spnPrice.getEditor();
         if (ed instanceof JSpinner.NumberEditor)
             ((JSpinner.NumberEditor) ed).getFormat().setGroupingUsed(true);
-        main.add(fieldRow("BASE PRICE (VND)", spnPrice, null));
+        main.add(fieldRow("GIÁ VÉ CƠ BẢN (VNĐ)", spnPrice, null));
 
         // Error
         lblSystemError = new JLabel(" ");
-        lblSystemError.setFont(FONT_WARN);
-        lblSystemError.setForeground(WARN_COLOR);
+        lblSystemError.setFont(FONT_SMALL.deriveFont(Font.ITALIC));
+        lblSystemError.setForeground(ACCENT);
         lblSystemError.setAlignmentX(LEFT_ALIGNMENT);
         main.add(lblSystemError);
         main.add(Box.createRigidArea(new Dimension(0, 8)));
@@ -206,38 +201,39 @@ public class AddShowTimeDialog extends JDialog {
         setContentPane(wrapper);
     }
 
-    // ═══════════════════ LOGIC ═══════════════════
+    // ── LOGIC ────────────────────────────────────────────────────────────────
 
     private void handleCreate() {
         lblSystemError.setText(" ");
         Movie mv = getSelectedMovie();
         if (mv == null) {
-            lblSystemError.setText("Vui long chon phim.");
+            lblSystemError.setText("Vui lòng chọn phim.");
             return;
         }
         CinemaHall hall = getSelectedHall();
         if (hall == null) {
-            lblSystemError.setText("Vui long chon phong chieu.");
+            lblSystemError.setText("Vui lòng chọn phòng chiếu.");
             return;
         }
         LocalDateTime start = getStartTime();
         if (start == null || start.isBefore(LocalDateTime.now())) {
-            lblSystemError.setText("Thoi gian bat dau phai trong tuong lai.");
+            lblSystemError.setText("Thời gian bắt đầu phải sau thời gian hiện tại.");
             return;
         }
         LocalDateTime end = start.plusMinutes(mv.getDurationMins() + 15);
         double price = ((Number) spnPrice.getValue()).doubleValue();
         if (price <= 0) {
-            lblSystemError.setText("Gia ve phai lon hon 0.");
+            lblSystemError.setText("Giá phải lớn hơn 0.");
             return;
         }
         try {
             if (stDao.hasOverlap(hall.getHallId(), start, end)) {
-                lblSystemError.setText("Trung lich! Phong " + hall.getName() + " da co suat chieu khung gio nay.");
+                lblSystemError
+                        .setText("Đã trùng lịch! Phòng " + hall.getName() + " đã có suất chiếu trong khung giờ này.");
                 return;
             }
         } catch (SQLException ex) {
-            lblSystemError.setText("Loi kiem tra: " + ex.getMessage());
+            lblSystemError.setText("Lỗi kiểm tra: " + ex.getMessage());
             return;
         }
 
@@ -256,7 +252,7 @@ public class AddShowTimeDialog extends JDialog {
             showSuccessDialog(st2.getShowtimeId(), mv.getTitle());
             dispose();
         } catch (SQLException ex) {
-            lblSystemError.setText("Loi tao suat chieu: " + ex.getMessage());
+            lblSystemError.setText("Lỗi tạo suất chiếu: " + ex.getMessage());
             ex.printStackTrace();
         }
     }
@@ -280,7 +276,7 @@ public class AddShowTimeDialog extends JDialog {
         }
     }
 
-    // ═══════════════════ UI HELPERS ═══════════════════
+    // ── UI HELPERS ───────────────────────────────────────────────────────────
 
     private JPanel fieldRow(String label, Component input, JLabel warn) {
         JPanel p = new JPanel();
@@ -289,8 +285,8 @@ public class AddShowTimeDialog extends JDialog {
         p.setAlignmentX(LEFT_ALIGNMENT);
         p.setMaximumSize(new Dimension(Integer.MAX_VALUE, warn != null ? 88 : 72));
         JLabel lb = new JLabel(label);
-        lb.setFont(FONT_LABEL);
-        lb.setForeground(TEXT_HINT);
+        lb.setFont(FONT_BOLD.deriveFont(12f));
+        lb.setForeground(TEXT_SECONDARY);
         lb.setAlignmentX(LEFT_ALIGNMENT);
         p.add(lb);
         p.add(Box.createRigidArea(new Dimension(0, 5)));
@@ -314,12 +310,16 @@ public class AddShowTimeDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(0, 0, 0, 10);
-        JButton cancelBtn = roundedBtn("CANCEL", CANCEL_BG, CANCEL_TEXT, CANCEL_HOVER);
+
+        Color btnBg = new Color(243, 244, 246);
+        Color btnHover = new Color(229, 231, 235);
+        JButton cancelBtn = roundedBtn("HỦY", btnBg, TEXT_PRIMARY, btnHover);
         cancelBtn.addActionListener(e -> dispose());
         gbc.gridx = 0;
         gbc.weightx = 0.35;
         panel.add(cancelBtn, gbc);
-        JButton saveBtn = roundedBtn("CREATE SCHEDULE", PRIMARY_DARK, WHITE, HOVER_DARK);
+
+        JButton saveBtn = roundedBtn("LƯU LỊCH CHIẾU", TEXT_PRIMARY, SURFACE, new Color(50, 50, 65));
         saveBtn.addActionListener(e -> handleCreate());
         gbc.gridx = 1;
         gbc.weightx = 0.65;
@@ -340,14 +340,14 @@ public class AddShowTimeDialog extends JDialog {
                 super.paintComponent(g);
             }
         };
-        field.setFont(FONT_INPUT);
-        field.setForeground(TEXT_HINT);
+        field.setFont(FONT_BODY.deriveFont(14f));
+        field.setForeground(TEXT_SECONDARY);
         field.setText(placeholder);
         field.setOpaque(false);
         field.setBorder(BorderFactory.createCompoundBorder(
                 new RoundedBorder(10, BORDER_COLOR), new EmptyBorder(8, 14, 8, 14)));
         field.setPreferredSize(new Dimension(Integer.MAX_VALUE, 42));
-        field.setBackground(WHITE);
+        field.setBackground(SURFACE);
         field.addFocusListener(new FocusAdapter() {
             public void focusGained(FocusEvent e) {
                 if (field.getText().equals(placeholder)) {
@@ -358,7 +358,7 @@ public class AddShowTimeDialog extends JDialog {
 
             public void focusLost(FocusEvent e) {
                 if (field.getText().isEmpty()) {
-                    field.setForeground(TEXT_HINT);
+                    field.setForeground(TEXT_SECONDARY);
                     field.setText(placeholder);
                 }
             }
@@ -368,7 +368,7 @@ public class AddShowTimeDialog extends JDialog {
 
     private JSpinner miniSpn(int val, int min, int max) {
         JSpinner sp = new JSpinner(new SpinnerNumberModel(val, min, max, 1));
-        sp.setFont(FONT_INPUT);
+        sp.setFont(FONT_BODY.deriveFont(14f));
         sp.setPreferredSize(new Dimension(55, 34));
         JComponent ed = sp.getEditor();
         if (ed instanceof JSpinner.NumberEditor)
@@ -378,7 +378,7 @@ public class AddShowTimeDialog extends JDialog {
 
     private JLabel lbl(String t) {
         JLabel l = new JLabel(t);
-        l.setFont(FONT_INPUT);
+        l.setFont(FONT_BODY.deriveFont(14f));
         return l;
     }
 
@@ -396,7 +396,7 @@ public class AddShowTimeDialog extends JDialog {
                 g2.dispose();
             }
         };
-        btn.setForeground(CLOSE_NORMAL);
+        btn.setForeground(TEXT_SECONDARY);
         btn.setPreferredSize(new Dimension(30, 30));
         btn.setOpaque(false);
         btn.setContentAreaFilled(false);
@@ -407,13 +407,13 @@ public class AddShowTimeDialog extends JDialog {
         btn.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                btn.setForeground(CLOSE_HOVER);
+                btn.setForeground(ACCENT);
                 btn.repaint();
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                btn.setForeground(CLOSE_NORMAL);
+                btn.setForeground(TEXT_SECONDARY);
                 btn.repaint();
             }
         });
@@ -432,7 +432,7 @@ public class AddShowTimeDialog extends JDialog {
                 super.paintComponent(g);
             }
         };
-        btn.setFont(FONT_BTN);
+        btn.setFont(FONT_BOLD);
         btn.setForeground(fg);
         btn.setBackground(bg);
         btn.setOpaque(false);
@@ -465,24 +465,24 @@ public class AddShowTimeDialog extends JDialog {
         dlg.setLocationRelativeTo(parent);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(WHITE);
+        panel.setBackground(SURFACE);
         panel.setBorder(BorderFactory.createCompoundBorder(
                 new RoundedBorder(16, BORDER_COLOR), new EmptyBorder(24, 24, 24, 24)));
         JLabel ico = new JLabel("\u2714");
         ico.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        ico.setForeground(SUCCESS_FG);
+        ico.setForeground(SUCCESS);
         ico.setAlignmentX(CENTER_ALIGNMENT);
         panel.add(ico);
         panel.add(Box.createRigidArea(new Dimension(0, 6)));
-        JLabel msg = new JLabel("<html><center>Showtime <b>" + id + "</b><br>\"" + movieTitle
-                + "\"<br>Đã tạo thành công suất chiếu</center></html>");
-        msg.setFont(FONT_SUB);
+        JLabel msg = new JLabel("<html><center>Suất chiếu <b>" + id + "</b><br>\"" + movieTitle
+                + "\"<br>Đã tạo thành công</center></html>");
+        msg.setFont(FONT_BODY);
         msg.setForeground(TEXT_PRIMARY);
         msg.setAlignmentX(CENTER_ALIGNMENT);
         msg.setHorizontalAlignment(SwingConstants.CENTER);
         panel.add(msg);
         panel.add(Box.createRigidArea(new Dimension(0, 14)));
-        JButton ok = roundedBtn("OK", SUCCESS_FG, WHITE, new Color(16, 130, 55));
+        JButton ok = roundedBtn("OK", SUCCESS, SURFACE, new Color(16, 130, 55));
         ok.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
         ok.setAlignmentX(CENTER_ALIGNMENT);
         ok.addActionListener(e -> dlg.dispose());

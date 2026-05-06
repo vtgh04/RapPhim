@@ -122,7 +122,7 @@ public class GeneralAdmin extends JPanel {
         textPanel.add(brandSub);
 
         logoPanel.add(textPanel);
-        logoPanel.add(Box.createHorizontalGlue()); // Đẩy các icon/text sang lề trái
+        logoPanel.add(Box.createHorizontalGlue());
         sidebar.add(logoPanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
@@ -243,14 +243,7 @@ public class GeneralAdmin extends JPanel {
         rightPanel.setLayout(new BorderLayout());
 
         switch (page) {
-            case "Dashboard" -> {
-                rightPanel.setLayout(new GridBagLayout());
-                String name = loggedInName.isBlank() ? "!" : ", " + loggedInName + "!";
-                JLabel welcomeLabel = new JLabel("Welcome back" + name);
-                welcomeLabel.setFont(FONT_BOLD_26);
-                welcomeLabel.setForeground(TEXT_PRIMARY);
-                rightPanel.add(welcomeLabel);
-            }
+            case "Dashboard" -> rightPanel.add(new DashboardPanel(), BorderLayout.CENTER);
             case "Employees" -> rightPanel.add(new EmployeePanel(), BorderLayout.CENTER);
             case "Movies" -> rightPanel.add(new MoviePanel(), BorderLayout.CENTER);
             case "Halls & Seats" -> rightPanel.add(new HallPanel(), BorderLayout.CENTER);
@@ -258,13 +251,7 @@ public class GeneralAdmin extends JPanel {
             case "Transactions" -> rightPanel.add(new TransactionPanel(), BorderLayout.CENTER);
             case "Showtimes" -> rightPanel.add(new ShowtimesPanel(), BorderLayout.CENTER);
             case "Settings" -> rightPanel.add(new SettingPanel(currentEmployee), BorderLayout.CENTER);
-            default -> {
-                rightPanel.setLayout(new GridBagLayout());
-                JLabel pageLabel = new JLabel(page + " Page");
-                pageLabel.setFont(FONT_BOLD_26);
-                pageLabel.setForeground(TEXT_PRIMARY);
-                rightPanel.add(pageLabel);
-            }
+            default -> rightPanel.add(createPlaceholderPanel(page, "images/icons/dashboard.png", "Manage your "));
         }
 
         rightPanel.revalidate();

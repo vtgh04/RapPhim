@@ -1,70 +1,66 @@
-# Business Requirements Document (BRD) & Product Strategy
-**Project:** CinePro Management & POS System
-**Document Owner:** Senior Business Analyst
-**Status:** Approved | **Version:** 1.0
+# Tài liệu Yêu cầu Nghiệp vụ (BRD) & Chiến lược Sản phẩm
+**Dự án:** Hệ thống Quản lý và Bán vé Rạp chiếu phim (CinePro)
+**Trạng thái:** Đã phê duyệt | **Phiên bản:** 1.0
 
 ---
 
-## 1. Executive Summary
-CinePro is a comprehensive Point of Sale (POS) and Cinema Management desktop system designed to handle the end-to-end operational workflows of a modern movie theater. The system centralizes movie scheduling, seat inventory management, transaction processing, and management reporting.
+## 1. Tóm tắt Dự án
+CinePro là một hệ thống ứng dụng desktop quản lý rạp chiếu phim (POS) toàn diện, được thiết kế để xử lý luồng vận hành thực tế của một rạp chiếu phim. Hệ thống tập trung vào việc quản lý lịch chiếu, trạng thái ghế ngồi, quy trình bán vé/thanh toán và cung cấp báo cáo thống kê cho ban quản lý.
 
-## 2. Business Analysis (System Domain)
-The system integrates several core operational modules:
-*   **Movie Management:** Metadata repository for films (Title, Duration, Rating, Poster, Status).
-*   **Showtime Management:** Operational scheduling bridging Movies and Cinema Halls.
-*   **Seat Booking & Ticket Selling:** Real-time visual POS interface for allocating seats and generating tickets.
-*   **Invoice & Payment:** Transaction tracking and PDF generation.
-*   **Discount System:** Promotional code validation to adjust cart totals.
-*   **Employee Management:** RBAC (Role-Based Access Control) for Staff and Managers.
-*   **Reporting & Dashboard:** 30-day revenue analytics and top-performing movie metrics.
+## 2. Phạm vi Nghiệp vụ (System Domain)
+Hệ thống tích hợp các phân hệ nghiệp vụ cốt lõi sau:
+*   **Quản lý Phim:** Lưu trữ thông tin phim (Tiêu đề, Thời lượng, Xếp hạng, Poster, Trạng thái).
+*   **Quản lý Lịch chiếu:** Lên lịch chiếu kết nối giữa Phim và Phòng chiếu.
+*   **Sơ đồ Ghế & Bán vé:** Giao diện POS trực quan theo thời gian thực để chọn ghế và tạo vé.
+*   **Hóa đơn & Thanh toán:** Lưu vết giao dịch và xuất file PDF.
+*   **Hệ thống Khuyến mãi:** Xác thực mã giảm giá để trừ tiền trên tổng giỏ hàng.
+*   **Quản lý Nhân viên:** Phân quyền (RBAC) giữa Nhân viên bán vé và Quản lý.
+*   **Báo cáo & Thống kê:** Biểu đồ doanh thu 30 ngày và top phim bán chạy nhất.
 
-## 3. Stakeholder Analysis
-### 3.1 Actors & Roles
-| Actor | Description | System Permissions |
+## 3. Phân tích Các bên Liên quan (Stakeholders)
+### 3.1 Vai trò & Quyền hạn
+| Đối tượng (Actor) | Mô tả | Quyền hạn Hệ thống |
 | :--- | :--- | :--- |
-| **Cinema Manager** | High-level operations and strategic decision maker. | Full CRUD on Movies, Showtimes, Employees, Discounts. View Dashboard & All Invoices. |
-| **Box Office Staff** | Frontline employee serving customers. | Sell Tickets, Apply Discounts, View Own Transactions. (Restricted from Settings/Dashboards). |
-| **System Admin** | IT Support (Implicit). | Database maintenance, system configurations. |
+| **Quản lý (Manager)** | Người điều hành, ra quyết định chiến lược. | Toàn quyền (CRUD) Phim, Lịch chiếu, Nhân viên, Mã giảm giá. Xem Dashboard & Tất cả Hóa đơn. |
+| **Nhân viên (Staff)** | Nhân viên quầy vé phục vụ khách hàng trực tiếp. | Bán vé, Áp dụng Khuyến mãi, Xem lịch sử giao dịch cá nhân. (Bị chặn quyền vào Cài đặt/Dashboard). |
 
-### 3.2 Stakeholder Goals & Pain Points
-*   **Goal:** Maximize ticket throughput during peak hours (blockbuster premieres) with zero double-bookings.
-*   **Operational Pain Point:** Legacy systems suffer from slow checkout flows and accidental seat conflicts during concurrent sales. Staff training on complex UIs takes too long.
-*   **Business Goal:** Provide accurate daily revenue reporting to prevent financial leakage.
-
----
-
-## 4. Requirements Specification (SRS Extract)
-
-### 4.1 Business Requirements (BR)
-*   **BR-01:** The system must process a complete ticket sale (from seat selection to invoice printing) in under 15 seconds.
-*   **BR-02:** The system must strictly enforce role segregation to prevent financial fraud by box office staff.
-
-### 4.2 Functional Requirements (FR)
-*   **FR-01 (Showtimes):** The system shall prevent scheduling overlapping showtimes within the same Cinema Hall.
-*   **FR-02 (Seat Booking):** The system shall lock seats visually when `status = BOOKED` and prevent subsequent selection.
-*   **FR-03 (Checkout):** The system must generate a unique `Invoice ID`, `Ticket IDs`, and Barcodes atomically during checkout.
-*   **FR-04 (Export):** The system must output PDF receipts and Excel analytical reports.
-
-### 4.3 Non-Functional Requirements (NFR)
-*   **NFR-01 (Performance):** Dashboard data aggregation for a 30-day window must load in < 2 seconds.
-*   **NFR-02 (Reliability/ACID):** The checkout process must be 100% atomic. If PDF generation fails, the database commit must still succeed, but if DB insert fails, nothing should be saved.
-*   **NFR-03 (Usability):** The POS seat map must use universally recognized color codes (Red=Booked, Green=Selected, Yellow=VIP).
-
-### 4.4 Constraints & Assumptions
-*   **Constraint:** The application must run on existing mid-tier Windows machines using Java Swing.
-*   **Assumption:** The database server (SQL Server) is hosted on a local network (LAN) with low latency.
+### 3.2 Mục tiêu & "Nỗi đau" (Pain Points)
+*   **Mục tiêu:** Tối đa hóa tốc độ bán vé trong giờ cao điểm (ví dụ: ngày công chiếu phim hot) và đảm bảo 0% tỷ lệ trùng ghế.
+*   **Vấn đề vận hành:** Các hệ thống cũ thường có luồng thanh toán chậm, dễ gây lỗi trùng ghế (double-booking) khi nhiều nhân viên cùng bán. Giao diện phức tạp khiến việc đào tạo nhân viên mới mất nhiều thời gian.
+*   **Mục tiêu Kinh doanh:** Cung cấp báo cáo doanh thu chính xác mỗi ngày để ngăn chặn thất thoát tài chính.
 
 ---
 
-## 5. Product Thinking & Strategy
+## 4. Yêu cầu Hệ thống (SRS Extract)
 
-### 5.1 UX & Operational Bottlenecks
-*   **Current Bottleneck:** Staff have to manually hunt for showtimes in a list. 
-*   **UX Problem:** If a customer changes their mind mid-checkout, rollback logic in UI can be clunky.
-*   **Scalability Concern:** The Desktop/JDBC direct connection architecture limits the ability to add customer-facing mobile apps (requires an API layer).
+### 4.1 Yêu cầu Nghiệp vụ (Business Requirements)
+*   **BR-01:** Hệ thống phải hoàn tất toàn bộ quy trình bán vé (từ lúc chọn ghế đến khi in hóa đơn) trong thời gian dưới 15 giây.
+*   **BR-02:** Hệ thống phải áp dụng phân quyền nghiêm ngặt để tránh nhân viên quầy vé truy cập vào các tính năng quản trị và gian lận.
 
-### 5.2 Proposed Feature Improvements (Product Roadmap)
-*   **Automation:** Auto-schedule showtimes based on previous week's performance data.
-*   **Feature Expansion:** Introduce **"Seat Hold" (Pessimistic Locking)**. When a staff member clicks a seat, lock it for 3 minutes so other terminals cannot select it, preventing conflict at the `checkout` button.
-*   **Customer Experience:** Implement a dual-screen display so customers can see the seat map in real-time.
-*   **Payment Integration:** Integrate a dynamic QR code payment gateway (VNPay/Momo) directly into the POS UI.
+### 4.2 Yêu cầu Chức năng (Functional Requirements)
+*   **FR-01 (Lịch chiếu):** Hệ thống không được phép cho lưu lịch chiếu nếu thời gian bị trùng lặp trong cùng một Phòng chiếu.
+*   **FR-02 (Ghế ngồi):** Hệ thống phải tự động khóa ghế (chuyển sang màu xám/đỏ) ngay khi `status = BOOKED` và không cho phép chọn lại.
+*   **FR-03 (Thanh toán):** Hệ thống phải tự động sinh `Mã Hóa Đơn` (Invoice ID), `Mã Vé` (Ticket IDs), và Mã vạch (Barcode) duy nhất trong lúc thanh toán.
+*   **FR-04 (Xuất file):** Hệ thống phải hỗ trợ xuất Biên lai dạng PDF và dữ liệu giao dịch ra file Excel.
+
+### 4.3 Yêu cầu Phi chức năng (Non-Functional Requirements)
+*   **NFR-01 (Hiệu năng):** Dữ liệu Dashboard thống kê doanh thu 30 ngày phải được tính toán và tải xong trong < 2 giây.
+*   **NFR-02 (Tính Toàn vẹn / ACID):** Giao dịch thanh toán phải đạt 100% atomic. Nếu in PDF lỗi, việc lưu dữ liệu vẫn phải thành công. Nếu lưu dữ liệu lỗi, toàn bộ thao tác (lưu vé, cập nhật trạng thái ghế) phải bị rollback.
+*   **NFR-03 (Trải nghiệm UI):** Sơ đồ ghế ngồi phải dùng mã màu quen thuộc (Đỏ = Đã đặt, Xanh/Đang chọn = Selected, Vàng = VIP).
+
+### 4.4 Ràng buộc & Giả định (Constraints & Assumptions)
+*   **Ràng buộc:** Ứng dụng là phần mềm Desktop viết bằng Java Swing, chạy trên Windows.
+*   **Giả định:** Database Server (SQL Server) nằm trên cùng mạng nội bộ (LAN) với độ trễ thấp.
+
+---
+
+## 5. Đề xuất Cải tiến Sản phẩm (Product Thinking)
+
+### 5.1 Vấn đề Trải nghiệm (UX) & Điểm nghẽn
+*   **Điểm nghẽn hiện tại:** Nhân viên phải cuộn tìm suất chiếu trong một danh sách khá dài.
+*   **Khả năng mở rộng:** Do là app Desktop (Swing) kết nối trực tiếp JDBC, việc mở rộng cho khách hàng tự đặt vé (Mobile App/Web) sẽ gặp khó khăn.
+
+### 5.2 Lộ trình Nâng cấp (Roadmap)
+*   **Mở rộng (Pessimistic Locking):** Thêm tính năng "Giữ ghế" (Seat Hold). Khi một nhân viên click vào ghế, ghế đó bị khóa trong 3 phút trên toàn hệ thống để các máy khác không thể chọn, chống xung đột từ sớm.
+*   **Trải nghiệm Khách hàng:** Hỗ trợ màn hình phụ (Dual-screen) để khách hàng thấy sơ đồ ghế khi đang mua.
+*   **Thanh toán:** Tích hợp API tạo mã QR thanh toán động (VNPay/Momo) hiển thị ngay trên màn hình POS.

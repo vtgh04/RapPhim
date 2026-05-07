@@ -1,67 +1,40 @@
-# Agile Backlog, Jira Setup & CV Portfolio Value
-**Project:** CinePro Management & POS System
+# Product Backlog & Quản lý Dự án (Agile/Scrum)
+**Dự án:** Hệ thống Quản lý và Bán vé Rạp chiếu phim (CinePro)
 
 ---
 
-## 1. Agile Product Backlog (Jira Style)
+## 1. Product Backlog (Danh sách Yêu cầu Hệ thống)
 
-### 1.1 Epics & Stories
+### 1.1 Danh sách Epics & User Stories
 
-#### Epic 1: Box Office Ticketing & Sales
-**Description:** Implement a robust POS system for staff to sell tickets efficiently.
+#### Epic 1: Giao diện Bán vé & Thanh toán tại Quầy
+**Mô tả:** Xây dựng một hệ thống POS mạnh mẽ để nhân viên bán vé cho khách hàng một cách nhanh chóng và chính xác.
 
-| Ticket ID | Type | Priority | Story Points | Title |
+| Ticket ID | Loại | Độ ưu tiên | Điểm (Story Points) | Tiêu đề (User Story) |
 | :--- | :--- | :--- | :--- | :--- |
-| POS-01 | Story | Highest | 8 | As a Staff, I want to view an interactive seat map so I can select available seats for customers. |
-| POS-02 | Story | High | 5 | As a Staff, I want to apply a discount code to the cart so that promotional pricing is reflected. |
-| POS-03 | Story | Highest | 13 | As the System, I must execute checkout as a single database transaction to prevent double booking. |
+| POS-01 | Story | Rất Cao | 8 | Là một Nhân viên, tôi muốn xem sơ đồ ghế trực quan để có thể chọn ghế trống cho khách hàng. |
+| POS-02 | Story | Cao | 5 | Là một Nhân viên, tôi muốn có khả năng nhập mã giảm giá vào giỏ hàng để hệ thống tự động trừ tiền thanh toán. |
+| POS-03 | Story | Rất Cao | 13 | Là Hệ thống, tôi phải thực hiện thao tác Thanh toán (Checkout) dưới dạng một Transaction cơ sở dữ liệu nguyên tử (atomic) để chống lỗi trùng ghế. |
 
-**Acceptance Criteria for POS-03 (Checkout Transaction):**
-*   **GIVEN** a staff member has seats in the cart
-*   **WHEN** they click "Checkout"
-*   **THEN** the system must lock the seats, generate an invoice, and print tickets.
-*   **AND** if any database insertion fails, all previous steps in the checkout must be rolled back entirely.
+**Tiêu chí Chấp nhận (Acceptance Criteria) cho POS-03 (Transaction Thanh toán):**
+*   **GIVEN (Trong điều kiện):** Nhân viên đã chọn xong ghế vào giỏ hàng.
+*   **WHEN (Khi):** Nhân viên nhấn nút "Thanh toán".
+*   **THEN (Thì):** Hệ thống phải tiến hành khóa ghế, sinh mã hóa đơn, sinh mã vé và lưu dữ liệu.
+*   **AND (Và):** Nếu quá trình chèn dữ liệu thất bại ở bất kỳ bảng nào, toàn bộ các thao tác trước đó trong luồng thanh toán phải được rollback hoàn toàn để bảo vệ tính đúng đắn của dữ liệu.
 
-#### Epic 2: Management & Analytics Dashboard
-**Description:** Equip managers with tools to oversee operations and revenue.
+#### Epic 2: Bảng Điều khiển Quản trị & Báo cáo Doanh thu
+**Mô tả:** Cung cấp cho Quản lý các công cụ giám sát vận hành và theo dõi doanh thu.
 
-| Ticket ID | Type | Priority | Story Points | Title |
+| Ticket ID | Loại | Độ ưu tiên | Điểm (Story Points) | Tiêu đề (User Story) |
 | :--- | :--- | :--- | :--- | :--- |
-| MGT-01 | Story | High | 5 | As a Manager, I want to see a 30-day revenue line chart to analyze sales trends. |
-| MGT-02 | Story | Medium | 3 | As a Manager, I want to export transaction history to Excel for accounting purposes. |
-| MGT-03 | Story | High | 8 | As a Manager, I want to schedule showtimes, and the system must alert me if there is a time overlap in the same hall. |
+| MGT-01 | Story | Cao | 5 | Là một Quản lý, tôi muốn xem biểu đồ dạng đường thể hiện doanh thu trong 30 ngày gần nhất để phân tích biến động kinh doanh. |
+| MGT-02 | Story | Trung bình | 3 | Là một Quản lý, tôi muốn xuất lịch sử giao dịch ra file Excel để nộp cho phòng kế toán. |
+| MGT-03 | Story | Cao | 8 | Là một Quản lý, tôi muốn xếp lịch chiếu phim, và hệ thống phải cảnh báo tôi nếu thời gian suất chiếu mới bị trùng lặp với suất chiếu cũ trong cùng một phòng chiếu. |
 
 ---
 
-## 2. CV / Portfolio Value (BA & System Analyst Perspective)
-
-When presenting this project to recruiters, emphasize these key **Talking Points**:
-
-### 2.1 The "BA Mindset" Showcased
-*   **Workflow Optimization:** You didn't just build a UI; you mapped a complex user journey (Login -> Select Movie -> Pick Seat -> Validate Discount -> Checkout -> Print) and translated it into a streamlined UI.
-*   **Business Rules Enforcement:** Implemented strict real-world business constraints, such as overlapping showtime prevention (Time A vs Time B logic) and role-based access control.
-
-### 2.2 The "System Analyst / Technical BA" Edge
-*   **ACID Transaction Modeling:** Understanding that "Ticket Booking" isn't just an INSERT statement. It requires transactional safety (Commit/Rollback) to prevent the "Double Booking" business nightmare. 
-*   **Architecture Decoupling:** Recognizing the flaw of UI-to-Database direct calls and architecting the 3-Layer model (UI -> Service -> DAO) to ensure the system can scale to Web or Mobile APIs in the future.
-
-### 2.3 Key Achievements for CV Bullets
-> *   "Analyzed and re-engineered the ticket checkout process, establishing ACID-compliant transaction boundaries that eliminated the business risk of double-booked seats."
-> *   "Defined and documented complex business rules for overlapping showtime schedules, directly preventing operational conflicts in cinema halls."
-> *   "Authored comprehensive agile documentation (Epics, User Stories, Acceptance Criteria) to bridge the gap between cinema operational goals and technical implementation."
-
----
-
-## 3. Gap Analysis (Level Assessment)
-
-What level does this project put you at, and what's missing to reach Big Tech standards?
-
-### Junior to Mid-Level BA (Current State)
-*   **Achieved:** Strong grasp of functional requirements, database relationships (ERD), UI/UX workflow, and basic system architecture.
-*   **Proof:** The strict 3-tier architecture and transactional safety logic.
-
-### Senior / Big Tech BA (What to add next)
-To elevate this portfolio to Big Tech standards, you should simulate/document the following:
-1.  **Scalability Analysis:** Document how the system would handle 10,000 concurrent users booking *Avengers: Endgame* online (e.g., introducing Redis for seat-locking caching, Message Queues for ticket generation).
-2.  **API Specifications (Swagger):** Big Tech projects are API-first. You should write a mockup OpenAPI/Swagger spec for the `POST /api/v1/checkout` endpoint.
-3.  **A/B Testing & Data Analytics:** Define metrics. *How do we know the new POS UI is faster?* Define KPIs like "Average Time to Checkout" and "Error Rate during Booking".
+## 2. Tiêu chuẩn Hoàn thành (Definition of Done)
+*   **Code Quality:** Không có lỗi nghiêm trọng (Critical/Blocker). Code phải được review và tuân thủ mô hình 3 Lớp (UI -> Service -> DAO).
+*   **Testing:** Vượt qua toàn bộ các Unit test cốt lõi, đặc biệt là bài test cho luồng `SaleService.processCheckout()` để đảm bảo không bị double-booking.
+*   **Integration:** Các tính năng xuất PDF hóa đơn và vé phải hoạt động thành công không làm crash ứng dụng chính.
+*   **UI/UX:** Giao diện đã được căn chỉnh không bị vỡ layout, các trạng thái của hệ thống (loading, success, error) đã hiển thị đầy đủ thông báo tiếng Việt cho người dùng.

@@ -1,28 +1,28 @@
-# System Analysis & Architecture Design
-**Project:** CinePro Management & POS System
+# Phân tích Hệ thống & Thiết kế Kiến trúc
+**Dự án:** Hệ thống Quản lý và Bán vé Rạp chiếu phim (CinePro)
 
 ---
 
-## 1. Architectural Analysis
-The project strictly implements a **3-Tier Architecture** ensuring separation of concerns, scalability, and clean data flow.
+## 1. Phân tích Kiến trúc
+Dự án áp dụng chặt chẽ **Kiến trúc 3 Lớp (3-Tier Architecture)** nhằm đảm bảo tính phân tách (Separation of Concerns), dễ bảo trì và dễ mở rộng.
 
-### 1.1 Architecture Diagram
+### 1.1 Sơ đồ Kiến trúc
 
 ```mermaid
 graph TD
-    subgraph View Layer [Presentation Tier]
+    subgraph View Layer [Lớp Giao diện]
         UI[UI Panels & Dialogs]
         Controllers[Event Controllers]
     end
 
-    subgraph Service Layer [Business Tier]
+    subgraph Service Layer [Lớp Nghiệp vụ]
         AuthSvc[AuthService]
         SaleSvc[SaleService]
         ShowSvc[ShowtimeService]
-        OtherSvc[Other Services...]
+        OtherSvc[Các Service khác...]
     end
 
-    subgraph DAO Layer [Data Tier]
+    subgraph DAO Layer [Lớp Truy cập Dữ liệu]
         SaleDAO[InvoiceDAO & TicketDao]
         ShowDAO[ShowtimeDAO]
         UserDAO[EmployeeDAO]
@@ -32,36 +32,36 @@ graph TD
         SQL[(SQL Server)]
     end
 
-    UI -->|DTOs / Data| Service Layer
+    UI -->|DTOs / Gọi Hàm| Service Layer
     Service Layer -->|Entity Models| DAO Layer
     DAO Layer -->|JDBC/SQL| Database
     
-    %% Transaction Management highlights
-    Service Layer -.->|Controls Commit/Rollback| Database
+    %% Quản lý Transaction
+    Service Layer -.->|Quản lý Commit/Rollback| Database
 ```
 
-### 1.2 Layer Responsibilities
-*   **Presentation Layer (UI):** Captures user inputs, validates UI-level formatting, and calls Service methods. *No SQL logic.*
-*   **Business Logic Layer (Service):** Orchestrates workflows. Example: `SaleService.processCheckout()` handles atomicity, generates IDs, updates seat statuses, and saves tickets all within a single transaction boundary.
-*   **Data Access Layer (DAO):** Pure database interaction. Contains raw SQL queries, `PreparedStatement`, and `ResultSet` mapping.
+### 1.2 Trách nhiệm từng Lớp
+*   **Lớp Giao diện (UI/Panel):** Nhận input từ người dùng, kiểm tra định dạng giao diện, và gọi các phương thức trong Service. *Tuyệt đối không chứa logic SQL.*
+*   **Lớp Nghiệp vụ (Service):** Điều phối luồng xử lý. Ví dụ: `SaleService.processCheckout()` quản lý transaction, sinh mã ID, cập nhật trạng thái ghế và lưu hóa đơn - tất cả nằm trong một chu trình nguyên tử (atomic).
+*   **Lớp Dữ liệu (DAO):** Chuyên tương tác cơ sở dữ liệu. Chỉ chứa SQL thô (`INSERT`, `SELECT`, `UPDATE`), xử lý `PreparedStatement` và ánh xạ `ResultSet`.
 
 ---
 
-## 2. Database Analysis (Data Dictionary & ERD)
+## 2. Thiết kế Cơ sở Dữ liệu (ERD & Data Dictionary)
 
-### 2.1 Entity Relationship Diagram (ERD)
+### 2.1 Sơ đồ Thực thể - Liên kết (ERD)
 
 ```mermaid
 erDiagram
-    EMPLOYEES ||--o{ INVOICES : creates
-    MOVIES ||--o{ SHOWTIMES : scheduled_for
-    CINEMA_HALLS ||--o{ SHOWTIMES : hosts
-    CINEMA_HALLS ||--o{ SEATS : contains
-    SHOWTIMES ||--o{ SHOW_SEATS : has
-    SEATS ||--o{ SHOW_SEATS : mapped_to
-    INVOICES ||--o{ TICKETS : includes
-    SHOW_SEATS ||--o| TICKETS : generates
-    DISCOUNTS ||--o{ INVOICES : applied_to
+    EMPLOYEES ||--o{ INVOICES : tao
+    MOVIES ||--o{ SHOWTIMES : duoc_len_lich
+    CINEMA_HALLS ||--o{ SHOWTIMES : dien_ra_tai
+    CINEMA_HALLS ||--o{ SEATS : chua
+    SHOWTIMES ||--o{ SHOW_SEATS : co
+    SEATS ||--o{ SHOW_SEATS : map_voi
+    INVOICES ||--o{ TICKETS : bao_gom
+    SHOW_SEATS ||--o| TICKETS : tao_ra
+    DISCOUNTS ||--o{ INVOICES : ap_dung_cho
 
     EMPLOYEES {
         string employee_id PK
@@ -103,18 +103,18 @@ erDiagram
     }
 ```
 
-### 2.2 Data Dictionary (Key Transaction Tables)
-| Table Name | Description | Key Constraints & Indexes |
+### 2.2 Từ điển Dữ liệu (Các bảng Transaction cốt lõi)
+| Tên Bảng | Mô tả | Ràng buộc & Chỉ mục (Indexes) |
 | :--- | :--- | :--- |
-| `show_seats` | Tracks the dynamic status of a physical seat for a specific showtime. | `status` (AVAILABLE, BOOKED, BROKEN). *Index recommended on `showtime_id, seat_id` for fast checkout lookup.* |
-| `tickets` | The physical ticket granted to a customer. | FK to `invoice_id`. Unique constraint on `barcode`. |
-| `showtimes` | Overlap prevention relies on `start_time` and `end_time` logic. | Check constraints ensure `end_time > start_time`. |
+| `show_seats` | Quản lý trạng thái động của một chiếc ghế vật lý trong một suất chiếu cụ thể. | Trạng thái: `AVAILABLE`, `BOOKED`, `BROKEN`. Khuyến nghị tạo Index trên `showtime_id, seat_id` để tăng tốc độ tìm kiếm khi thanh toán. |
+| `tickets` | Vé vật lý / vé điện tử cấp cho khách hàng. | FK liên kết tới `invoice_id`. Unique constrain trên cột `barcode`. |
+| `showtimes` | Ngăn chặn trùng lặp lịch chiếu dựa trên thời gian. | Cần có Check constraint đảm bảo `end_time > start_time`. |
 
-### 2.3 Transaction Management & ACID Analysis
-The most critical database operation is the **Ticket Checkout**. 
-To prevent race conditions (two staff members booking the same seat simultaneously), the `SaleService` disables auto-commit (`conn.setAutoCommit(false)`). 
-1. Reads `show_seats` to ensure `status = 'AVAILABLE'`.
-2. Updates `show_seats` to `BOOKED`.
-3. Inserts `Invoice` and `Tickets`.
-4. Commits transaction (`conn.commit()`).
-*If any constraint fails, the entire block rolls back, guaranteeing data integrity.*
+### 2.3 Quản lý Giao dịch (Transaction) & Tính toàn vẹn (ACID)
+Thao tác phức tạp và nhạy cảm nhất là **Thanh toán vé (Checkout)**.
+Để chống lỗi xung đột (ví dụ: 2 nhân viên bán cùng 1 ghế tại 1 giây), `SaleService` buộc phải vô hiệu hóa auto-commit (`conn.setAutoCommit(false)`). 
+1. Đọc bảng `show_seats` để kiểm tra `status = 'AVAILABLE'`.
+2. Cập nhật `show_seats` thành `BOOKED`.
+3. Thêm mới dữ liệu vào `Invoices` và `Tickets`.
+4. Hoàn tất giao dịch (`conn.commit()`).
+*Chỉ cần một thao tác thất bại, toàn bộ khối lệnh sẽ bị rollback, bảo toàn dữ liệu tuyệt đối.*

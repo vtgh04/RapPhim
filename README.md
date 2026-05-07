@@ -93,13 +93,13 @@
 
 ## 3. Screenshots
 
-|             Login & Authentication             |                                               Point of Sale (POS)                                               |
-| :---------------------------------------------: | :-------------------------------------------------------------------------------------------------------------: |
-| ![Login UI](Screenshot%202026-05-07%20161048.png) |                              ![POS Interface](Screenshot%202026-05-07%20161110.png)                              |
-|         **Interactive Seat Map**         |                                         **Dashboard & Analytics**                                         |
-| ![Seat Map](Screenshot%202026-05-07%20161129.png) |                                ![Dashboard](Screenshot%202026-05-07%20161159.png)                                |
-|          **Showtime Scheduling**          |                                      **Exported Tickets & Invoices**                                      |
-| ![Showtime](Screenshot%202026-05-07%20161225.png) | [🎫 View Ticket PDF](invoice/tickets/tickets_INV024.pdf)`<br><br>`[🧾 View Invoice PDF](invoice/invoice_INV024.pdf) |
+| Login & Authentication | Point of Sale (POS) |
+|:---:|:---:|
+| ![Login UI](image/README/Login.png) | ![POS Interface](image/README/Sale.png) |
+| **Interactive Seat Map** | **Dashboard & Analytics** |
+| ![Seat Map](image/README/SeatMap.png) | ![Dashboard](image/README/Dashboard.png) |
+| **Showtime Scheduling** | **Exported Tickets & Invoices** |
+| ![Showtime](image/README/Showtimes.png) | ![Invoice](image/README/Invoice.png)<br>[🎫 View PDF Ticket](invoice/tickets/tickets_INV024.pdf) \| [🧾 View PDF Invoice](invoice/invoice_INV024.pdf) |
 
 ---
 

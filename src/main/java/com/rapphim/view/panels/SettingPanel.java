@@ -1,8 +1,8 @@
 package com.rapphim.view.panels;
 
-import com.rapphim.dao.EmployeeDAO;
-import com.rapphim.dao.HallDao;
-import com.rapphim.dao.MovieDAO;
+import com.rapphim.service.EmployeeService;
+import com.rapphim.service.HallService;
+import com.rapphim.service.MovieService;
 import com.rapphim.model.Employee;
 
 import javax.swing.*;
@@ -51,15 +51,15 @@ public class SettingPanel extends JPanel {
 
     private void loadStats() {
         try {
-            totalEmployees = new EmployeeDAO().findAll().size();
+            totalEmployees = new EmployeeService().getAllEmployees().size();
         } catch (Exception ignored) {
         }
         try {
-            totalHalls = new HallDao().findAllHalls().size();
+            totalHalls = new HallService().getAllHalls().size();
         } catch (Exception ignored) {
         }
         try {
-            totalMovies = new MovieDAO().findAll().size();
+            totalMovies = new MovieService().getAllMovies().size();
         } catch (Exception ignored) {
         }
     }

@@ -2,6 +2,7 @@ package com.rapphim.view.panels;
 
 import com.rapphim.model.Invoice;
 import com.rapphim.service.InvoiceService;
+import com.rapphim.service.DashboardService;
 import com.rapphim.util.InvoiceExcelUtils;
 
 import javax.swing.*;
@@ -23,6 +24,7 @@ public class DashboardPanel extends JPanel {
     private JPanel topMoviesPanel;
 
     private final InvoiceService service = new InvoiceService();
+    private final DashboardService dashboardService = new DashboardService();
     private java.util.List<Invoice> invoices = new ArrayList<>();
 
     public DashboardPanel() {
@@ -180,7 +182,7 @@ public class DashboardPanel extends JPanel {
             lbTickets.setText(String.valueOf(tickets));
 
             Map<Integer, Double> map = new HashMap<>();
-            for (Object[] r : service.getRevenueByDay()) {
+            for (Object[] r : dashboardService.getRevenueByDay()) {
                 map.put((Integer) r[0], (Double) r[1]);
             }
             chartPanel.setData(map);
@@ -196,7 +198,7 @@ public class DashboardPanel extends JPanel {
 
         topMoviesPanel.removeAll();
 
-        for (Object[] r : service.getTopMovies()) {
+        for (Object[] r : dashboardService.getTopMovies()) {
 
             String title = (String) r[0];
             String poster = (String) r[1];

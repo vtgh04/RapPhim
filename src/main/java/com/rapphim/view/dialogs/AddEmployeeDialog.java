@@ -1,6 +1,6 @@
 package com.rapphim.view.dialogs;
 
-import com.rapphim.dao.EmployeeDAO;
+import com.rapphim.service.EmployeeService;
 import com.rapphim.model.Employee;
 import com.rapphim.model.enums.EmployeeRole;
 import com.rapphim.model.enums.EmployeeStatus;
@@ -72,7 +72,7 @@ public class AddEmployeeDialog extends JDialog {
     private JTextField txtEmail;
     private JLabel lblError;
 
-    private final EmployeeDAO employeeDAO = new EmployeeDAO();
+    private final EmployeeService employeeService = new EmployeeService();
     private boolean saved = false;
 
     public AddEmployeeDialog(JFrame parent) {
@@ -456,7 +456,7 @@ public class AddEmployeeDialog extends JDialog {
 
     private void loadNextEmployeeId() {
         try {
-            String nextId = employeeDAO.getNextEmployeeId();
+            String nextId = employeeService.getNextEmployeeId();
             txtEmployeeCode.setText(nextId);
         } catch (Exception ex) {
             txtEmployeeCode.setText("EMP???");
@@ -518,7 +518,7 @@ public class AddEmployeeDialog extends JDialog {
         }
 
         try {
-            for (Employee e : employeeDAO.findAll()) {
+            for (Employee e : employeeService.getAllEmployees()) {
                 if (e.getUsername().equalsIgnoreCase(username)) {
                     showError("Username đã tồn tại trong hệ thống.");
                     txtUsername.requestFocus();
@@ -545,7 +545,7 @@ public class AddEmployeeDialog extends JDialog {
                 email.isEmpty() ? null : email);
 
         try {
-            employeeDAO.insert(employee);
+            employeeService.addEmployee(employee);
             saved = true;
             JOptionPane.showMessageDialog(this,
                     "Thêm nhân viên thành công!\nMã NV: " + empId,

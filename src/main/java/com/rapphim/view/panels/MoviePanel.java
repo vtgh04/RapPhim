@@ -22,9 +22,7 @@ import javax.swing.table.JTableHeader;
 import java.io.File;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import com.rapphim.util.MovieExcelUtils;
-
-import com.rapphim.dao.MovieDAO;
+import com.rapphim.service.MovieService;
 import com.rapphim.model.Movie;
 import com.rapphim.model.enums.MovieStatus;
 import com.rapphim.view.dialogs.EditMovieDialog;
@@ -75,6 +73,8 @@ public class MoviePanel extends JPanel {
     private boolean gridMode = true;
     private static final Map<String, BufferedImage> posterCache = new HashMap<>();
 
+    private MovieService movieService = new MovieService();
+
     // Components updated dynamically
     private JPanel bannerHolder;
 
@@ -111,7 +111,7 @@ public class MoviePanel extends JPanel {
     // ════════════════════════════════════════════════════════════════════════
     private void loadData() {
         try {
-            allMovies = new MovieDAO().findAll();
+            allMovies = movieService.getAllMovies();
         } catch (Exception ex) {
             ex.printStackTrace();
             allMovies = new ArrayList<>();
@@ -1095,7 +1095,7 @@ public class MoviePanel extends JPanel {
                 fileToSave = new File(fileToSave.getParentFile(), fileToSave.getName() + ".xlsx");
             }
             try {
-                MovieExcelUtils.exportToExcel(allMovies, fileToSave);
+                movieService.exportMovies(allMovies, fileToSave);
                 JOptionPane.showMessageDialog(this, "Đã xuất dữ liệu ra file Excel:\n" + fileToSave.getAbsolutePath(),
                         "Thành công", JOptionPane.INFORMATION_MESSAGE);
             } catch (Exception ex) {
@@ -1115,7 +1115,7 @@ public class MoviePanel extends JPanel {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToRead = fileChooser.getSelectedFile();
             try {
-                List<Movie> importedList = MovieExcelUtils.importFromExcel(fileToRead, new MovieDAO());
+                List<Movie> importedList = movieService.importMovies(fileToRead);
                 JOptionPane.showMessageDialog(this, "Đã nhập thành công " + importedList.size() + " phim!",
                         "Thành công", JOptionPane.INFORMATION_MESSAGE);
                 loadData();

@@ -9,6 +9,21 @@ import java.util.Optional;
 
 public class AuthService {
 
+    // ── Quản lý phiên đăng nhập (Session) ────────────────────────────────
+    // Di chuyển từ EmployeeDAO sang đây vì đây là business/state logic,
+    // không phải thao tác database.
+    private static String loggedInEmployeeId = "EMP001"; // Mặc định cho môi trường phát triển
+
+    public static String getLoggedInEmployee() {
+        return loggedInEmployeeId;
+    }
+
+    public static void setLoggedInEmployee(String empId) {
+        loggedInEmployeeId = empId;
+    }
+    // ──────────────────────────────────────────────────────────────────────
+
+
     public enum AuthError {
         INVALID_CREDENTIALS,
         ACCOUNT_INACTIVE,

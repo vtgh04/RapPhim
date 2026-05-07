@@ -67,6 +67,13 @@ public class GeneralStaff extends JPanel {
 
         rightPanel = createRightPanel();
         add(rightPanel, BorderLayout.CENTER);
+
+        // Load default panel
+        SwingUtilities.invokeLater(() -> {
+            if (activeNavBtn != null) {
+                handleNavigation(activeNavBtn.getText());
+            }
+        });
     }
 
     public static void openAsFrame(Employee employee) {
@@ -124,11 +131,10 @@ public class GeneralStaff extends JPanel {
         sidebar.add(logoPanel);
         sidebar.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // ── Navigation buttons ──────────────────────────────────────
-        JButton dashBtn = createNavButton("Dashboard", "images/icons/dashboard.png", true);
-        activeNavBtn = dashBtn;
-        sidebar.add(dashBtn);
-        sidebar.add(createNavButton("Sales & POS", "images/icons/sales.png", false));
+        JButton salesBtn = createNavButton("Sales & POS", "images/icons/sales.png", true);
+        activeNavBtn = salesBtn;
+        sidebar.add(salesBtn);
+        sidebar.add(createNavButton("Dashboard", "images/icons/dashboard.png", false));
         sidebar.add(createNavButton("Transactions", "images/icons/transactions.png", false));
         sidebar.add(createNavButton("Showtimes", "images/icons/Showtimes.png", false));
 
@@ -142,15 +148,8 @@ public class GeneralStaff extends JPanel {
     }
 
     private JPanel createRightPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BG_COLOR);
-
-        String name = loggedInName.isBlank() ? "" : ", " + loggedInName + "!";
-        JLabel welcomeLabel = new JLabel("Welcome back" + name);
-        welcomeLabel.setFont(FONT_BOLD_26);
-        welcomeLabel.setForeground(TEXT_PRIMARY);
-
-        panel.add(welcomeLabel);
         return panel;
     }
 
@@ -186,7 +185,7 @@ public class GeneralStaff extends JPanel {
                 if (window != null) {
                     window.dispose();
                 }
-                SwingUtilities.invokeLater(() -> new Login().setVisible(true));
+                SwingUtilities.invokeLater(() -> new LoginPanel().setVisible(true));
                 return;
             }
 
@@ -294,8 +293,7 @@ public class GeneralStaff extends JPanel {
 
     private String iconPathForButton(String label) {
         return switch (label) {
-            case "Dashboard" ->
-                "images/icons/dashboard.png";
+            case "Dashboard" -> "images/icons/dashboard.png";
             case "Sales & POS" ->
                 "images/icons/sales.png";
             case "Transactions" ->

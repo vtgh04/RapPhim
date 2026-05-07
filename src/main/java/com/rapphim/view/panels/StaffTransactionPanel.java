@@ -1,6 +1,6 @@
 package com.rapphim.view.panels;
 
-import com.rapphim.dao.EmployeeDAO;
+import com.rapphim.service.AuthService;
 import com.rapphim.model.Invoice;
 
 import javax.swing.*;
@@ -15,7 +15,7 @@ public class StaffTransactionPanel extends TransactionPanel {
 
     @Override
     protected void loadData() {
-        String empId = EmployeeDAO.getLoggedInEmployee();
+        String empId = AuthService.getLoggedInEmployee();
 
         new SwingWorker<List<Invoice>, Void>() {
             @Override

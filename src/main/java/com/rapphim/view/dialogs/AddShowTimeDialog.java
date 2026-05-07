@@ -1,8 +1,8 @@
 package com.rapphim.view.dialogs;
 
-import com.rapphim.dao.HallDao;
-import com.rapphim.dao.MovieDAO;
-import com.rapphim.dao.ShowtimeDAO;
+import com.rapphim.service.ShowtimeService;
+import com.rapphim.service.MovieService;
+import com.rapphim.service.HallService;
 import com.rapphim.model.CinemaHall;
 import com.rapphim.model.Movie;
 import com.rapphim.model.Showtime;
@@ -38,9 +38,9 @@ public class AddShowTimeDialog extends JDialog {
     private static final Font FONT_BOLD = new Font("Segoe UI", Font.BOLD, 14);
     private static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 11);
 
-    private final ShowtimeDAO stDao = new ShowtimeDAO();
-    private final MovieDAO mvDao = new MovieDAO();
-    private final HallDao hallDao = new HallDao();
+    private final ShowtimeService showtimeService = new ShowtimeService();
+    private final MovieService movieService = new MovieService();
+    private final HallService hallService = new HallService();
 
     private List<Movie> activeMovies;
     private List<CinemaHall> activeHalls;
@@ -63,13 +63,13 @@ public class AddShowTimeDialog extends JDialog {
 
     private void loadData() {
         try {
-            activeMovies = mvDao.findAll().stream()
+            activeMovies = movieService.getAllMovies().stream()
                     .filter(m -> m.getStatus() == MovieStatus.ACTIVE).collect(Collectors.toList());
         } catch (SQLException e) {
             activeMovies = List.of();
         }
         try {
-            activeHalls = hallDao.findAllHalls().stream()
+            activeHalls = hallService.getAllHalls().stream()
                     .filter(h -> h.getStatus() == CinemaHallStatus.ACTIVE).collect(Collectors.toList());
         } catch (SQLException e) {
             activeHalls = List.of();
@@ -130,7 +130,7 @@ public class AddShowTimeDialog extends JDialog {
         txtId.setForeground(INFO);
         txtId.setFont(FONT_BOLD);
         try {
-            txtId.setText(stDao.getNextShowtimeId());
+            txtId.setText(showtimeService.getNextShowtimeId());
         } catch (SQLException e) {
             txtId.setText("");
         }
@@ -227,7 +227,7 @@ public class AddShowTimeDialog extends JDialog {
             return;
         }
         try {
-            if (stDao.hasOverlap(hall.getHallId(), start, end)) {
+            if (showtimeService.hasOverlap(hall.getHallId(), start, end)) {
                 lblSystemError
                         .setText("Đã trùng lịch! Phòng " + hall.getName() + " đã có suất chiếu trong khung giờ này.");
                 return;
@@ -246,8 +246,8 @@ public class AddShowTimeDialog extends JDialog {
         st2.setBasePrice(price);
         st2.setStatus(ShowtimeStatus.SCHEDULED);
         try {
-            stDao.insert(st2);
-            stDao.generateShowSeats(st2.getShowtimeId(), hall.getHallId(), price);
+            showtimeService.addShowtime(st2);
+            showtimeService.generateShowSeats(st2.getShowtimeId(), hall.getHallId(), price);
             saved = true;
             showSuccessDialog(st2.getShowtimeId(), mv.getTitle());
             dispose();

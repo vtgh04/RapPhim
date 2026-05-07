@@ -1,6 +1,6 @@
 package com.rapphim.view.dialogs;
 
-import com.rapphim.dao.EmployeeDAO;
+import com.rapphim.service.EmployeeService;
 import com.rapphim.model.Employee;
 import com.rapphim.model.enums.EmployeeRole;
 import com.rapphim.model.enums.EmployeeStatus;
@@ -69,7 +69,7 @@ public class EditEmployeeDialog extends JDialog {
     private JTextField txtEmail;
     private JLabel lblError;
 
-    private final EmployeeDAO employeeDAO = new EmployeeDAO();
+    private final EmployeeService employeeService = new EmployeeService();
     private final Employee employee;
     private boolean saved = false;
 
@@ -482,7 +482,7 @@ public class EditEmployeeDialog extends JDialog {
         }
 
         try {
-            for (Employee e : employeeDAO.findAll()) {
+            for (Employee e : employeeService.getAllEmployees()) {
                 if (!e.getEmployeeId().equals(employee.getEmployeeId())) {
                     if (e.getUsername().equalsIgnoreCase(username)) {
                         showError("Username đã tồn tại trong hệ thống.");
@@ -517,7 +517,7 @@ public class EditEmployeeDialog extends JDialog {
         employee.setEmail(email.isEmpty() ? null : email);
 
         try {
-            employeeDAO.update(employee);
+            employeeService.updateEmployee(employee);
             saved = true;
             JOptionPane.showMessageDialog(this,
                     "Cập nhật nhân viên thành công!\nMã NV: " + employee.getEmployeeId(),

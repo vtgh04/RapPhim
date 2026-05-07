@@ -20,8 +20,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-// import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.CompoundBorder;
@@ -30,7 +30,7 @@ import javax.swing.border.LineBorder;
 
 import com.rapphim.controller.LoginController;
 
-public class Login extends JFrame {
+public class LoginPanel extends JFrame {
 
     private static final long serialVersionUID = 1;
     private final int FIELD_W = 310;
@@ -38,9 +38,10 @@ public class Login extends JFrame {
 
     private JTextField usernameField;
     private JPasswordField pwField;
+    private JProgressBar progressBar;
     private LoginController controller;
 
-    public Login() {
+    public LoginPanel() {
         setTitle("Cinema  Pro");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setSize(1200, 650);
@@ -59,13 +60,14 @@ public class Login extends JFrame {
         bannerPanel.setBackground(Color.BLACK);
 
         JLabel bannerLabel = new JLabel();
-        ImageIcon bannerIcon = loadIcon("images/banners/LoadingScreen.png", (int) (1200 * 0.7), 650);
+        ImageIcon bannerIcon = loadIcon("images/banners/LoginBanner.png", (int) (1200 * 0.7), 650);
         if (bannerIcon != null) {
             bannerLabel.setIcon(bannerIcon);
             bannerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
             bannerLabel.setLayout(new GridBagLayout());
-            JLabel titleBanner = new JLabel("RẠP PHIM CINEMAPRO");
+            JLabel titleBanner = new JLabel("Hệ thống quản lý rạp phim");
+            titleBanner.setAlignmentX(Component.LEFT_ALIGNMENT);
             titleBanner.setFont(new Font("Segoe UI", Font.BOLD, 40));
             titleBanner.setForeground(Color.WHITE);
 
@@ -155,6 +157,15 @@ public class Login extends JFrame {
         signInBtn.setPreferredSize(new Dimension(FIELD_W, 45));
         signInBtn.setMaximumSize(new Dimension(FIELD_W, 45));
         logPanel.add(signInBtn);
+        logPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+        progressBar = new JProgressBar();
+        progressBar.setIndeterminate(true);
+        progressBar.setVisible(false);
+        progressBar.setForeground(new Color(220, 20, 20));
+        progressBar.setMaximumSize(new Dimension(FIELD_W, 4));
+        progressBar.setAlignmentX(Component.LEFT_ALIGNMENT);
+        logPanel.add(progressBar);
 
         controller = new LoginController(this);
 
@@ -196,7 +207,13 @@ public class Login extends JFrame {
         return new ImageIcon(new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH));
     }
 
+    public void setProgressVisible(boolean visible) {
+        if (progressBar != null) {
+            progressBar.setVisible(visible);
+        }
+    }
+
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new Login().setVisible(true));
+        SwingUtilities.invokeLater(() -> new LoginPanel().setVisible(true));
     }
 }

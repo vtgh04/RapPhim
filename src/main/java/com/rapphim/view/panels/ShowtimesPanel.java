@@ -1,9 +1,9 @@
 package com.rapphim.view.panels;
 
-import com.rapphim.dao.HallDao;
+import com.rapphim.service.HallService;
 import com.rapphim.view.dialogs.AddShowTimeDialog;
-import com.rapphim.dao.MovieDAO;
-import com.rapphim.dao.ShowtimeDAO;
+import com.rapphim.service.MovieService;
+import com.rapphim.service.ShowtimeService;
 import com.rapphim.model.CinemaHall;
 import com.rapphim.model.Movie;
 import com.rapphim.model.Seat;
@@ -11,9 +11,7 @@ import com.rapphim.model.Showtime;
 import com.rapphim.model.enums.SeatType;
 import com.rapphim.model.enums.ShowSeatStatus;
 import com.rapphim.model.enums.ShowtimeStatus;
-import com.rapphim.util.ShowtimeExcelUtils;
 import com.toedter.calendar.JDateChooser;
-
 import javax.swing.*;
 import javax.swing.border.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -53,8 +51,9 @@ public class ShowtimesPanel extends JPanel {
     private static final DateTimeFormatter TF = DateTimeFormatter.ofPattern("HH:mm");
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    private final ShowtimeDAO stDao = new ShowtimeDAO();
-    private final MovieDAO mvDao = new MovieDAO();
+    private final ShowtimeService showtimeService = new ShowtimeService();
+    private final MovieService movieService = new MovieService();
+    private final HallService hallService = new HallService();
     private final Map<String, Movie> movieCache = new HashMap<>();
 
     private List<Showtime> todayList = new ArrayList<>();
@@ -96,11 +95,11 @@ public class ShowtimesPanel extends JPanel {
 
     private void loadData() {
         try {
-            stDao.autoUpdateStatuses(LocalDateTime.now());
+            showtimeService.autoUpdateStatuses(LocalDateTime.now());
             LocalDateTime from = selectedDate.atTime(0, 0);
             LocalDateTime to = from.plusDays(1);
-            todayList = stDao.findByDateRange(from, to);
-            List<Movie> movies = mvDao.findAll();
+            todayList = showtimeService.getShowtimesByDateRange(from, to);
+            List<Movie> movies = movieService.getAllMovies();
             movieCache.clear();
             for (Movie m : movies) {
                 movieCache.put(m.getMovieId(), m);
@@ -573,15 +572,15 @@ public class ShowtimesPanel extends JPanel {
 
         seatView.add(buildSeatMapHeader(st), BorderLayout.NORTH);
 
-        HallDao hallDao = new HallDao();
+        HallService hallSvc = this.hallService;
         CinemaHall hall = null;
         List<Seat> seats = null;
         Map<String, ShowSeatStatus> statuses = null;
 
         try {
-            hall = hallDao.findHallById(st.getHallId());
-            seats = hallDao.findSeatsByHall(st.getHallId());
-            statuses = stDao.getShowSeatStatuses(st.getShowtimeId());
+            hall = hallSvc.getHallById(st.getHallId());
+            seats = hallSvc.getSeatsByHall(st.getHallId());
+            statuses = showtimeService.getShowSeatStatuses(st.getShowtimeId());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -837,7 +836,7 @@ public class ShowtimesPanel extends JPanel {
         }
         try {
             double np = Double.parseDouble(raw);
-            stDao.updateBasePrice(st.getShowtimeId(), np);
+            showtimeService.updateBasePrice(st.getShowtimeId(), np);
             st.setBasePrice(np);
             priceField.setText(NumberFormat.getNumberInstance().format((long) np));
             showMsg("Cập nhật giá thành công!", false);
@@ -862,7 +861,7 @@ public class ShowtimesPanel extends JPanel {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                stDao.updateStatus(st.getShowtimeId(), ShowtimeStatus.CANCELLED);
+                showtimeService.updateStatus(st.getShowtimeId(), ShowtimeStatus.CANCELLED);
                 st.setStatus(ShowtimeStatus.CANCELLED);
                 showMsg("Hủy suất chiếu thành công!", false);
                 updateStatsUI();
@@ -884,7 +883,7 @@ public class ShowtimesPanel extends JPanel {
             if (!f.getName().endsWith(".xlsx"))
                 f = new File(f.getAbsolutePath() + ".xlsx");
             try {
-                ShowtimeExcelUtils.exportToExcel(todayList, movieCache, f);
+                showtimeService.exportToExcel(todayList, movieCache, f);
                 showMsg("Đã xuất dữ liệu ra file Excel:\n" + f.getAbsolutePath(), false);
             } catch (Exception ex) {
                 showMsg("Lỗi khi xuất: " + ex.getMessage(), true);

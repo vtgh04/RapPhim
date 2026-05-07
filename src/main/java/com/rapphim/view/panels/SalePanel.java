@@ -13,10 +13,10 @@ import com.rapphim.model.Seat;
 import com.rapphim.model.enums.MovieStatus;
 import com.rapphim.model.enums.ShowSeatStatus;
 import com.rapphim.model.enums.ShowtimeStatus;
-import com.rapphim.dao.MovieDAO;
-import com.rapphim.dao.ShowtimeDAO;
-import com.rapphim.dao.HallDao;
-import com.rapphim.dao.InvoiceDAO;
+import com.rapphim.service.MovieService;
+import com.rapphim.service.ShowtimeService;
+import com.rapphim.service.HallService;
+import com.rapphim.service.SaleService;
 import com.rapphim.view.dialogs.PaymentDialog;
 
 public class SalePanel extends JPanel {
@@ -56,10 +56,10 @@ public class SalePanel extends JPanel {
     private JTextField searchField;
 
     // dâta
-    private MovieDAO movieDao = new MovieDAO();
-    private ShowtimeDAO showtimeDao = new ShowtimeDAO();
-    private HallDao hallDao = new HallDao();
-    private InvoiceDAO invoiceDao = new InvoiceDAO();
+    private MovieService movieService = new MovieService();
+    private ShowtimeService showtimeService = new ShowtimeService();
+    private HallService hallService = new HallService();
+    private SaleService saleService = new SaleService();
 
     // luachon
     private Movie selectedMovie;
@@ -173,8 +173,8 @@ public class SalePanel extends JPanel {
     private void loadMovies() {
         movieView.removeAll();
         try {
-            java.util.List<Movie> movies = movieDao.findAll();
-            java.util.List<Showtime> sts = showtimeDao.findAll();
+            java.util.List<Movie> movies = movieService.getAllMovies();
+            java.util.List<Showtime> sts = showtimeService.getAllShowtimes();
             java.time.LocalDate today = java.time.LocalDate.now();
 
             java.util.Set<String> validMovieIds = new java.util.HashSet<>();
@@ -352,7 +352,7 @@ public class SalePanel extends JPanel {
         movieInfoContainer.add(infoBox, BorderLayout.CENTER);
 
         try {
-            java.util.List<Showtime> sts = showtimeDao.findAll();
+            java.util.List<Showtime> sts = showtimeService.getAllShowtimes();
             java.time.LocalDate today = java.time.LocalDate.now();
 
             for (Showtime st : sts) {
@@ -545,9 +545,9 @@ public class SalePanel extends JPanel {
         updateCartUI();
 
         try {
-            com.rapphim.model.CinemaHall hall = hallDao.findHallById(st.getHallId());
-            java.util.List<Seat> seats = hallDao.findSeatsByHall(st.getHallId());
-            Map<String, ShowSeatStatus> statuses = showtimeDao.getShowSeatStatuses(st.getShowtimeId());
+            com.rapphim.model.CinemaHall hall = hallService.getHallById(st.getHallId());
+            java.util.List<Seat> seats = hallService.getSeatsByHall(st.getHallId());
+            Map<String, ShowSeatStatus> statuses = showtimeService.getShowSeatStatuses(st.getShowtimeId());
 
             if (hall != null && seats != null) {
                 int rows = hall.getTotalRows();
@@ -853,7 +853,7 @@ public class SalePanel extends JPanel {
         }
 
         try {
-            boolean success = invoiceDao.processCheckout(
+            boolean success = saleService.processCheckout(
                     selectedShowtime.getShowtimeId(),
                     cartMap,
                     total,

@@ -1,7 +1,6 @@
 package com.rapphim.view.panels;
 
 import com.rapphim.model.Employee;
-
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -67,6 +66,13 @@ public class GeneralAdmin extends JPanel {
 
         rightPanel = createRightPanel();
         add(rightPanel, BorderLayout.CENTER);
+
+        // Load default panel
+        SwingUtilities.invokeLater(() -> {
+            if (activeNavBtn != null) {
+                handleNavigation(activeNavBtn.getText());
+            }
+        });
     }
 
     /**
@@ -135,6 +141,7 @@ public class GeneralAdmin extends JPanel {
         sidebar.add(createNavButton("Showtimes", "images/icons/Showtimes.png", false));
         sidebar.add(createNavButton("Halls & Seats", "images/icons/hall.png", false));
         sidebar.add(createNavButton("Employees", "images/icons/employees.png", false));
+        sidebar.add(createNavButton("Discounts", "images/icons/discount.png", false));
 
         sidebar.add(Box.createVerticalGlue());
 
@@ -146,15 +153,8 @@ public class GeneralAdmin extends JPanel {
     }
 
     private JPanel createRightPanel() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(BG_COLOR);
-
-        String name = loggedInName.isBlank() ? "" : ", " + loggedInName + "!";
-        JLabel welcomeLabel = new JLabel("Welcome back" + name);
-        welcomeLabel.setFont(FONT_BOLD_26);
-        welcomeLabel.setForeground(TEXT_PRIMARY);
-
-        panel.add(welcomeLabel);
         return panel;
     }
 
@@ -190,7 +190,7 @@ public class GeneralAdmin extends JPanel {
                 if (window != null) {
                     window.dispose();
                 }
-                SwingUtilities.invokeLater(() -> new Login().setVisible(true));
+                SwingUtilities.invokeLater(() -> new LoginPanel().setVisible(true));
                 return;
             }
 
@@ -250,6 +250,7 @@ public class GeneralAdmin extends JPanel {
             case "Sales & POS" -> rightPanel.add(new SalePanel(), BorderLayout.CENTER);
             case "Transactions" -> rightPanel.add(new TransactionPanel(), BorderLayout.CENTER);
             case "Showtimes" -> rightPanel.add(new ShowtimesPanel(), BorderLayout.CENTER);
+            case "Discounts" -> rightPanel.add(new DiscountPanel(), BorderLayout.CENTER);
             case "Settings" -> rightPanel.add(new SettingPanel(currentEmployee), BorderLayout.CENTER);
             default -> rightPanel.add(createPlaceholderPanel(page, "images/icons/dashboard.png", "Manage your "));
         }
@@ -315,6 +316,7 @@ public class GeneralAdmin extends JPanel {
             case "Showtimes" -> "images/icons/Showtimes.png";
             case "Halls & Seats" -> "images/icons/hall.png";
             case "Employees" -> "images/icons/employees.png";
+            case "Discounts" -> "images/icons/discount.png";
             case "Settings" -> "images/icons/Setting.png";
             case "Logout" -> "images/icons/logout.png";
             default -> "";

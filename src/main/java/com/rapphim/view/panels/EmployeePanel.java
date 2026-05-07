@@ -1,6 +1,6 @@
 package com.rapphim.view.panels;
 
-import com.rapphim.dao.EmployeeDAO;
+import com.rapphim.service.EmployeeService;
 import com.rapphim.model.Employee;
 import com.rapphim.view.dialogs.AddEmployeeDialog;
 import com.rapphim.view.dialogs.EditEmployeeDialog;
@@ -30,7 +30,6 @@ import javax.swing.AbstractCellEditor;
 import javax.swing.JFileChooser;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import com.rapphim.util.EmployeeExcelUtils;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -93,7 +92,7 @@ public class EmployeePanel extends JPanel {
                 Math.min(255, (int) (fg.getBlue() * ratio + bg.getBlue() * inv)));
     }
 
-    private final EmployeeDAO employeeDAO = new EmployeeDAO();
+    private final EmployeeService employeeService = new EmployeeService();
     private JTable table;
     private DefaultTableModel tableModel;
     private TableRowSorter<DefaultTableModel> sorter;
@@ -247,7 +246,7 @@ public class EmployeePanel extends JPanel {
                 fileToSave = new File(fileToSave.getParentFile(), fileToSave.getName() + ".xlsx");
             }
             try {
-                EmployeeExcelUtils.exportToExcel(employees, fileToSave);
+                employeeService.exportToExcel(employees, fileToSave);
                 showModernMessageDialog("Thành công", "Đã xuất dữ liệu ra file Excel:\n" + fileToSave.getAbsolutePath(),
                         false);
             } catch (Exception ex) {
@@ -266,7 +265,7 @@ public class EmployeePanel extends JPanel {
         if (userSelection == JFileChooser.APPROVE_OPTION) {
             File fileToRead = fileChooser.getSelectedFile();
             try {
-                List<Employee> importedList = EmployeeExcelUtils.importFromExcel(fileToRead, employeeDAO);
+                List<Employee> importedList = employeeService.importFromExcel(fileToRead);
                 showModernMessageDialog("Thành công", "Đã nhập thành công " + importedList.size() + " nhân viên!",
                         false);
                 refreshData();
@@ -752,7 +751,7 @@ public class EmployeePanel extends JPanel {
 
     private void handleEditEmployee(String employeeId, String fullName) {
         try {
-            java.util.Optional<Employee> optEmp = employeeDAO.findById(employeeId);
+            java.util.Optional<Employee> optEmp = employeeService.getEmployeeById(employeeId);
             if (optEmp.isPresent()) {
                 JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
                 EditEmployeeDialog dialog = new EditEmployeeDialog(parentFrame, optEmp.get());
@@ -775,7 +774,7 @@ public class EmployeePanel extends JPanel {
 
         if (confirmDialog.isConfirmed()) {
             try {
-                employeeDAO.delete(employeeId);
+                employeeService.deleteEmployee(employeeId);
                 showModernMessageDialog("Thành công", "Đã xoá nhân viên: " + fullName, false);
                 refreshData();
             } catch (Exception ex) {
@@ -1069,7 +1068,7 @@ public class EmployeePanel extends JPanel {
 
     private void loadData() {
         try {
-            employees = employeeDAO.findAll();
+            employees = employeeService.getAllEmployees();
             populateTable(employees);
         } catch (SQLException e) {
             System.err.println("[EmployeePanel] Lỗi tải dữ liệu: " + e.getMessage());

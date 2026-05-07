@@ -1,6 +1,6 @@
 package com.rapphim.view.panels;
 
-import com.rapphim.dao.HallDao;
+import com.rapphim.service.HallService;
 import com.rapphim.model.CinemaHall;
 import com.rapphim.model.Seat;
 import com.rapphim.model.enums.CinemaHallStatus;
@@ -42,7 +42,7 @@ public class HallPanel extends JPanel {
     private static final Font FONT_SEAT = new Font("Segoe UI", Font.BOLD, 11);
     private static final Font FONT_ROW = new Font("Segoe UI", Font.BOLD, 12);
 
-    private final HallDao hallDao = new HallDao();
+    private final HallService hallService = new HallService();
     private List<CinemaHall> allHalls = new ArrayList<>();
 
     private CinemaHall currentHall;
@@ -84,7 +84,7 @@ public class HallPanel extends JPanel {
 
     private void loadHallsFromDB() {
         try {
-            allHalls = hallDao.findAllHalls();
+            allHalls = hallService.getAllHalls();
         } catch (SQLException e) {
             e.printStackTrace();
             allHalls = new ArrayList<>();
@@ -101,7 +101,7 @@ public class HallPanel extends JPanel {
         double stdFactor = 1.0;
         double vipFactor = 1.5;
         try {
-            List<Seat> seats = hallDao.findSeatsByHall(hallId);
+            List<Seat> seats = hallService.getSeatsByHall(hallId);
             for (Seat s : seats) {
                 String key = String.valueOf(s.getRowChar()) + s.getColNumber();
                 seatMap.put(key, s);
@@ -573,12 +573,12 @@ public class HallPanel extends JPanel {
             hasHallChange = true;
             try {
                 if (nameOrTypeChanged) {
-                    hallDao.updateHallInfo(currentHall.getHallId(), newName, newType);
+                    hallService.updateHallInfo(currentHall.getHallId(), newName, newType);
                     currentHall.setName(newName);
                     currentHall.setHallType(newType);
                 }
                 if (statusChanged) {
-                    hallDao.updateHallStatus(currentHall.getHallId(), newStatus);
+                    hallService.updateHallStatus(currentHall.getHallId(), newStatus);
                     currentHall.setStatus(newStatus);
                     // Refresh seat interactivity
                     refreshSeatInteractivity();
@@ -598,7 +598,7 @@ public class HallPanel extends JPanel {
                 return;
             }
             try {
-                hallDao.updateSeatStatuses(modifiedSeats);
+                hallService.updateSeatStatuses(modifiedSeats);
                 modifiedSeats.clear();
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -732,8 +732,8 @@ public class HallPanel extends JPanel {
         double stdFactor = ((Number) spnStdFactor.getValue()).doubleValue();
         double vipFactor = ((Number) spnVipFactor.getValue()).doubleValue();
         try {
-            hallDao.updateSeatFactorByType(currentHall.getHallId(), SeatType.REGULAR, stdFactor);
-            hallDao.updateSeatFactorByType(currentHall.getHallId(), SeatType.VIP, vipFactor);
+            hallService.updateSeatFactorByType(currentHall.getHallId(), SeatType.REGULAR, stdFactor);
+            hallService.updateSeatFactorByType(currentHall.getHallId(), SeatType.VIP, vipFactor);
             showModernMessageDialog("Thành công",
                     String.format("Đã cập nhật hệ số thành công!%n  Phổ thông: %.1f x%n  Vip:      %.1f x",
                             stdFactor, vipFactor),

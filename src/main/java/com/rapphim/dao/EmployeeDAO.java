@@ -15,17 +15,6 @@ import java.util.Optional;
 
 public class EmployeeDAO {
 
-    // --- Quản lý phiên đăng nhập (Session) ---
-    private static String loggedInEmployeeId = "EMP001"; // Mặc định cho môi trường phát triển
-
-    public static String getLoggedInEmployee() {
-        return loggedInEmployeeId;
-    }
-
-    public static void setLoggedInEmployee(String empId) {
-        loggedInEmployeeId = empId;
-    }
-    // ------------------------------------------------
 
     // Tìm kiếm theo tên đăng nhập
     private static final String SQL_FIND_BY_USERNAME = "SELECT employee_id, full_name, username, password," +

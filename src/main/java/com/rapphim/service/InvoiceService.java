@@ -36,15 +36,4 @@ public class InvoiceService {
     public void updateStatus(String invoiceId, InvoiceStatus newStatus) throws Exception {
         invoiceDAO.updateStatus(invoiceId, newStatus);
     }
-
-    // THÊM CHO DASHBOARD 
-    // doanh thu theo ngày
-    public List<Object[]> getRevenueByDay() throws Exception {
-        return invoiceDAO.getRevenueByDay();
-    }
-
-    // top phim
-    public List<Object[]> getTopMovies() throws Exception {
-        return invoiceDAO.getTopMovies();
-    }
 }

@@ -2,7 +2,8 @@ package com.rapphim.view;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import com.rapphim.view.panels.Login;
+
+import com.rapphim.view.panels.LoginPanel;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,7 +14,7 @@ public class Main {
         }
 
         SwingUtilities.invokeLater(() -> {
-            Login login = new Login();
+            LoginPanel login = new LoginPanel();
             login.setVisible(true);
         });
     }

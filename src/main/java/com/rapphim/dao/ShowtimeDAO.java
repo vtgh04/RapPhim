@@ -305,6 +305,35 @@ public class ShowtimeDAO {
         return result;
     }
 
+    // ── Transaction-aware methods (gọi từ SaleService với Connection bên ngoài) ──
+
+    /**
+     * Tìm mã show_seat_id theo suất chiếu và ghế.
+     * Nhận Connection từ bên ngoài để tham gia cùng transaction.
+     */
+    public String findShowSeatId(java.sql.Connection conn, String showtimeId, String seatId) throws SQLException {
+        String sql = "SELECT show_seat_id FROM show_seats WHERE showtime_id = ? AND seat_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, showtimeId);
+            ps.setString(2, seatId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? rs.getString("show_seat_id") : null;
+            }
+        }
+    }
+
+    /**
+     * Cập nhật trạng thái ghế trong suất chiếu thành BOOKED.
+     * Nhận Connection từ bên ngoài để tham gia cùng transaction.
+     */
+    public int updateShowSeatStatus(java.sql.Connection conn, String showSeatId) throws SQLException {
+        String sql = "UPDATE show_seats SET status = 'BOOKED' WHERE show_seat_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, showSeatId);
+            return ps.executeUpdate();
+        }
+    }
+
     // ── Mapper ───────────────────────────────────────────────────────────────
     private Showtime map(ResultSet rs) throws SQLException {
         return new Showtime(

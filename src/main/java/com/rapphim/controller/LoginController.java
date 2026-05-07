@@ -6,7 +6,7 @@ import com.rapphim.service.AuthService;
 import com.rapphim.service.AuthService.AuthException;
 import com.rapphim.view.panels.GeneralAdmin;
 import com.rapphim.view.panels.GeneralStaff;
-import com.rapphim.view.panels.Login;
+import com.rapphim.view.panels.LoginPanel;
 
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
@@ -14,10 +14,10 @@ import javax.swing.SwingWorker;
 
 public class LoginController {
 
-    private final Login loginView;
+    private final LoginPanel loginView;
     private final AuthService authService;
 
-    public LoginController(Login loginView) {
+    public LoginController(LoginPanel loginView) {
         this.loginView = loginView;
         this.authService = new AuthService();
     }
@@ -30,6 +30,7 @@ public class LoginController {
 
         signInBtn.setEnabled(false);
         signInBtn.setText("Đang đăng nhập...");
+        loginView.setProgressVisible(true);
 
         new SwingWorker<Employee, Void>() {
 
@@ -43,10 +44,11 @@ public class LoginController {
 
                 signInBtn.setEnabled(true);
                 signInBtn.setText("Sign In");
+                loginView.setProgressVisible(false);
 
                 try {
                     Employee employee = get();
-                    com.rapphim.dao.EmployeeDAO.setLoggedInEmployee(employee.getEmployeeId());
+                    AuthService.setLoggedInEmployee(employee.getEmployeeId());
                     openMainPage(employee);
                 } catch (java.util.concurrent.ExecutionException ee) {
                     Throwable cause = ee.getCause();

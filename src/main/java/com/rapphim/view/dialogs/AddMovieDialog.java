@@ -1,6 +1,6 @@
 package com.rapphim.view.dialogs;
 
-import com.rapphim.dao.MovieDAO;
+import com.rapphim.service.MovieService;
 import com.rapphim.model.Movie;
 import com.rapphim.model.enums.MovieStatus;
 import com.toedter.calendar.JDateChooser;
@@ -64,7 +64,7 @@ public class AddMovieDialog extends JDialog {
     private JLabel warnPoster;
     private JLabel lblSystemError;
 
-    private final MovieDAO movieDAO = new MovieDAO();
+    private final MovieService movieService = new MovieService();
     private Movie movie;
     private boolean saved = false;
 
@@ -72,7 +72,7 @@ public class AddMovieDialog extends JDialog {
         super(parent, "Add Movie", true);
         try {
             this.movie = new Movie();
-            this.movie.setMovieId(movieDAO.getNextMovieId());
+            this.movie.setMovieId(movieService.getNextMovieId());
         } catch (Exception e) {
             e.printStackTrace();
             this.movie = new Movie();
@@ -587,7 +587,7 @@ public class AddMovieDialog extends JDialog {
         movie.setPosterUrl(poster);
 
         try {
-            movieDAO.insert(movie);
+            movieService.addMovie(movie);
             saved = true;
             showSuccessDialog("Thêm phim thành công!", movie.getTitle());
             dispose();

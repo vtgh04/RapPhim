@@ -10,34 +10,34 @@ Dự án áp dụng chặt chẽ **Kiến trúc 3 Lớp (3-Tier Architecture)** 
 
 ```mermaid
 graph TD
-    subgraph View Layer [Lớp Giao diện]
+    subgraph ViewLayer [Lớp Giao diện]
         UI[UI Panels & Dialogs]
         Controllers[Event Controllers]
     end
 
-    subgraph Service Layer [Lớp Nghiệp vụ]
+    subgraph ServiceLayer [Lớp Nghiệp vụ]
         AuthSvc[AuthService]
         SaleSvc[SaleService]
         ShowSvc[ShowtimeService]
         OtherSvc[Các Service khác...]
     end
 
-    subgraph DAO Layer [Lớp Truy cập Dữ liệu]
+    subgraph DAOLayer [Lớp Truy cập Dữ liệu]
         SaleDAO[InvoiceDAO & TicketDao]
         ShowDAO[ShowtimeDAO]
         UserDAO[EmployeeDAO]
     end
 
-    subgraph Database
+    subgraph DBLayer [Database]
         SQL[(SQL Server)]
     end
 
-    UI -->|DTOs / Gọi Hàm| Service Layer
-    Service Layer -->|Entity Models| DAO Layer
-    DAO Layer -->|JDBC/SQL| Database
+    ViewLayer -->|DTOs / Gọi Hàm| ServiceLayer
+    ServiceLayer -->|Entity Models| DAOLayer
+    DAOLayer -->|JDBC/SQL| DBLayer
     
     %% Quản lý Transaction
-    Service Layer -.->|Quản lý Commit/Rollback| Database
+    ServiceLayer -.->|Quản lý Commit/Rollback| DBLayer
 ```
 
 ### 1.2 Trách nhiệm từng Lớp
@@ -53,53 +53,102 @@ graph TD
 
 ```mermaid
 erDiagram
-    EMPLOYEES ||--o{ INVOICES : tao
-    MOVIES ||--o{ SHOWTIMES : duoc_len_lich
-    CINEMA_HALLS ||--o{ SHOWTIMES : dien_ra_tai
-    CINEMA_HALLS ||--o{ SEATS : chua
-    SHOWTIMES ||--o{ SHOW_SEATS : co
-    SEATS ||--o{ SHOW_SEATS : map_voi
-    INVOICES ||--o{ TICKETS : bao_gom
-    SHOW_SEATS ||--o| TICKETS : tao_ra
-    DISCOUNTS ||--o{ INVOICES : ap_dung_cho
+    employees ||--o{ invoices : creates
+    invoices ||--o{ tickets : includes
+    discounts ||--o{ tickets : applies_to
+    show_seats ||--o{ tickets : generates
+    showtimes ||--o{ show_seats : has
+    seats ||--o{ show_seats : mapped_to
+    cinema_halls ||--o{ seats : contains
+    cinema_halls ||--o{ showtimes : hosts
+    movies ||--o{ showtimes : scheduled_for
 
-    EMPLOYEES {
+    employees {
         string employee_id PK
         string full_name
         string username
         string password
         string role
+        string status
+        string phone
+        string email
     }
-    MOVIES {
-        string movie_id PK
-        string title
-        int duration_mins
-        string rating
+    invoices {
+        string invoice_id PK
+        string employee_id FK
+        datetime created_at
+        float total_amount
+        int total_tickets
+        string payment_method
+        string status
+        string note
     }
-    SHOWTIMES {
+    tickets {
+        string ticket_id PK
+        string invoice_id FK
+        string show_seat_id FK
+        string discount_id FK
+        string barcode
+        float original_price
+        float discount_amount
+        float final_price
+        datetime issued_at
+    }
+    discounts {
+        string discount_id PK
+        string discount_name
+        string discount_type
+        float discount_rate
+        datetime valid_from
+        datetime valid_to
+        int min_ticket_quantity
+        bit is_active
+    }
+    show_seats {
+        string show_seat_id PK
+        string showtime_id FK
+        string seat_id FK
+        float price
+        string status
+        datetime held_until
+    }
+    showtimes {
         string showtime_id PK
         string movie_id FK
         string hall_id FK
         datetime start_time
         datetime end_time
-    }
-    SHOW_SEATS {
-        string show_seat_id PK
-        string showtime_id FK
-        string seat_id FK
+        float base_price
         string status
     }
-    INVOICES {
-        string invoice_id PK
-        string employee_id FK
-        float total_amount
-        datetime created_at
+    movies {
+        string movie_id PK
+        string title
+        string genre
+        int duration_mins
+        string format_movie
+        string rating
+        string language
+        date release_date
+        string status
+        string description
     }
-    TICKETS {
-        string ticket_id PK
-        string invoice_id FK
-        string show_seat_id FK
-        string barcode
+    cinema_halls {
+        string hall_id PK
+        string name
+        string hall_type
+        int total_rows
+        int total_cols
+        string status
+    }
+    seats {
+        string seat_id PK
+        string hall_id FK
+        string row_char
+        int col_number
+        string seat_type
+        float seat_factor
+        bit is_broken
     }
 ```
 

@@ -25,23 +25,24 @@
 5. [Project Architecture](#5-project-architecture)
 6. [Folder Structure](#6-folder-structure)
 7. [Database Design](#7-database-design)
-8. [Setup & Installation](#8-setup--installation)
+8. [Setup &amp; Installation](#8-setup--installation)
 9. [Running The Application](#9-running-the-application)
 10. [Core Business Flows](#10-core-business-flows)
-11. [Clean Architecture & Design Patterns](#11-clean-architecture--design-patterns)
+11. [Clean Architecture &amp; Design Patterns](#11-clean-architecture--design-patterns)
 12. [Security](#12-security)
 13. [Future Improvements](#13-future-improvements)
 14. [Performance Notes](#14-performance-notes)
-15. [Known Issues & Refactoring Opportunities](#15-known-issues--refactoring-opportunities)
+15. [Known Issues &amp; Refactoring Opportunities](#15-known-issues--refactoring-opportunities)
 16. [Author](#16-author)
 
 ---
 
 ## 1. Project Overview
 
-**Cinema POS** is a comprehensive, desktop-based management application designed to streamline the daily operations of a modern cinema. It handles everything from movie and showtime scheduling, interactive seat booking, and transaction processing to robust dashboard analytics. 
+**Cinema POS** is a comprehensive, desktop-based management application designed to streamline the daily operations of a modern cinema. It handles everything from movie and showtime scheduling, interactive seat booking, and transaction processing to robust dashboard analytics.
 
 **Goals:**
+
 - Provide a blazing-fast, intuitive POS interface for cinema staff to quickly serve customers.
 - Equip cinema managers with powerful tools for inventory (halls, movies, showtimes) and employee management.
 - Establish a strict, maintainable, and scalable **3-Layer Architecture** (UI ➔ Service ➔ DAO) to separate business logic from data persistence.
@@ -51,32 +52,39 @@
 ## 2. Features
 
 ### 🔐 Authentication & Authorization
+
 - Secure login mechanism with Role-Based Access Control (RBAC).
 - Specialized views for **Manager** (Full Access) and **Staff** (Restricted Access).
 
 ### 🎬 Movie Management
+
 - Full CRUD operations for movies (Title, Genre, Duration, Rating, Poster, etc.).
 - Active/Inactive toggling to manage currently showing films.
 
 ### 📅 Showtime Management
+
 - Schedule movies into cinema halls with specific start/end times.
 - Prevent overlapping schedules with robust validation algorithms.
 - Automatic seat generation for each scheduled showtime.
 
 ### 🎟️ Ticket Booking & POS
+
 - Interactive, real-time visual **Seat Map** (VIP, Regular, Broken, Booked).
 - Shopping cart functionality with real-time total calculation.
 - Support for multiple payment methods (Cash, Credit Card, Bank Transfer).
 
 ### 🧾 Invoice & Transactions
+
 - Complete transaction history tracking.
 - Staff can view their own transactions; Managers can view all.
 - Automatic barcode generation and **PDF Ticket Export**.
 
 ### 💸 Discount System
+
 - Validate and apply promotional discount codes during checkout.
 
 ### 📊 Dashboard Statistics
+
 - Real-time animated charts showing revenue over the last 30 days.
 - Top 5 best-selling movies leaderboards with visual posters.
 - Export transaction data to **Excel**.
@@ -85,15 +93,13 @@
 
 ## 3. Screenshots
 
-> *Note: Placeholders for actual project screenshots.*
-
-| Login & Authentication | Point of Sale (POS) |
-|:---:|:---:|
-| ![Login UI](placeholder-login.png) | ![POS Interface](placeholder-pos.png) |
-| **Interactive Seat Map** | **Dashboard & Analytics** |
-| ![Seat Map](placeholder-seatmap.png) | ![Dashboard](placeholder-dashboard.png) |
-| **Showtime Scheduling** | **PDF Exported Ticket** |
-| ![Showtime](placeholder-showtime.png) | ![PDF Ticket](placeholder-ticket.png) |
+|             Login & Authentication             |                                               Point of Sale (POS)                                               |
+| :---------------------------------------------: | :-------------------------------------------------------------------------------------------------------------: |
+| ![Login UI](Screenshot%202026-05-07%20161048.png) |                              ![POS Interface](Screenshot%202026-05-07%20161110.png)                              |
+|         **Interactive Seat Map**         |                                         **Dashboard & Analytics**                                         |
+| ![Seat Map](Screenshot%202026-05-07%20161129.png) |                                ![Dashboard](Screenshot%202026-05-07%20161159.png)                                |
+|          **Showtime Scheduling**          |                                      **Exported Tickets & Invoices**                                      |
+| ![Showtime](Screenshot%202026-05-07%20161225.png) | [🎫 View Ticket PDF](invoice/tickets/tickets_INV024.pdf)`<br><br>`[🧾 View Invoice PDF](invoice/invoice_INV024.pdf) |
 
 ---
 
@@ -122,7 +128,7 @@ graph TD
 ```
 
 - **View Layer (Panels/Dialogs):** Handles user interactions, captures input, and strictly delegates business operations to Services. *Never interacts with DAOs directly.*
-- **Service Layer (`Service`):** The orchestrator. Contains all business logic, workflow validations, ID generation, and transaction management (Commit/Rollback). 
+- **Service Layer (`Service`):** The orchestrator. Contains all business logic, workflow validations, ID generation, and transaction management (Commit/Rollback).
 - **DAO Layer (`DAO`):** Pure Data Access Objects. Contains only SQL statements (`INSERT`, `SELECT`, `UPDATE`). Receives `Connection` objects from Services for transactional consistency.
 - **Model Layer (`Model`):** POJOs (Plain Old Java Objects) representing database entities.
 
@@ -150,6 +156,7 @@ src/main/java/com/rapphim/
 The database is normalized to 3NF to ensure data integrity and prevent redundancy.
 
 ### Core Tables:
+
 1. `employees`: Stores user credentials and roles (Manager/Staff).
 2. `movies`: Movie metadata (Title, duration, rating, poster URL).
 3. `cinema_halls`: Physical halls containing seating capacity metadata.
@@ -160,6 +167,7 @@ The database is normalized to 3NF to ensure data integrity and prevent redundanc
 8. `tickets`: Individual ticket records linked to an invoice and a show_seat.
 
 ### ERD Overview (ASCII):
+
 ```text
 [employees] 1 ---- * [invoices] 1 ---- * [tickets]
                                             | 1
@@ -173,11 +181,13 @@ The database is normalized to 3NF to ensure data integrity and prevent redundanc
 ## 8. Setup & Installation
 
 ### Prerequisites:
+
 - Java JDK 17 or higher.
 - Microsoft SQL Server (2019+).
 - Maven (optional, if migrating to a managed build system).
 
 ### Step-by-Step:
+
 1. **Clone the repository:**
    ```bash
    git clone https://github.com/yourusername/cinema-pos.git
@@ -199,7 +209,7 @@ The database is normalized to 3NF to ensure data integrity and prevent redundanc
 
 1. **Login Screen:** Use `admin` / `admin` for Manager access, or `staff` / `staff` for Staff access.
 2. **Dashboard (Manager Only):** View the 30-day revenue chart and top-selling movies.
-3. **Sales / POS:** 
+3. **Sales / POS:**
    - Select a movie ➔ Select a showtime.
    - Click on the interactive seat map to add tickets to the cart.
    - Click **Thanh toán (Checkout)**, select payment method, and confirm.
@@ -210,7 +220,9 @@ The database is normalized to 3NF to ensure data integrity and prevent redundanc
 ## 10. Core Business Flows
 
 ### Ticket Booking Workflow (Checkout Orchestration)
+
 The checkout process is a highly transactional workflow handled by `SaleService`:
+
 1. Validates the cart and selected showtime.
 2. **Disables Auto-Commit** on the JDBC connection to start a transaction.
 3. Generates consecutive Invoice and Ticket IDs.
@@ -245,6 +257,7 @@ The checkout process is a highly transactional workflow handled by `SaleService`
 ## 13. Future Improvements
 
 To scale this monolithic desktop app to a modern enterprise ecosystem:
+
 - **Migration to Spring Boot:** Convert the backend into a RESTful API.
 - **Web/Mobile Frontend:** Replace Java Swing with React.js (Admin/Staff Web) and React Native (Customer Mobile App).
 - **Connection Pooling:** Integrate **HikariCP** to manage database connections more efficiently.
@@ -264,6 +277,7 @@ To scale this monolithic desktop app to a modern enterprise ecosystem:
 ## 15. Known Issues & Refactoring Opportunities
 
 *Recently refactored to eliminate architectural violations (e.g., UI directly calling DAOs, DAOs handling business logic).*
+
 - **Tight Coupling in UI:** Some Swing Panels are quite large. Future refactoring should abstract complex UI components (like the Seat Grid) into separate classes.
 - **Global State:** Currently, `AuthService` stores the logged-in user as a static variable. Moving to a Context-based dependency injection framework would improve testability.
 
@@ -271,10 +285,8 @@ To scale this monolithic desktop app to a modern enterprise ecosystem:
 
 ## 16. Author
 
-**Senior Software Engineer**  
-- 💼 **Portfolio:** [your-portfolio.com](#)
-- 🐙 **GitHub:** [@yourusername](https://github.com/yourusername)
-- ✉️ **Contact:** your.email@example.com
+- 🐙 **GitHub:** [@vtgh04](https://github.com/vtgh04)
+- ✉️ **Contact:** vtgh1602@gmail.com
 
 <p align="center">
   <i>If you find this project interesting, consider giving it a ⭐!</i>

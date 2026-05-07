@@ -9,10 +9,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DAO chuyên biệt cho các truy vấn Dashboard/Analytics.
- * Tách ra từ InvoiceDAO để tuân thủ Single Responsibility Principle.
- */
 public class DashboardDao {
 
     /**

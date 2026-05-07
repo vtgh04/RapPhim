@@ -9,6 +9,8 @@ import java.util.List;
 
 public class StaffTransactionPanel extends TransactionPanel {
 
+    private static final long serialVersionUID = 1L;
+
     public StaffTransactionPanel() {
         super();
     }

@@ -5,6 +5,8 @@ import javax.swing.JButton;
 
 public class StaffShowPanel extends ShowtimesPanel {
 
+    private static final long serialVersionUID = 1L;
+
     public StaffShowPanel() {
         super();
     }

@@ -4,11 +4,6 @@ import rapphim.dao.DashboardDao;
 
 import java.util.List;
 
-/**
- * Service chuyên biệt cho nghiệp vụ Dashboard/Thống kê.
- * Lấy dữ liệu từ DashboardDao và có thể thêm business logic xử lý
- * trước khi trả về cho Panel (ví dụ: tính toán tỷ lệ, format dữ liệu).
- */
 public class DashboardService {
 
     private final DashboardDao dashboardDao;

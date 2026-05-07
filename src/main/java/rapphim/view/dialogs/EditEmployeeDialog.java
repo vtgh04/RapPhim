@@ -109,7 +109,6 @@ public class EditEmployeeDialog extends JDialog {
         titleLabel.setForeground(TEXT_PRIMARY);
         headerPanel.add(titleLabel, BorderLayout.WEST);
 
-        // ── Close button — tự vẽ dấu × bằng Graphics2D ──────────────────
         JButton closeBtn = new JButton() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -150,7 +149,6 @@ public class EditEmployeeDialog extends JDialog {
         mainPanel.add(headerPanel);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 8)));
 
-        // ── Separator ────────────────────────────────────────────────────
         JPanel separator = new JPanel();
         separator.setBackground(BORDER_COLOR);
         separator.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
@@ -158,9 +156,6 @@ public class EditEmployeeDialog extends JDialog {
         mainPanel.add(separator);
         mainPanel.add(Box.createRigidArea(new Dimension(0, 20)));
 
-        // ── Form fields ──────────────────────────────────────────────────
-
-        // Employee Code (read-only)
         txtEmployeeCode = createStyledTextField("");
         txtEmployeeCode.setEditable(false);
         txtEmployeeCode.setBackground(AUTO_BG);
@@ -247,10 +242,6 @@ public class EditEmployeeDialog extends JDialog {
             txtEmail.setForeground(TEXT_PRIMARY);
         }
     }
-
-    // =====================================================================
-    // FIELD BUILDERS
-    // =====================================================================
 
     private JPanel createFieldPanel(String labelText, Component inputField) {
         JPanel panel = new JPanel();
@@ -533,11 +524,8 @@ public class EditEmployeeDialog extends JDialog {
         lblError.setText("<html>" + msg + "</html>");
     }
 
-    // =====================================================================
-    // CUSTOM PAINTING HELPERS
-    // =====================================================================
-
     private static class RoundedBorder extends AbstractBorder {
+        private static final long serialVersionUID = 1L;
         private final int radius;
         private final Color color;
 

@@ -8,6 +8,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class PaymentDialog extends JDialog {
+    private static final long serialVersionUID = 1L;
 
     private static final Color BORDER = new Color(226, 232, 240);
     private static final Color TXT_DARK = new Color(15, 23, 42);
@@ -81,6 +82,7 @@ public class PaymentDialog extends JDialog {
         cardsPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         class PaymentCard extends JPanel {
+            private static final long serialVersionUID = 1L;
             boolean isSelected = false;
             String method;
             JLabel lblText;

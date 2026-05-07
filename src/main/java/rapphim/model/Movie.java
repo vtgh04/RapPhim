@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public class Movie implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String movieId;
     private String title;
     private String genre;
@@ -17,11 +18,12 @@ public class Movie implements Serializable {
     private String description;
     private String posterUrl;
 
-    public Movie() {}
+    public Movie() {
+    }
 
     public Movie(String movieId, String title, String genre, int durationMins, String formatMovie,
-                 String rating, String language, LocalDate releaseDate, MovieStatus status,
-                 String description, String posterUrl) {
+            String rating, String language, LocalDate releaseDate, MovieStatus status,
+            String description, String posterUrl) {
         this.movieId = movieId;
         this.title = title;
         this.genre = genre;
@@ -35,38 +37,93 @@ public class Movie implements Serializable {
         this.posterUrl = posterUrl;
     }
 
-    public String getMovieId() { return movieId; }
-    public void setMovieId(String movieId) { this.movieId = movieId; }
+    public String getMovieId() {
+        return movieId;
+    }
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setMovieId(String movieId) {
+        this.movieId = movieId;
+    }
 
-    public String getGenre() { return genre; }
-    public void setGenre(String genre) { this.genre = genre; }
+    public String getTitle() {
+        return title;
+    }
 
-    public int getDurationMins() { return durationMins; }
-    public void setDurationMins(int durationMins) { this.durationMins = durationMins; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    public String getFormatMovie() { return formatMovie; }
-    public void setFormatMovie(String formatMovie) { this.formatMovie = formatMovie; }
+    public String getGenre() {
+        return genre;
+    }
 
-    public String getRating() { return rating; }
-    public void setRating(String rating) { this.rating = rating; }
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
 
-    public String getLanguage() { return language; }
-    public void setLanguage(String language) { this.language = language; }
+    public int getDurationMins() {
+        return durationMins;
+    }
 
-    public LocalDate getReleaseDate() { return releaseDate; }
-    public void setReleaseDate(LocalDate releaseDate) { this.releaseDate = releaseDate; }
+    public void setDurationMins(int durationMins) {
+        this.durationMins = durationMins;
+    }
 
-    public MovieStatus getStatus() { return status; }
-    public void setStatus(MovieStatus status) { this.status = status; }
+    public String getFormatMovie() {
+        return formatMovie;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setFormatMovie(String formatMovie) {
+        this.formatMovie = formatMovie;
+    }
 
-    public String getPosterUrl() { return posterUrl; }
-    public void setPosterUrl(String posterUrl) { this.posterUrl = posterUrl; }
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public LocalDate getReleaseDate() {
+        return releaseDate;
+    }
+
+    public void setReleaseDate(LocalDate releaseDate) {
+        this.releaseDate = releaseDate;
+    }
+
+    public MovieStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(MovieStatus status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getPosterUrl() {
+        return posterUrl;
+    }
+
+    public void setPosterUrl(String posterUrl) {
+        this.posterUrl = posterUrl;
+    }
 
     @Override
     public String toString() {

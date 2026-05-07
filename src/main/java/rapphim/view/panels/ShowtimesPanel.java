@@ -30,6 +30,7 @@ import java.util.List;
 
 public class ShowtimesPanel extends JPanel {
 
+    private static final long serialVersionUID = 1L;
     // ── Design tokens (5 colours, 5 fonts) ────────────────────────────────────
     private static final Color BG_COLOR = new Color(240, 242, 245);
     private static final Color SURFACE = Color.WHITE;

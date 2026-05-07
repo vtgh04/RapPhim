@@ -17,10 +17,13 @@ import rapphim.service.MovieService;
 import rapphim.service.ShowtimeService;
 import rapphim.service.HallService;
 import rapphim.service.SaleService;
+import rapphim.model.Discount;
+import rapphim.service.DiscountService;
 import rapphim.view.dialogs.PaymentDialog;
 
 public class SalePanel extends JPanel {
 
+    private static final long serialVersionUID = 1L;
     // Colors
     private static final Color BG_MAIN = new Color(248, 249, 252);
     private static final Color BG_PANEL = Color.WHITE;
@@ -50,9 +53,11 @@ public class SalePanel extends JPanel {
     // gio hang
     private JPanel cartItemsPanel;
     private JLabel lblSubtotal;
+    private JLabel lblDiscountAmount;
     private JLabel lblTax;
     private JLabel lblTotal;
-    private JTextField txtPromo;
+    private JComboBox<String> cmbPromo;
+    private java.util.List<Discount> activeDiscounts = new ArrayList<>();
     private JTextField searchField;
 
     // dâta
@@ -60,12 +65,14 @@ public class SalePanel extends JPanel {
     private ShowtimeService showtimeService = new ShowtimeService();
     private HallService hallService = new HallService();
     private SaleService saleService = new SaleService();
+    private DiscountService discountService = new DiscountService();
 
     // luachon
     private Movie selectedMovie;
     private Showtime selectedShowtime;
     private java.util.List<Seat> selectedSeats = new ArrayList<>();
     private Map<Seat, Double> cartMap = new LinkedHashMap<>();
+    private Discount appliedDiscount = null;
 
     public SalePanel() {
         setLayout(new GridBagLayout());
@@ -727,6 +734,8 @@ public class SalePanel extends JPanel {
             cartMap.clear();
             if (selectedShowtime != null)
                 loadSeats(selectedShowtime);
+            appliedDiscount = null;
+            cmbPromo.setSelectedIndex(0);
             updateCartUI();
         });
         header.add(btnReset, BorderLayout.EAST);
@@ -765,17 +774,15 @@ public class SalePanel extends JPanel {
         JPanel promoWrap = new JPanel(new BorderLayout(8, 0));
         promoWrap.setOpaque(false);
         promoWrap.setAlignmentX(Component.LEFT_ALIGNMENT);
-        txtPromo = new JTextField();
-        txtPromo.putClientProperty("JTextField.placeholderText", "Mã khuyến mãi");
-        JButton btnApply = new JButton("APPLY");
-        btnApply.setForeground(Color.WHITE);
-        btnApply.setBackground(PRIMARY);
-        btnApply.setOpaque(true);
-        btnApply.setContentAreaFilled(true);
-        btnApply.setBorderPainted(false);
-        btnApply.setFocusPainted(false);
-        promoWrap.add(txtPromo, BorderLayout.CENTER);
-        promoWrap.add(btnApply, BorderLayout.EAST);
+        cmbPromo = new JComboBox<>();
+        cmbPromo.setFont(F_NORM);
+        loadActiveDiscounts();
+        cmbPromo.addActionListener(e -> {
+            if (cmbPromo.getSelectedIndex() > 0) {
+                applyDiscount();
+            }
+        });
+        promoWrap.add(cmbPromo, BorderLayout.CENTER);
 
         promoContainer.add(lblPromoTitle);
         promoContainer.add(Box.createRigidArea(new Dimension(0, 4)));
@@ -787,15 +794,17 @@ public class SalePanel extends JPanel {
 
         // Totals
         lblSubtotal = new JLabel("$0.00");
+        lblDiscountAmount = new JLabel("$0.00");
         lblTax = new JLabel("$0.00");
         lblTotal = new JLabel("$0.00");
         lblTotal.setFont(F_H1);
         lblTotal.setForeground(PRIMARY);
 
         bottom.add(totalRow("Tạm tính", lblSubtotal, F_NORM, TXT_DARK));
+        bottom.add(totalRow("Giảm giá", lblDiscountAmount, F_NORM, GREEN_COLOR));
         bottom.add(totalRow("Thuế (10%)", lblTax, F_NORM, MUTED));
         bottom.add(Box.createRigidArea(new Dimension(0, 8)));
-        bottom.add(totalRow("Tổng cộng", lblTotal, F_H1, TXT_DARK));
+        bottom.add(totalRow("Tổng Cộng", lblTotal, F_H1, TXT_DARK));
         bottom.add(Box.createRigidArea(new Dimension(0, 16)));
 
         JButton btnCheckout = new JButton("Thanh toán");
@@ -824,8 +833,18 @@ public class SalePanel extends JPanel {
         double subtotal = 0;
         for (Double price : cartMap.values())
             subtotal += price;
-        double tax = subtotal * 0.10;
-        double total = subtotal + tax;
+
+        double discountVal = 0;
+        if (appliedDiscount != null) {
+            discountVal = subtotal * (appliedDiscount.getDiscountRate());
+            if (discountVal > subtotal) {
+                discountVal = subtotal;
+            }
+        }
+
+        double finalSubtotal = subtotal - discountVal;
+        double tax = finalSubtotal * 0.10;
+        double total = finalSubtotal + tax;
 
         PaymentDialog dialog = new PaymentDialog(SwingUtilities.getWindowAncestor(this), total);
         dialog.setVisible(true);
@@ -864,6 +883,8 @@ public class SalePanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Thanh toán thành công!");
                 selectedSeats.clear();
                 cartMap.clear();
+                appliedDiscount = null;
+                cmbPromo.setSelectedIndex(0);
                 updateCartUI();
                 loadSeats(selectedShowtime);
             } else {
@@ -889,6 +910,51 @@ public class SalePanel extends JPanel {
         return p;
     }
 
+    private void loadActiveDiscounts() {
+        DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+        model.addElement("-- Chọn mã giảm giá --");
+        activeDiscounts.clear();
+        try {
+            Date today = new Date();
+            for (Discount d : discountService.getAllDiscounts()) {
+                if (d.isActive()) {
+                    boolean valid = true;
+                    if (d.getValidFrom() != null && today.before(d.getValidFrom()))
+                        valid = false;
+                    if (d.getValidTo() != null && today.after(d.getValidTo()))
+                        valid = false;
+                    if (valid) {
+                        model.addElement(d.getDiscountName());
+                        activeDiscounts.add(d);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        cmbPromo.setModel(model);
+    }
+
+    private void applyDiscount() {
+        int idx = cmbPromo.getSelectedIndex();
+        if (idx <= 0) {
+            appliedDiscount = null;
+            updateCartUI();
+            return;
+        }
+        Discount d = activeDiscounts.get(idx - 1);
+        if (cartMap.size() < d.getMinTicketQuantity()) {
+            JOptionPane.showMessageDialog(this,
+                    "Chưa đủ số lượng vé tối thiểu (" + d.getMinTicketQuantity() + " vé) để áp dụng mã này.");
+            appliedDiscount = null;
+            cmbPromo.setSelectedIndex(0);
+        } else {
+            appliedDiscount = d;
+            JOptionPane.showMessageDialog(this, "Áp dụng mã khuyến mãi thành công!");
+        }
+        updateCartUI();
+    }
+
     private void updateCartUI() {
         cartItemsPanel.removeAll();
         double subtotal = 0;
@@ -912,10 +978,29 @@ public class SalePanel extends JPanel {
             }
         }
 
-        double tax = subtotal * 0.10;
-        double total = subtotal + tax;
+        if (appliedDiscount != null) {
+            if (cartMap.size() < appliedDiscount.getMinTicketQuantity()) {
+                appliedDiscount = null;
+                cmbPromo.setSelectedIndex(0);
+            }
+        }
+
+        double discountVal = 0;
+        if (appliedDiscount != null) {
+            discountVal = subtotal * appliedDiscount.getDiscountRate();
+            if (discountVal > subtotal) {
+                discountVal = subtotal;
+            }
+        }
+
+        double finalSubtotal = subtotal - discountVal;
+        double tax = finalSubtotal * 0.10;
+        double total = finalSubtotal + tax;
 
         lblSubtotal.setText(String.format("%,.0f đ", subtotal));
+        if (lblDiscountAmount != null) {
+            lblDiscountAmount.setText(String.format("-%,.0f đ", discountVal));
+        }
         lblTax.setText(String.format("%,.0f đ", tax));
         lblTotal.setText(String.format("%,.0f đ", total));
 

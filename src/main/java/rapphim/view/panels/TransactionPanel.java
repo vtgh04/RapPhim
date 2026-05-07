@@ -369,6 +369,7 @@ public class TransactionPanel extends JPanel {
     }
 
     private static class RoundedPanel extends JPanel {
+        private static final long serialVersionUID = 1L;
         private final int radius;
         private final Color bg;
 
@@ -389,6 +390,7 @@ public class TransactionPanel extends JPanel {
     }
 
     private static class RoundedBorder extends AbstractBorder {
+        private static final long serialVersionUID = 1L;
         private final int r;
         private final Color c;
 
@@ -406,6 +408,7 @@ public class TransactionPanel extends JPanel {
     }
 
     private static class TotalRenderer extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 1L;
         private static final java.text.NumberFormat FMT = java.text.NumberFormat
                 .getNumberInstance(new java.util.Locale("vi", "VN"));
 
@@ -422,6 +425,7 @@ public class TransactionPanel extends JPanel {
     }
 
     private static class StatusRenderer extends DefaultTableCellRenderer {
+        private static final long serialVersionUID = 1L;
         private static final Color AMBER_BG = new Color(254, 243, 199);
         private static final Color AMBER_TX = new Color(146, 64, 14);
 

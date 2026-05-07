@@ -716,6 +716,7 @@ public class EditMovieDialog extends JDialog {
     // INNER CLASS
     // =====================================================================
     private static class RoundedBorder extends AbstractBorder {
+        private static final long serialVersionUID = 1L;
         private final int radius;
         private final Color color;
 

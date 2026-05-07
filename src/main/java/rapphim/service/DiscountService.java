@@ -44,4 +44,8 @@ public class DiscountService {
     public List<Discount> searchDiscounts(String keyword) throws SQLException {
         return discountDao.search(keyword);
     }
+
+    public Discount getDiscountById(String discountId) throws SQLException {
+        return discountDao.findById(discountId);
+    }
 }

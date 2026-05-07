@@ -957,6 +957,7 @@ public class MoviePanel extends JPanel {
     // INNER CLASSES
     // ════════════════════════════════════════════════════════════════════════
     private static class RoundedPanel extends JPanel {
+        private static final long serialVersionUID = 1L;
         private final int radius;
         private final Color bg;
 
@@ -978,6 +979,7 @@ public class MoviePanel extends JPanel {
     }
 
     private static class RoundedBorder extends AbstractBorder {
+        private static final long serialVersionUID = 1L;
         private final int radius;
         private final Color color;
 
@@ -1008,6 +1010,7 @@ public class MoviePanel extends JPanel {
     }
 
     private static class ModernScrollBarUI extends BasicScrollBarUI {
+        private static final long serialVersionUID = 1L;
         private static final int THUMB_W = 8;
         private static final Color THUMB_COLOR = new Color(180, 185, 195);
         private static final Color THUMB_HOVER_COLOR = new Color(140, 145, 155);

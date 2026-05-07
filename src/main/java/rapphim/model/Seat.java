@@ -4,6 +4,7 @@ import rapphim.model.enums.SeatType;
 import java.io.Serializable;
 
 public class Seat implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String seatId;
     private String hallId;
     private char rowChar;
@@ -12,7 +13,8 @@ public class Seat implements Serializable {
     private double seatFactor;
     private boolean isBroken;
 
-    public Seat() {}
+    public Seat() {
+    }
 
     public Seat(String seatId, String hallId, char rowChar, int colNumber, SeatType seatType, double seatFactor) {
         this.seatId = seatId;
@@ -79,9 +81,6 @@ public class Seat implements Serializable {
         this.seatFactor = seatFactor;
     }
 
-    /**
-     * Phương thức tiện ích để lấy tên hiển thị của ghế (VD: A1, B5)
-     */
     public String getSeatName() {
         return String.valueOf(rowChar) + colNumber;
     }

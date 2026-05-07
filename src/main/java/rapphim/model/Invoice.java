@@ -4,26 +4,20 @@ import rapphim.model.enums.InvoiceStatus;
 import rapphim.model.enums.Payment;
 import java.time.LocalDateTime;
 
-/**
- * Maps to DB table: dbo.invoices
- * Columns: invoice_id, employee_id, created_at, total_amount, total_tickets,
- * payment_method, status, note
- */
 public class Invoice {
     private String invoiceId;
-    private String employeeId; // FK → employees
-    private String staffName; // joined from employees.full_name
+    private String employeeId;
+    private String staffName;
     private LocalDateTime createdAt;
-    private double totalAmount; // SUM(final_price) of all tickets
-    private int totalTickets; // COUNT of tickets in this invoice
-    private Payment paymentMethod;// CASH | CARD | TRANSFER
-    private InvoiceStatus status; // PENDING | CONFIRMED | CANCELLED
+    private double totalAmount;
+    private int totalTickets;
+    private Payment paymentMethod;
+    private InvoiceStatus status;
     private String note;
 
     public Invoice() {
     }
 
-    /** Full constructor used by DAO. */
     public Invoice(String invoiceId, String employeeId, String staffName,
             LocalDateTime createdAt, double totalAmount, int totalTickets,
             Payment paymentMethod, InvoiceStatus status, String note) {
@@ -38,7 +32,6 @@ public class Invoice {
         this.note = note;
     }
 
-    // ── Getters ──────────────────────────────────────────────────────────────
     public String getInvoiceId() {
         return invoiceId;
     }
@@ -75,7 +68,6 @@ public class Invoice {
         return note;
     }
 
-    // ── Setters ──────────────────────────────────────────────────────────────
     public void setInvoiceId(String invoiceId) {
         this.invoiceId = invoiceId;
     }

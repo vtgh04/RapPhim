@@ -35,33 +35,9 @@ public class SaleService {
         this.showtimeDAO = new ShowtimeDAO();
     }
 
-    /**
-     * Xử lý thanh toán toàn bộ giỏ hàng (Checkout Workflow):
-     * 
-     * 1. Validate giỏ hàng
-     * 2. Bắt đầu Transaction
-     * 3. Sinh mã Hóa đơn và mã Vé kế tiếp
-     * 4. Thêm bản ghi Hóa đơn
-     * 5. Với mỗi ghế trong giỏ:
-     *    - Tìm show_seat_id
-     *    - Cập nhật trạng thái ghế thành BOOKED
-     *    - Sinh barcode
-     *    - Thêm bản ghi Vé
-     * 6. Commit Transaction
-     * 7. Xuất PDF Hóa đơn & Vé
-     * 
-     * @param showtimeId    Mã suất chiếu
-     * @param cart          Map ghế → giá
-     * @param totalAmount   Tổng tiền thanh toán
-     * @param paymentMethod Phương thức thanh toán (CASH/CARD/TRANSFER)
-     * @param status        Trạng thái hóa đơn (CONFIRMED)
-     * @return true nếu thanh toán thành công
-     * @throws SQLException nếu có lỗi database
-     */
     public boolean processCheckout(String showtimeId, Map<Seat, Double> cart,
             double totalAmount, String paymentMethod, String status) throws SQLException {
 
-        // ── Validate nghiệp vụ ──────────────────────────────────────────
         if (cart == null || cart.isEmpty()) {
             throw new IllegalArgumentException("Giỏ hàng không được trống.");
         }
@@ -69,13 +45,12 @@ public class SaleService {
             throw new IllegalArgumentException("Mã suất chiếu không hợp lệ.");
         }
 
-        // ── Transaction Management ──────────────────────────────────────
         Connection conn = DatabaseConnection.getInstance();
         boolean previousAutoCommit = true;
 
         try {
             previousAutoCommit = conn.getAutoCommit();
-            conn.setAutoCommit(false); // Bắt đầu giao dịch
+            conn.setAutoCommit(false);
 
             // 1. Sinh mã Hóa đơn và mã Vé kế tiếp
             String newInvoiceId = invoiceDAO.getNextInvoiceId(conn);
@@ -114,10 +89,8 @@ public class SaleService {
                         showSeatId, price, price, barcode);
             }
 
-            // 5. Commit giao dịch
             conn.commit();
 
-            // 6. Xuất PDF Hóa đơn & Vé (sau khi commit thành công)
             TicketsExporter.exportTickets(newInvoiceId);
             InvoicePdfExporter.exportInvoice(newInvoiceId);
 
@@ -142,8 +115,6 @@ public class SaleService {
             }
         }
     }
-
-    // ── Business Logic helpers ───────────────────────────────────────────────
 
     /**
      * Sinh mã barcode duy nhất cho vé.

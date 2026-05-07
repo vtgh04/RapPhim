@@ -120,12 +120,6 @@ public class InvoiceDAO {
         }
     }
 
-    // ── Transaction-aware methods (gọi từ SaleService với Connection bên ngoài) ──
-
-    /**
-     * Sinh mã hóa đơn kế tiếp (INV001, INV002, ...).
-     * Nhận Connection từ bên ngoài để tham gia cùng transaction.
-     */
     public String getNextInvoiceId(java.sql.Connection conn) throws SQLException {
         String sql = "SELECT MAX(CAST(SUBSTRING(invoice_id, 4, LEN(invoice_id)) AS INT)) FROM invoices WHERE invoice_id LIKE 'INV%' AND LEN(invoice_id) <= 10";
         try (Statement st = conn.createStatement(); java.sql.ResultSet rs = st.executeQuery(sql)) {
@@ -134,10 +128,6 @@ public class InvoiceDAO {
         }
     }
 
-    /**
-     * Thêm một bản ghi hóa đơn vào database.
-     * Nhận Connection từ bên ngoài để tham gia cùng transaction.
-     */
     public void insertInvoice(java.sql.Connection conn, String invoiceId, String employeeId,
             double totalAmount, int totalTickets, String paymentMethod, String status) throws SQLException {
         String sql = "INSERT INTO invoices (invoice_id, employee_id, created_at, total_amount, total_tickets, payment_method, status) VALUES (?, ?, GETDATE(), ?, ?, ?, ?)";
@@ -151,8 +141,6 @@ public class InvoiceDAO {
             ps.executeUpdate();
         }
     }
-
-
 
     private Invoice map(ResultSet rs) throws SQLException {
         return new Invoice(

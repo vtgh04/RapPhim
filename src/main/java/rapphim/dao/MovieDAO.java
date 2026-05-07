@@ -18,35 +18,30 @@ import java.util.Optional;
 
 public class MovieDAO {
 
-    private static final String COLS =
-            "movie_id, title, genre, duration_mins, format_movie, rating, language," +
+    private static final String COLS = "movie_id, title, genre, duration_mins, format_movie, rating, language," +
             " release_date, status, description, poster_url";
 
-    private static final String SQL_FIND_ALL =
-            "SELECT " + COLS + " FROM movies ORDER BY movie_id";
+    private static final String SQL_FIND_ALL = "SELECT " + COLS + " FROM movies ORDER BY movie_id";
 
-    private static final String SQL_FIND_BY_ID =
-            "SELECT " + COLS + " FROM movies WHERE movie_id = ?";
+    private static final String SQL_FIND_BY_ID = "SELECT " + COLS + " FROM movies WHERE movie_id = ?";
 
-    private static final String SQL_INSERT =
-            "INSERT INTO movies (" + COLS + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    private static final String SQL_INSERT = "INSERT INTO movies (" + COLS
+            + ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-    private static final String SQL_UPDATE =
-            "UPDATE movies SET title = ?, genre = ?, duration_mins = ?, format_movie = ?, rating = ?," +
+    private static final String SQL_UPDATE = "UPDATE movies SET title = ?, genre = ?, duration_mins = ?, format_movie = ?, rating = ?,"
+            +
             " language = ?, release_date = ?, status = ?, description = ?, poster_url = ?" +
             " WHERE movie_id = ?";
 
-    private static final String SQL_MAX_ID =
-            "SELECT MAX(movie_id) AS max_id FROM movies";
-
-    // ═════════════════════════════════════════════════════════════════════════
+    private static final String SQL_MAX_ID = "SELECT MAX(movie_id) AS max_id FROM movies";
 
     public List<Movie> findAll() throws SQLException {
         List<Movie> movies = new ArrayList<>();
         Connection conn = DatabaseConnection.getInstance();
         try (PreparedStatement ps = conn.prepareStatement(SQL_FIND_ALL);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) movies.add(mapRow(rs));
+                ResultSet rs = ps.executeQuery()) {
+            while (rs.next())
+                movies.add(mapRow(rs));
         }
         return movies;
     }
@@ -100,7 +95,7 @@ public class MovieDAO {
     public String getNextMovieId() throws SQLException {
         Connection conn = DatabaseConnection.getInstance();
         try (Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(SQL_MAX_ID)) {
+                ResultSet rs = st.executeQuery(SQL_MAX_ID)) {
             if (rs.next()) {
                 String maxId = rs.getString("max_id");
                 if (maxId != null && maxId.startsWith("MOV")) {
@@ -111,12 +106,11 @@ public class MovieDAO {
         return "MOV001";
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
-    /** Sets a DATE parameter, or SQL NULL if the value is null. */
     private static void setDateOrNull(PreparedStatement ps, int idx, LocalDate date) throws SQLException {
-        if (date != null) ps.setDate(idx, Date.valueOf(date));
-        else ps.setNull(idx, Types.DATE);
+        if (date != null)
+            ps.setDate(idx, Date.valueOf(date));
+        else
+            ps.setNull(idx, Types.DATE);
     }
 
     private Movie mapRow(ResultSet rs) throws SQLException {

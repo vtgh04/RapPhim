@@ -6,6 +6,7 @@ import rapphim.model.enums.EmployeeRole;
 import rapphim.model.enums.EmployeeStatus;
 
 public class Employee implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String employeeId;
     private String fullName;
     private String username;

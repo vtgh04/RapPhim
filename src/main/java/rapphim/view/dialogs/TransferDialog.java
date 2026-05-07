@@ -7,6 +7,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 public class TransferDialog extends JDialog {
+    private static final long serialVersionUID = 1L;
 
     private boolean isPaid = false;
 

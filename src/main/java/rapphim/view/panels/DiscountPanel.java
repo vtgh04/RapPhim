@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class DiscountPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
 
     private static final Color BG = new Color(240, 242, 245);
     private static final Color WHITE = Color.WHITE;
@@ -123,7 +124,7 @@ public class DiscountPanel extends JPanel {
         txtValidFrom.setToolTipText("yyyy-MM-dd");
         txtValidTo.setToolTipText("yyyy-MM-dd");
 
-        cbType = new JComboBox<>(new String[]{"PERCENT", "AMOUNT"});
+        cbType = new JComboBox<>(new String[]{"HOLIDAY", "GROUP", "SPECIAL"});
         cbStatus = new JComboBox<>(new String[]{"Hoạt động", "Không hoạt động"});
 
         txtDesc = new JTextArea(3, 20);
@@ -346,6 +347,10 @@ public class DiscountPanel extends JPanel {
     private void addDiscount() {
         try {
             Discount d = getDiscountFromForm();
+            if (d.getDiscountRate() > 0.5) {
+                JOptionPane.showMessageDialog(this, "Giá trị giảm không được lớn hơn 0.5 (50%)!");
+                return;
+            }
             discountService.addDiscount(d);
             JOptionPane.showMessageDialog(this, "Thêm thành công!");
             loadDataToTable();
@@ -364,6 +369,10 @@ public class DiscountPanel extends JPanel {
         }
         try {
             Discount d = getDiscountFromForm();
+            if (d.getDiscountRate() > 0.5) {
+                JOptionPane.showMessageDialog(this, "Giá trị giảm không được lớn hơn 0.5 (50%)!");
+                return;
+            }
             discountService.updateDiscount(d);
             JOptionPane.showMessageDialog(this, "Sửa thành công!");
             loadDataToTable();
@@ -401,7 +410,7 @@ public class DiscountPanel extends JPanel {
 
         txtCode.setText(model.getValueAt(row, 0) != null ? model.getValueAt(row, 0).toString() : "");
         txtName.setText(model.getValueAt(row, 1) != null ? model.getValueAt(row, 1).toString() : "");
-        cbType.setSelectedItem(model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "PERCENT");
+        cbType.setSelectedItem(model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "HOLIDAY");
         txtValue.setText(model.getValueAt(row, 3) != null ? model.getValueAt(row, 3).toString() : "");
         txtValidFrom.setText(model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "");
         txtValidTo.setText(model.getValueAt(row, 5) != null ? model.getValueAt(row, 5).toString() : "");

@@ -680,6 +680,7 @@ public class EmployeePanel extends JPanel {
     }
 
     private class ActionButtonRenderer extends JPanel implements TableCellRenderer {
+        private static final long serialVersionUID = 1L;
         ActionButtonRenderer() {
             setLayout(new FlowLayout(FlowLayout.CENTER, 8, 0));
             setOpaque(true);
@@ -696,6 +697,7 @@ public class EmployeePanel extends JPanel {
     }
 
     private class ActionButtonEditor extends AbstractCellEditor implements TableCellEditor {
+        private static final long serialVersionUID = 1L;
         private final JPanel panel;
         private final JButton btnEdit;
         private final JButton btnRemove;
@@ -785,6 +787,7 @@ public class EmployeePanel extends JPanel {
     }
 
     private class DeleteEmployeeDialog extends JDialog {
+        private static final long serialVersionUID = 1L;
         private boolean confirmed = false;
 
         public DeleteEmployeeDialog(JFrame parent, String employeeId, String fullName) {
@@ -1130,6 +1133,7 @@ public class EmployeePanel extends JPanel {
     }
 
     private static class RoundedPanel extends JPanel {
+        private static final long serialVersionUID = 1L;
         private final int radius;
         private final Color bgColor;
 
@@ -1151,6 +1155,7 @@ public class EmployeePanel extends JPanel {
     }
 
     private static class RoundedBorder extends AbstractBorder {
+        private static final long serialVersionUID = 1L;
         private final int radius;
         private final Color color;
 

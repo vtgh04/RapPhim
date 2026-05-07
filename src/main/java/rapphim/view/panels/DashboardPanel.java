@@ -13,6 +13,7 @@ import java.awt.*;
 import java.util.*;
 
 public class DashboardPanel extends JPanel {
+    private static final long serialVersionUID = 1L;
 
     Color BG = new Color(240, 242, 245);
     Color WHITE = Color.WHITE;
@@ -125,7 +126,7 @@ public class DashboardPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(20, 0));
         panel.setOpaque(false);
 
-        // CHART
+        //
         chartPanel = new ChartPanel();
         chartPanel.setPreferredSize(new Dimension(800, 350));
         chartPanel.setBackground(WHITE);
@@ -133,7 +134,6 @@ public class DashboardPanel extends JPanel {
 
         panel.add(chartPanel, BorderLayout.CENTER);
 
-        // TOP MOVIES
         panel.add(createTopMovies(), BorderLayout.EAST);
 
         return panel;
@@ -149,11 +149,10 @@ public class DashboardPanel extends JPanel {
         title.setFont(new Font("Segoe UI", Font.BOLD, 16));
         title.setBorder(new EmptyBorder(0, 0, 8, 0));
 
-        // ALIGN TOP
         topMoviesPanel = new JPanel();
         topMoviesPanel.setLayout(new BoxLayout(topMoviesPanel, BoxLayout.Y_AXIS));
         topMoviesPanel.setBackground(WHITE);
-        topMoviesPanel.setAlignmentY(Component.TOP_ALIGNMENT); // 🟢 QUAN TRỌNG
+        topMoviesPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 
         JScrollPane scroll = new JScrollPane(topMoviesPanel);
         scroll.setBorder(null);
@@ -280,6 +279,7 @@ public class DashboardPanel extends JPanel {
     }
 
     static class ChartPanel extends JPanel {
+        private static final long serialVersionUID = 1L;
 
         private Map<Integer, Double> data = new TreeMap<>();
         private float progress = 0f;

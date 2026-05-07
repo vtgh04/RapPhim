@@ -6,6 +6,7 @@ import java.awt.*;
 import java.util.List;
 
 public class InvoiceDetailDialog extends JDialog {
+    private static final long serialVersionUID = 1L;
 
     public InvoiceDetailDialog(JFrame parent,
                                String invoiceId,

@@ -4,6 +4,7 @@ import rapphim.model.enums.CinemaHallStatus;
 import java.io.Serializable;
 
 public class CinemaHall implements Serializable {
+    private static final long serialVersionUID = 1L;
     private String hallId;
     private String name;
     private String hallType;

@@ -245,6 +245,7 @@ public class DeleteEmployeeDialog extends JDialog {
     }
 
     private static class RoundedBorder extends AbstractBorder {
+        private static final long serialVersionUID = 1L;
         private final int radius;
         private final Color color;
 

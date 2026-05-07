@@ -9,10 +9,7 @@ import java.util.Optional;
 
 public class AuthService {
 
-    // ── Quản lý phiên đăng nhập (Session) ────────────────────────────────
-    // Di chuyển từ EmployeeDAO sang đây vì đây là business/state logic,
-    // không phải thao tác database.
-    private static String loggedInEmployeeId = "EMP001"; // Mặc định cho môi trường phát triển
+    private static String loggedInEmployeeId = "EMP001";
 
     public static String getLoggedInEmployee() {
         return loggedInEmployeeId;
@@ -21,8 +18,6 @@ public class AuthService {
     public static void setLoggedInEmployee(String empId) {
         loggedInEmployeeId = empId;
     }
-    // ──────────────────────────────────────────────────────────────────────
-
 
     public enum AuthError {
         INVALID_CREDENTIALS,
@@ -31,6 +26,7 @@ public class AuthService {
     }
 
     public static class AuthException extends Exception {
+        private static final long serialVersionUID = 1L;
         private final AuthError error;
 
         public AuthException(AuthError error, String message) {

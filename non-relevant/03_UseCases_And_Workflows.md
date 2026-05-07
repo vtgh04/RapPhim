@@ -7,24 +7,24 @@
 ## 1. System Use Case Diagram
 
 ```mermaid
-usecaseDiagram
-    actor Staff
-    actor Manager
+flowchart LR
+    Staff([Staff])
+    Manager([Manager])
 
-    package "POS System" {
-        usecase "UC1: Login" as UC1
-        usecase "UC2: Select Movie & Showtime" as UC2
-        usecase "UC3: Select Seats (Map)" as UC3
-        usecase "UC4: Apply Discount" as UC4
-        usecase "UC5: Checkout & Print Ticket" as UC5
-    }
+    subgraph POS System
+        UC1(UC1: Login)
+        UC2(UC2: Select Movie & Showtime)
+        UC3(UC3: Select Seats Map)
+        UC4(UC4: Apply Discount)
+        UC5(UC5: Checkout & Print Ticket)
+    end
 
-    package "Management System" {
-        usecase "UC6: Manage Movies" as UC6
-        usecase "UC7: Schedule Showtimes" as UC7
-        usecase "UC8: View Analytics Dashboard" as UC8
-        usecase "UC9: Manage Employees" as UC9
-    }
+    subgraph Management System
+        UC6(UC6: Manage Movies)
+        UC7(UC7: Schedule Showtimes)
+        UC8(UC8: View Analytics Dashboard)
+        UC9(UC9: Manage Employees)
+    end
 
     Staff --> UC1
     Staff --> UC2
@@ -37,9 +37,9 @@ usecaseDiagram
     Manager --> UC7
     Manager --> UC8
     Manager --> UC9
-  
+    
     %% Manager inherits Staff abilities implicitly
-    Manager --|> Staff
+    Manager -.->|Inherits abilities of| Staff
 ```
 
 ---

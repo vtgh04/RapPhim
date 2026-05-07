@@ -5,7 +5,7 @@
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.rapphim</groupId>
+    <groupId>rapphim</groupId>
     <artifactId>RapPhim</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
@@ -132,7 +132,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>com.rapphim.Main</mainClass>
+                    <mainClass>rapphim.view.Main</mainClass>
                 </configuration>
             </plugin>
 
@@ -144,7 +144,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.rapphim.Main</mainClass>
+                            <mainClass>rapphim.view.Main</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
@@ -169,6 +169,46 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.1.2</version>
+            </plugin>
+
+            <!-- Launch4j Plugin - Tạo file EXE -->
+            <plugin>
+                <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                <artifactId>launch4j-maven-plugin</artifactId>
+                <version>2.4.1</version>
+                <executions>
+                    <execution>
+                        <id>l4j-gui</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>launch4j</goal>
+                        </goals>
+                        <configuration>
+                            <headerType>gui</headerType>
+                            <outfile>${project.build.directory}/RapPhim.exe</outfile>
+                            <jar>${project.build.directory}/RapPhim-${project.version}.jar</jar>
+                            <errTitle>RapPhim Application Error</errTitle>
+                            <classPath>
+                                <mainClass>rapphim.view.Main</mainClass>
+                            </classPath>
+                            <jre>
+                                <minVersion>17.0.0</minVersion>
+                                <!-- Yêu cầu máy cài sẵn JRE 17 trở lên -->
+                            </jre>
+                            <versionInfo>
+                                <fileVersion>1.0.0.0</fileVersion>
+                                <txtFileVersion>1.0.0.0</txtFileVersion>
+                                <fileDescription>Hệ thống Quản lý Rạp Chiếu Phim</fileDescription>
+                                <copyright>2026</copyright>
+                                <productVersion>1.0.0.0</productVersion>
+                                <txtProductVersion>1.0.0.0</txtProductVersion>
+                                <productName>RapPhim</productName>
+                                <internalName>RapPhim</internalName>
+                                <originalFilename>RapPhim.exe</originalFilename>
+                            </versionInfo>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 

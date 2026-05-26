@@ -114,15 +114,9 @@ src/
 
 ## 🗄️ Database Design
 
-The relational database is optimized for ACID transactions, especially during concurrent seat bookings:
+The relational database is normalized to 3NF to ensure data integrity and prevent redundancy:
 
-```text
-[employees] 1 ---- * [invoices] 1 ---- * [tickets]
-                                            | 1
-[movies] 1 --- * [showtimes] 1 --- * [show_seats]
-                      | 1                   * |
-[cinema_halls] 1 -----+----------------- 1 [seats]
-```
+![Database Design ERD](images/database_design.svg)
 
 ---
 

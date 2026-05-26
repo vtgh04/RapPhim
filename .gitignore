@@ -1,0 +1,45 @@
+# Target / Build outputs
+**/target/
+**/bin/
+**/out/
+
+# IDE / Project files
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.settings/
+.classpath
+.project
+.metadata/
+.factorypath
+.recommenders/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# OS / System files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Logs & temp files
+*.log
+tmp/
+temp/
+
+# Spring Boot & Application Specific
+**/invoice/
+.gemini/
+*.pdf
+*.xlsx
+
+# Dependency directories (Frontend node_modules)
+**/node_modules/
+**/dist/
+**/build/
+.env*.local

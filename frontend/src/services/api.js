@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { useAuthStore } from '../features/auth/AuthStore'
+import { useAuthStore } from '../store/authStore'
+import { toast } from '../components/ui/ToastProvider'
 
 // Base Axios instance
 const api = axios.create({
@@ -82,6 +83,11 @@ api.interceptors.response.use(
       } finally {
         isRefreshing = false
       }
+    }
+
+    const errMsg = error.response?.data?.message || error.message || 'Lỗi kết nối đến máy chủ.'
+    if (originalRequest && !originalRequest.url?.includes('/auth/refresh-token')) {
+      toast.error(errMsg)
     }
 
     return Promise.reject(error)

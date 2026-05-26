@@ -1,13 +1,81 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { motion, AnimatePresence } from 'framer-motion'
 import api from '../../services/api'
-import Spinner from '../../shared/Spinner'
-import { Calendar, Clock, Film, Landmark, ChevronLeft, Play } from 'lucide-react'
+import Spinner from '../../components/ui/Spinner'
+import { Calendar, Clock, Film, Landmark, ChevronLeft, Play, Star, MessageSquare, Send } from 'lucide-react'
+import { useAuthStore } from '../../store/authStore'
+import { useNotificationStore } from '../../store/notificationStore'
+
+// Star Rating Component
+function StarRating({ value, onChange, readOnly = false }) {
+  const [hovered, setHovered] = useState(0)
+
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type={readOnly ? 'button' : 'button'}
+          disabled={readOnly}
+          onClick={() => !readOnly && onChange && onChange(star)}
+          onMouseEnter={() => !readOnly && setHovered(star)}
+          onMouseLeave={() => !readOnly && setHovered(0)}
+          className={`transition-all ${readOnly ? 'cursor-default' : 'cursor-pointer hover:scale-110'}`}
+        >
+          <Star
+            size={readOnly ? 13 : 20}
+            className={`transition-colors ${
+              star <= (hovered || value)
+                ? 'text-amber-400 fill-amber-400'
+                : 'text-slate-600'
+            }`}
+          />
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// Single review card
+function ReviewCard({ review }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="glass-panel p-4 rounded-xl space-y-2"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-full bg-brand/20 border border-brand/30 flex items-center justify-center text-brand font-black text-xs uppercase">
+            {review.userId.charAt(0)}
+          </div>
+          <span className="text-xs font-bold text-slate-300">{review.userId}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <StarRating value={review.rating} readOnly />
+          <span className="text-[10px] text-slate-500">
+            {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+          </span>
+        </div>
+      </div>
+      {review.comment && (
+        <p className="text-xs text-slate-400 leading-relaxed pl-9">{review.comment}</p>
+      )}
+    </motion.div>
+  )
+}
 
 export default function MovieDetail() {
   const { id } = useParams()
+  const { user } = useAuthStore()
+  const { push: pushNotification } = useNotificationStore()
+  const queryClient = useQueryClient()
+
+  const [reviewRating, setReviewRating] = useState(0)
+  const [reviewComment, setReviewComment] = useState('')
+  const [reviewSubmitted, setReviewSubmitted] = useState(false)
 
   // 1. Fetch movie details
   const { data: movie, isLoading: isMovieLoading, error: movieError } = useQuery({
@@ -24,6 +92,41 @@ export default function MovieDetail() {
     queryFn: async () => {
       const response = await api.get('/showtimes')
       return response.data
+    }
+  })
+
+  // 3. Fetch Reviews
+  const { data: reviewData, isLoading: isReviewsLoading } = useQuery({
+    queryKey: ['reviews', id],
+    queryFn: async () => {
+      const response = await api.get(`/reviews/${id}`)
+      return response.data
+    }
+  })
+
+  // Submit Review Mutation
+  const submitReviewMutation = useMutation({
+    mutationFn: async (payload) => {
+      const response = await api.post('/reviews', payload)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reviews', id] })
+      setReviewRating(0)
+      setReviewComment('')
+      setReviewSubmitted(true)
+      pushNotification({
+        type: 'success',
+        title: 'Đánh giá thành công!',
+        message: `Cảm ơn bạn đã đánh giá "${movie?.title}".`,
+      })
+    },
+    onError: (err) => {
+      pushNotification({
+        type: 'error',
+        title: 'Gửi đánh giá thất bại',
+        message: err?.response?.data?.error || 'Vui lòng thử lại.',
+      })
     }
   })
 
@@ -53,7 +156,7 @@ export default function MovieDetail() {
     return acc
   }, {})
 
-  // Helper to format date display (Vietnam style: Thứ... Ngày DD/MM)
+  // Helper to format date display (Vietnam style)
   const formatDateLabel = (dateString) => {
     const d = new Date(dateString)
     const options = { weekday: 'long', day: '2-digit', month: '2-digit' }
@@ -64,6 +167,20 @@ export default function MovieDetail() {
     if (!url) return '';
     if (url.startsWith('http') || url.startsWith('/')) return url;
     return '/' + url;
+  }
+
+  const avgRating = reviewData?.averageRating
+  const totalReviews = reviewData?.totalReviews || 0
+  const reviews = reviewData?.reviews || []
+
+  const handleSubmitReview = (e) => {
+    e.preventDefault()
+    if (reviewRating === 0) return
+    submitReviewMutation.mutate({
+      movieId: id,
+      rating: reviewRating,
+      comment: reviewComment.trim() || null,
+    })
   }
 
   return (
@@ -88,6 +205,23 @@ export default function MovieDetail() {
               alt={movie.title}
               className="w-full h-full object-cover"
             />
+          </div>
+
+          {/* Rating Summary */}
+          <div className="glass-panel p-4 rounded-2xl space-y-2 text-center">
+            {isReviewsLoading ? (
+              <div className="h-8 bg-slate-900 rounded animate-pulse" />
+            ) : avgRating ? (
+              <>
+                <div className="text-4xl font-black text-amber-400">{avgRating.toFixed(1)}</div>
+                <div className="flex justify-center">
+                  <StarRating value={Math.round(avgRating)} readOnly />
+                </div>
+                <p className="text-xs text-slate-500">{totalReviews} đánh giá</p>
+              </>
+            ) : (
+              <p className="text-xs text-slate-500 py-2">Chưa có đánh giá</p>
+            )}
           </div>
 
           <div className="glass-panel p-5 rounded-2xl space-y-4 text-sm text-slate-300">
@@ -119,7 +253,7 @@ export default function MovieDetail() {
           </div>
         </motion.div>
 
-        {/* Right Side: Description & Grouped Showtimes */}
+        {/* Right Side: Description, Showtimes & Reviews */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -184,8 +318,82 @@ export default function MovieDetail() {
               </div>
             )}
           </div>
-        </motion.div>
 
+          {/* ===== Reviews Section ===== */}
+          <div className="space-y-6">
+            <h2 className="text-xl font-extrabold tracking-wide flex items-center gap-2 text-white pb-3 border-b border-slate-900">
+              <MessageSquare size={20} className="text-brand" />
+              Đánh Giá & Bình Luận
+              {totalReviews > 0 && (
+                <span className="text-xs text-slate-500 font-normal">({totalReviews})</span>
+              )}
+            </h2>
+
+            {/* Submit Review Form */}
+            {user ? (
+              reviewSubmitted ? (
+                <div className="glass-panel p-4 rounded-xl text-center text-sm text-emerald-400 font-semibold">
+                  ✅ Cảm ơn bạn đã gửi đánh giá!
+                </div>
+              ) : (
+                <form onSubmit={handleSubmitReview} className="glass-panel p-5 rounded-2xl space-y-4">
+                  <p className="text-sm font-bold text-slate-200">Viết đánh giá của bạn</p>
+                  <div className="space-y-1">
+                    <p className="text-xs text-slate-500">Xếp hạng <span className="text-rose-400">*</span></p>
+                    <StarRating value={reviewRating} onChange={setReviewRating} />
+                  </div>
+                  <textarea
+                    value={reviewComment}
+                    onChange={(e) => setReviewComment(e.target.value)}
+                    placeholder="Chia sẻ cảm nhận về bộ phim... (không bắt buộc)"
+                    rows={3}
+                    maxLength={1000}
+                    className="w-full px-3.5 py-3 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40 transition-all resize-none font-medium placeholder-slate-600"
+                  />
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      disabled={reviewRating === 0 || submitReviewMutation.isPending}
+                      className="flex items-center gap-2 px-5 py-2.5 bg-brand hover:bg-brand-hover disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold rounded-xl text-sm transition-all cursor-pointer disabled:cursor-not-allowed"
+                    >
+                      <Send size={14} />
+                      {submitReviewMutation.isPending ? 'Đang gửi...' : 'Gửi đánh giá'}
+                    </button>
+                  </div>
+                </form>
+              )
+            ) : (
+              <div className="glass-panel p-4 rounded-xl text-sm text-slate-400 text-center">
+                <Link to="/login" className="text-brand hover:underline font-semibold">Đăng nhập</Link> để viết đánh giá.
+              </div>
+            )}
+
+            {/* Reviews List */}
+            {isReviewsLoading ? (
+              <div className="space-y-3">
+                {[1, 2].map((i) => (
+                  <div key={i} className="glass-panel p-4 rounded-xl animate-pulse space-y-2">
+                    <div className="h-4 bg-slate-900 rounded w-1/3" />
+                    <div className="h-3 bg-slate-900 rounded w-full" />
+                  </div>
+                ))}
+              </div>
+            ) : reviews.length === 0 ? (
+              <div className="text-center py-8 text-slate-500 text-sm">
+                Chưa có đánh giá nào. Hãy là người đầu tiên!
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <AnimatePresence>
+                  {reviews.map((review) => (
+                    <ReviewCard key={review.reviewId} review={review} />
+                  ))}
+                </AnimatePresence>
+              </div>
+            )}
+          </div>
+
+        </motion.div>
       </div>
     </div>
   )

@@ -1,13 +1,18 @@
 import React, { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import api from '../../services/api'
-import Spinner from '../../shared/Spinner'
-import { LayoutDashboard, Film, Calendar, Users, DollarSign, Plus, Trash2, ArrowUpRight, TrendingUp, RefreshCw, BarChart3, PieChart, LineChart, AreaChart } from 'lucide-react'
+import Spinner from '../../components/ui/Spinner'
+import { LayoutDashboard, Film, Calendar, Users, DollarSign, Plus, Trash2, ArrowUpRight, TrendingUp, RefreshCw, BarChart3, PieChart, LineChart, AreaChart, Building2, Download, X } from 'lucide-react'
+import { useUIStore } from '../../store/uiStore'
+import ConfirmModal from '../../components/ui/ConfirmModal'
+import { toast } from '../../components/ui/ToastProvider'
+import { useNotificationStore } from '../../store/notificationStore'
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview')
   const queryClient = useQueryClient()
+  const { t, language } = useUIStore()
   const [revenueChartType, setRevenueChartType] = useState('bar')
   const [hoveredPoint, setHoveredPoint] = useState(null)
   const [hoveredMovieIdx, setHoveredMovieIdx] = useState(null)
@@ -16,6 +21,57 @@ export default function Dashboard() {
   const [newShowtimeStart, setNewShowtimeStart] = useState('')
   const [newShowtimePrice, setNewShowtimePrice] = useState(80000)
   const [showtimeActionTab, setShowtimeActionTab] = useState('list')
+  const [editingMovie, setEditingMovie] = useState(null)
+  const [editingShowtime, setEditingShowtime] = useState(null)
+  const [editingEmployee, setEditingEmployee] = useState(null)
+  const [newEmployeeName, setNewEmployeeName] = useState('')
+  const [newEmployeeUsername, setNewEmployeeUsername] = useState('')
+  const [newEmployeePassword, setNewEmployeePassword] = useState('')
+  const [newEmployeeEmail, setNewEmployeeEmail] = useState('')
+  const [newEmployeeRole, setNewEmployeeRole] = useState('STAFF')
+  const [movieToDelete, setMovieToDelete] = useState(null)
+  const [showtimeToDelete, setShowtimeToDelete] = useState(null)
+  const [employeeToDelete, setEmployeeToDelete] = useState(null)
+  const [hallToDelete, setHallToDelete] = useState(null)
+
+  // New Cinema Hall form state
+  const [newHallId, setNewHallId] = useState('')
+  const [newHallName, setNewHallName] = useState('')
+  const [newHallType, setNewHallType] = useState('2D')
+  const [newHallRows, setNewHallRows] = useState(8)
+  const [newHallCols, setNewHallCols] = useState(10)
+  const [isExporting, setIsExporting] = useState(false)
+
+  const { push: pushNotification } = useNotificationStore()
+
+  const [newMovieTitle, setNewMovieTitle] = useState('')
+  const [newMovieGenre, setNewMovieGenre] = useState('')
+  const [newMovieDuration, setNewMovieDuration] = useState(120)
+
+  // Validation Touched states
+  const [movieTitleTouched, setMovieTitleTouched] = useState(false)
+  const [movieGenreTouched, setMovieGenreTouched] = useState(false)
+  
+  const [showtimeStartTouched, setShowtimeStartTouched] = useState(false)
+  const [showtimePriceTouched, setShowtimePriceTouched] = useState(false)
+  
+  const [empNameTouched, setEmpNameTouched] = useState(false)
+  const [empUserTouched, setEmpUserTouched] = useState(false)
+  const [empPassTouched, setEmpPassTouched] = useState(false)
+
+  // Form Validity Flags
+  const isMovieTitleValid = newMovieTitle.trim().length > 0
+  const isMovieGenreValid = newMovieGenre.trim().length > 0
+  const isMovieFormValid = isMovieTitleValid && isMovieGenreValid
+
+  const isShowtimeStartValid = newShowtimeStart.trim().length > 0
+  const isShowtimePriceValid = parseFloat(newShowtimePrice) > 0
+  const isShowtimeFormValid = isShowtimeStartValid && isShowtimePriceValid && !!newShowtimeHall
+
+  const isEmpNameValid = newEmployeeName.trim().length > 0
+  const isEmpUserValid = newEmployeeUsername.trim().length > 0
+  const isEmpPassValid = newEmployeePassword.trim().length >= 6
+  const isEmpFormValid = isEmpNameValid && isEmpUserValid && isEmpPassValid
 
   // 1. Fetch Overview Data
   const { data: invoices = [], isLoading: isInvoicesLoading, error: invoicesError } = useQuery({
@@ -76,10 +132,6 @@ export default function Dashboard() {
   })
 
   // 3. Add movie mutation
-  const [newMovieTitle, setNewMovieTitle] = useState('')
-  const [newMovieGenre, setNewMovieGenre] = useState('')
-  const [newMovieDuration, setNewMovieDuration] = useState(120)
-  
   const addMovieMutation = useMutation({
     mutationFn: async (payload) => {
       const response = await api.post('/movies', payload)
@@ -89,6 +141,41 @@ export default function Dashboard() {
       queryClient.invalidateQueries(['movies'])
       setNewMovieTitle('')
       setNewMovieGenre('')
+      setMovieTitleTouched(false)
+      setMovieGenreTouched(false)
+      toast.success("Thêm phim mới thành công!")
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  })
+
+  const updateMovieMutation = useMutation({
+    mutationFn: async (payload) => {
+      const response = await api.put(`/movies/${payload.movieId}`, payload)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['movies'])
+      setEditingMovie(null)
+      toast.success("Cập nhật thông tin phim thành công!")
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || err.message || 'Lỗi khi cập nhật phim')
+    }
+  })
+
+  const deleteMovieMutation = useMutation({
+    mutationFn: async (movieId) => {
+      const response = await api.delete(`/movies/${movieId}`)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['movies'])
+      queryClient.invalidateQueries(['showtimes'])
+      toast.success("Xóa phim thành công!")
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || err.message || 'Lỗi khi xóa phim')
     }
   })
 
@@ -100,10 +187,30 @@ export default function Dashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries(['showtimes'])
       setNewShowtimeStart('')
+      setShowtimeStartTouched(false)
+      setShowtimePriceTouched(false)
+      toast.success("Lên lịch suất chiếu thành công!")
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     },
     onError: (err) => {
       const msg = err.response?.data?.message || err.message || 'Lỗi khi tạo suất chiếu'
-      alert(msg)
+      toast.error(msg)
+    }
+  })
+
+  const updateShowtimeMutation = useMutation({
+    mutationFn: async (payload) => {
+      const response = await api.put(`/showtimes/${payload.showtimeId}`, payload)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['showtimes'])
+      setEditingShowtime(null)
+      toast.success("Cập nhật suất chiếu thành công!")
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || err.message || 'Lỗi khi cập nhật suất chiếu')
     }
   })
 
@@ -114,10 +221,63 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['showtimes'])
+      toast.success("Xóa suất chiếu thành công!")
     },
     onError: (err) => {
       const msg = err.response?.data?.message || err.message || 'Lỗi khi xóa suất chiếu'
-      alert(msg)
+      toast.error(msg)
+    }
+  })
+
+  const addEmployeeMutation = useMutation({
+    mutationFn: async (payload) => {
+      const response = await api.post('/employees', payload)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['employees'])
+      setNewEmployeeName('')
+      setNewEmployeeUsername('')
+      setNewEmployeePassword('')
+      setNewEmployeeEmail('')
+      setEmpNameTouched(false)
+      setEmpUserTouched(false)
+      setEmpPassTouched(false)
+      toast.success("Thêm nhân sự mới thành công!")
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || err.message || 'Lỗi khi thêm nhân sự')
+    }
+  })
+
+  const updateEmployeeMutation = useMutation({
+    mutationFn: async (payload) => {
+      const response = await api.put(`/employees/${payload.employeeId}`, payload)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['employees'])
+      setEditingEmployee(null)
+      toast.success("Cập nhật thông tin nhân sự thành công!")
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || err.message || 'Lỗi khi cập nhật nhân sự')
+    }
+  })
+
+  const deleteEmployeeMutation = useMutation({
+    mutationFn: async (employeeId) => {
+      const response = await api.delete(`/employees/${employeeId}`)
+      return response.data
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['employees'])
+      toast.success("Xóa nhân sự thành công!")
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.message || err.message || 'Lỗi khi xóa nhân sự')
     }
   })
 
@@ -250,12 +410,40 @@ export default function Dashboard() {
         <div>
           <h1 className="text-3xl font-black text-white flex items-center gap-2">
             <LayoutDashboard size={28} className="text-brand" />
-            Bảng Quản Trị Hệ Thống
+            {t('panelTitle')}
           </h1>
           <p className="text-xs text-slate-400 font-semibold mt-0.5">
-            Quản lý doanh thu, phim chiếu, suất chiếu và đội ngũ nhân viên
+            {t('panelDesc')}
           </p>
         </div>
+        {/* Excel Export Button */}
+        <button
+          id="export-revenue-btn"
+          disabled={isExporting}
+          onClick={async () => {
+            setIsExporting(true)
+            try {
+              const response = await api.get('/dashboard/export/revenue', { responseType: 'blob' })
+              const url = window.URL.createObjectURL(new Blob([response.data]))
+              const link = document.createElement('a')
+              link.href = url
+              link.setAttribute('download', `BaoCaoDoanhThu_${new Date().toISOString().slice(0,10)}.xlsx`)
+              document.body.appendChild(link)
+              link.click()
+              link.remove()
+              window.URL.revokeObjectURL(url)
+              pushNotification({ type: 'success', title: 'Xuất báo cáo thành công', message: 'File Excel đã được tải về.' })
+            } catch {
+              toast.error('Lỗi khi xuất báo cáo Excel')
+            } finally {
+              setIsExporting(false)
+            }
+          }}
+          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:bg-slate-800 disabled:text-slate-500 text-white font-bold rounded-xl text-sm shadow-lg shadow-emerald-900/20 transition-all cursor-pointer disabled:cursor-not-allowed"
+        >
+          <Download size={16} />
+          {isExporting ? 'Đang xuất...' : 'Xuất báo cáo Excel'}
+        </button>
       </div>
 
       {/* API Errors Alert Box */}
@@ -291,8 +479,8 @@ export default function Dashboard() {
             <DollarSign size={24} />
           </div>
           <div>
-            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Doanh Thu Hệ Thống</span>
-            <h3 className="text-xl font-black text-white mt-0.5">{totalRevenue.toLocaleString('vi-VN')}đ</h3>
+            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{t('revenue')}</span>
+            <h3 className="text-xl font-black text-white mt-0.5">{totalRevenue.toLocaleString(language === 'vi' ? 'vi-VN' : 'en-US')}{language === 'vi' ? 'đ' : ' VND'}</h3>
           </div>
         </div>
 
@@ -301,8 +489,8 @@ export default function Dashboard() {
             <Plus size={24} />
           </div>
           <div>
-            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Tổng Vé Đã Bán</span>
-            <h3 className="text-xl font-black text-white mt-0.5">{totalTicketsSold} vé</h3>
+            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{t('ticketsSold')}</span>
+            <h3 className="text-xl font-black text-white mt-0.5">{totalTicketsSold} {language === 'vi' ? 'vé' : 'tickets'}</h3>
           </div>
         </div>
 
@@ -311,8 +499,8 @@ export default function Dashboard() {
             <Film size={24} />
           </div>
           <div>
-            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Phim Đang Chiếu</span>
-            <h3 className="text-xl font-black text-white mt-0.5">{activeMoviesCount} phim</h3>
+            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{t('activeMovies')}</span>
+            <h3 className="text-xl font-black text-white mt-0.5">{activeMoviesCount} {language === 'vi' ? 'phim' : 'movies'}</h3>
           </div>
         </div>
 
@@ -321,19 +509,20 @@ export default function Dashboard() {
             <Users size={24} />
           </div>
           <div>
-            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Tổng Nhân Sự</span>
-            <h3 className="text-xl font-black text-white mt-0.5">{employeeCount} thành viên</h3>
+            <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">{t('totalEmployees')}</span>
+            <h3 className="text-xl font-black text-white mt-0.5">{employeeCount} {language === 'vi' ? 'nhân sự' : 'staff'}</h3>
           </div>
         </div>
       </div>
 
       {/* Tabs Menu */}
-      <div className="flex border-b border-slate-900 pb-px">
+      <div className="flex border-b border-slate-900 pb-px flex-wrap gap-1">
         {[
-          { id: 'overview', label: 'Tổng Quan' },
-          { id: 'movies', label: 'Quản Lý Phim' },
-          { id: 'showtimes', label: 'Suất Chiếu' },
-          { id: 'employees', label: 'Nhân Sự' },
+          { id: 'overview', label: t('overview') },
+          { id: 'movies', label: t('manageMovies') },
+          { id: 'showtimes', label: t('showtimes') },
+          { id: 'employees', label: t('employees') },
+          { id: 'halls', label: 'Ph\u00f2ng Chi\u1ebfu' },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -736,7 +925,8 @@ export default function Dashboard() {
                       <th className="pb-3">Thể loại</th>
                       <th className="pb-3">Thời lượng</th>
                       <th className="pb-3">Định dạng</th>
-                      <th className="pb-3 text-right">Trạng thái</th>
+                      <th className="pb-3">Trạng thái</th>
+                      <th className="pb-3 text-right">Hành động</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -746,7 +936,7 @@ export default function Dashboard() {
                         <td className="py-3 text-xs capitalize">{movie.genre}</td>
                         <td className="py-3">{movie.durationMins} phút</td>
                         <td className="py-3 font-semibold">{movie.formatMovie || '2D'}</td>
-                        <td className="py-3 text-right">
+                        <td className="py-3">
                           <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${
                             movie.status === 'ACTIVE' 
                               ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
@@ -754,6 +944,22 @@ export default function Dashboard() {
                           }`}>
                             {movie.status === 'ACTIVE' ? 'Đang chiếu' : 'Đóng'}
                           </span>
+                        </td>
+                        <td className="py-3 text-right flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingMovie(movie)}
+                            className="px-2 py-1 bg-sky-500/10 border border-sky-500/25 hover:bg-sky-500/20 text-sky-400 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setMovieToDelete(movie)}
+                            className="px-2 py-1 bg-rose-500/10 border border-rose-500/25 hover:bg-rose-500/20 text-rose-400 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                          >
+                            Xóa
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -763,7 +969,7 @@ export default function Dashboard() {
             </div>
 
             {/* Quick add Movie form */}
-            <div className="lg:col-span-1 glass-panel p-6 rounded-3xl space-y-5">
+            <div className="lg:col-span-1 glass-panel p-6 rounded-3xl space-y-5 lg:sticky lg:top-24 lg:self-start">
               <h3 className="font-extrabold text-white text-base flex items-center gap-2">
                 <Film size={18} className="text-brand" />
                 Thêm phim mới nhanh
@@ -771,26 +977,40 @@ export default function Dashboard() {
               
               <form onSubmit={handleAddMovie} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Tên phim</label>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+                    Tên phim <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="text"
-                    required
                     value={newMovieTitle}
                     onChange={(e) => setNewMovieTitle(e.target.value)}
+                    onBlur={() => setMovieTitleTouched(true)}
                     placeholder="Nhập tên phim..."
-                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                    className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-slate-200 text-sm transition-all focus:border-brand/40 ${
+                      movieTitleTouched && !isMovieTitleValid ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20' : 'border-slate-800'
+                    }`}
                   />
+                  {movieTitleTouched && !isMovieTitleValid && (
+                    <p className="text-[10px] text-rose-500 font-semibold mt-1">Tên phim không được để trống</p>
+                  )}
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Thể loại</label>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+                    Thể loại <span className="text-rose-500">*</span>
+                  </label>
                   <input
                     type="text"
-                    required
                     value={newMovieGenre}
                     onChange={(e) => setNewMovieGenre(e.target.value)}
+                    onBlur={() => setMovieGenreTouched(true)}
                     placeholder="ví dụ: Hành động, Tâm lý..."
-                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                    className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-slate-200 text-sm transition-all focus:border-brand/40 ${
+                      movieGenreTouched && !isMovieGenreValid ? 'border-rose-500 focus:border-rose-500 focus:ring-rose-500/20' : 'border-slate-800'
+                    }`}
                   />
+                  {movieGenreTouched && !isMovieGenreValid && (
+                    <p className="text-[10px] text-rose-500 font-semibold mt-1">Thể loại không được để trống</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Thời lượng (Phút)</label>
@@ -804,8 +1024,8 @@ export default function Dashboard() {
                 
                 <button
                   type="submit"
-                  disabled={addMovieMutation.isPending}
-                  className="w-full py-3 bg-brand hover:bg-brand-hover text-white text-xs font-bold rounded-xl shadow-md transition-all uppercase tracking-wider"
+                  disabled={addMovieMutation.isPending || !isMovieFormValid}
+                  className="w-full py-3 bg-brand hover:bg-brand-hover disabled:bg-slate-900 text-white disabled:text-slate-600 text-xs font-bold rounded-xl shadow-md transition-all uppercase tracking-wider disabled:cursor-not-allowed disabled:shadow-none cursor-pointer"
                 >
                   {addMovieMutation.isPending ? 'Đang tạo...' : 'Tạo Phim Mới'}
                 </button>
@@ -817,7 +1037,7 @@ export default function Dashboard() {
         {activeTab === 'showtimes' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column: List of Available Movies as Cards */}
-            <div className="lg:col-span-1 space-y-4">
+            <div className="lg:col-span-1 space-y-4 lg:sticky lg:top-24 lg:self-start">
               <div className="glass-panel p-5 rounded-3xl space-y-3">
                 <h3 className="font-extrabold text-white text-base flex items-center gap-2">
                   <Film size={18} className="text-brand" />
@@ -1029,15 +1249,18 @@ export default function Dashboard() {
                                               {st.status}
                                             </span>
                                           </td>
-                                          <td className="py-3 text-right">
+                                          <td className="py-3 text-right flex justify-end gap-2">
+                                            <button
+                                              type="button"
+                                              onClick={() => setEditingShowtime(st)}
+                                              className="px-2 py-1 bg-sky-500/10 border border-sky-500/25 hover:bg-sky-500/20 text-sky-400 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                                            >
+                                              Sửa
+                                            </button>
                                             <button
                                               type="button"
                                               disabled={deleteShowtimeMutation.isPending}
-                                              onClick={() => {
-                                                if (window.confirm(`Bạn có chắc chắn muốn xóa suất chiếu ${st.showtimeId} của phim này không?`)) {
-                                                  deleteShowtimeMutation.mutate(st.showtimeId);
-                                                }
-                                              }}
+                                              onClick={() => setShowtimeToDelete(st)}
                                               className="p-1.5 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 text-rose-400 rounded-lg transition-all cursor-pointer disabled:opacity-50"
                                             >
                                               <Trash2 size={14} />
@@ -1058,10 +1281,7 @@ export default function Dashboard() {
                           <form
                             onSubmit={(e) => {
                               e.preventDefault();
-                              if (!newShowtimeHall || !newShowtimeStart || !newShowtimePrice) {
-                                alert('Vui lòng điền đầy đủ thông tin');
-                                return;
-                              }
+                              if (!isShowtimeFormValid) return;
                               
                               const startDate = new Date(newShowtimeStart);
                               const endDate = new Date(startDate.getTime() + (selectedMovie.durationMins || 120) * 60 * 1000);
@@ -1083,9 +1303,10 @@ export default function Dashboard() {
                           >
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                               <div>
-                                <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Phòng chiếu</label>
+                                <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+                                  Phòng chiếu <span className="text-rose-500">*</span>
+                                </label>
                                 <select
-                                  required
                                   value={newShowtimeHall}
                                   onChange={(e) => setNewShowtimeHall(e.target.value)}
                                   className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
@@ -1098,27 +1319,41 @@ export default function Dashboard() {
                                 </select>
                               </div>
                               <div>
-                                <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Giá vé cơ bản (VND)</label>
+                                <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+                                  Giá vé cơ bản (VND) <span className="text-rose-500">*</span>
+                                </label>
                                 <input
                                   type="number"
-                                  required
                                   min="0"
                                   value={newShowtimePrice}
                                   onChange={(e) => setNewShowtimePrice(e.target.value)}
-                                  className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                                  onBlur={() => setShowtimePriceTouched(true)}
+                                  className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-slate-200 text-sm focus:border-brand/40 transition-all ${
+                                    showtimePriceTouched && !isShowtimePriceValid ? 'border-rose-500' : 'border-slate-800'
+                                  }`}
                                 />
+                                {showtimePriceTouched && !isShowtimePriceValid && (
+                                  <p className="text-[10px] text-rose-500 font-semibold mt-1">Giá vé phải lớn hơn 0</p>
+                                )}
                               </div>
                             </div>
 
                             <div>
-                              <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Thời gian bắt đầu</label>
+                              <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+                                Thời gian bắt đầu <span className="text-rose-500">*</span>
+                              </label>
                               <input
                                 type="datetime-local"
-                                required
                                 value={newShowtimeStart}
                                 onChange={(e) => setNewShowtimeStart(e.target.value)}
-                                className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                                onBlur={() => setShowtimeStartTouched(true)}
+                                className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-slate-200 text-sm focus:border-brand/40 transition-all ${
+                                  showtimeStartTouched && !isShowtimeStartValid ? 'border-rose-500' : 'border-slate-800'
+                                }`}
                               />
+                              {showtimeStartTouched && !isShowtimeStartValid && (
+                                <p className="text-[10px] text-rose-500 font-semibold mt-1">Thời gian không được để trống</p>
+                              )}
                               <p className="text-[10px] text-slate-500 font-semibold mt-1">
                                 * Thời gian kết thúc sẽ được tính toán tự động dựa trên thời lượng phim ({selectedMovie.durationMins} phút).
                               </p>
@@ -1126,8 +1361,8 @@ export default function Dashboard() {
 
                             <button
                               type="submit"
-                              disabled={addShowtimeMutation.isPending}
-                              className="w-full sm:w-auto px-6 py-3 bg-brand hover:bg-brand-hover text-white text-xs font-bold rounded-xl shadow-md transition-all uppercase tracking-wider disabled:opacity-50"
+                              disabled={addShowtimeMutation.isPending || !isShowtimeFormValid}
+                              className="w-full sm:w-auto px-6 py-3 bg-brand hover:bg-brand-hover disabled:bg-slate-900 text-white disabled:text-slate-600 text-xs font-bold rounded-xl shadow-md transition-all uppercase tracking-wider disabled:cursor-not-allowed disabled:shadow-none cursor-pointer"
                             >
                               {addShowtimeMutation.isPending ? 'Đang thêm...' : 'Lên Lịch Suất Chiếu'}
                             </button>
@@ -1143,43 +1378,749 @@ export default function Dashboard() {
         )}
 
         {activeTab === 'employees' && (
-          <div className="glass-panel p-6 rounded-3xl space-y-4">
-            <h3 className="font-extrabold text-white text-base flex items-center gap-2">
-              <Users size={18} className="text-brand" />
-              Đội ngũ nhân sự hệ thống
-            </h3>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Left Column: Employees List */}
+            <div className="lg:col-span-2 glass-panel p-6 rounded-3xl space-y-4">
+              <h3 className="font-extrabold text-white text-base flex items-center gap-2">
+                <Users size={18} className="text-brand" />
+                Đội ngũ nhân sự hệ thống
+              </h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-sm">
+                  <thead>
+                    <tr className="text-slate-500 border-b border-slate-900 text-xs uppercase tracking-wider font-bold">
+                      <th className="pb-3">Mã NV</th>
+                      <th className="pb-3">Họ và tên</th>
+                      <th className="pb-3">Tên đăng nhập</th>
+                      <th className="pb-3">Vai trò</th>
+                      <th className="pb-3">Email</th>
+                      <th className="pb-3">Trạng thái</th>
+                      <th className="pb-3 text-right">Hành động</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {employees.map((emp) => (
+                      <tr key={emp.employeeId} className="border-b border-slate-900/40 text-slate-300">
+                        <td className="py-3 font-bold uppercase">{emp.employeeId}</td>
+                        <td className="py-3 font-semibold">{emp.fullName}</td>
+                        <td className="py-3 text-slate-400">{emp.username}</td>
+                        <td className="py-3 font-bold text-xs uppercase text-slate-400">{emp.role}</td>
+                        <td className="py-3 text-xs text-slate-500">{emp.email || 'Chưa cung cấp'}</td>
+                        <td className="py-3">
+                          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide ${
+                            emp.status === 'ACTIVE' 
+                              ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                              : 'bg-slate-800 border border-slate-700 text-slate-500'
+                          }`}>
+                            {emp.status}
+                          </span>
+                        </td>
+                        <td className="py-3 text-right flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingEmployee(emp)}
+                            className="px-2 py-1 bg-sky-500/10 border border-sky-500/25 hover:bg-sky-500/20 text-sky-400 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setEmployeeToDelete(emp)}
+                            className="px-2 py-1 bg-rose-500/10 border border-rose-500/25 hover:bg-rose-500/20 text-rose-400 rounded-lg text-xs font-bold transition-all cursor-pointer"
+                          >
+                            Xóa
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Right Column: Quick Add Employee Form */}
+            <div className="lg:col-span-1 glass-panel p-6 rounded-3xl space-y-5 lg:sticky lg:top-24 lg:self-start">
+              <h3 className="font-extrabold text-white text-base flex items-center gap-2">
+                <Users size={18} className="text-brand" />
+                Thêm nhân sự mới
+              </h3>
+              
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!isEmpFormValid) return;
+                  addEmployeeMutation.mutate({
+                    fullName: newEmployeeName,
+                    username: newEmployeeUsername,
+                    password: newEmployeePassword,
+                    email: newEmployeeEmail,
+                    role: newEmployeeRole,
+                    status: 'ACTIVE'
+                  });
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+                    Họ và tên <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newEmployeeName}
+                    onChange={(e) => setNewEmployeeName(e.target.value)}
+                    onBlur={() => setEmpNameTouched(true)}
+                    placeholder="Nhập họ và tên..."
+                    className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-slate-200 text-sm focus:border-brand/40 transition-all ${
+                      empNameTouched && !isEmpNameValid ? 'border-rose-500' : 'border-slate-800'
+                    }`}
+                  />
+                  {empNameTouched && !isEmpNameValid && (
+                    <p className="text-[10px] text-rose-500 font-semibold mt-1">Họ tên không được để trống</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+                    Tên đăng nhập <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newEmployeeUsername}
+                    onChange={(e) => setNewEmployeeUsername(e.target.value)}
+                    onBlur={() => setEmpUserTouched(true)}
+                    placeholder="Nhập tên đăng nhập..."
+                    className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-slate-200 text-sm focus:border-brand/40 transition-all ${
+                      empUserTouched && !isEmpUserValid ? 'border-rose-500' : 'border-slate-800'
+                    }`}
+                  />
+                  {empUserTouched && !isEmpUserValid && (
+                    <p className="text-[10px] text-rose-500 font-semibold mt-1">Tên đăng nhập không được để trống</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">
+                    Mật khẩu <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={newEmployeePassword}
+                    onChange={(e) => setNewEmployeePassword(e.target.value)}
+                    onBlur={() => setEmpPassTouched(true)}
+                    placeholder="Nhập mật khẩu..."
+                    className={`w-full px-3.5 py-2.5 bg-slate-900 border rounded-xl text-slate-200 text-sm focus:border-brand/40 transition-all ${
+                      empPassTouched && !isEmpPassValid ? 'border-rose-500' : 'border-slate-800'
+                    }`}
+                  />
+                  {empPassTouched && !isEmpPassValid && (
+                    <p className="text-[10px] text-rose-500 font-semibold mt-1">Mật khẩu phải tối thiểu 6 ký tự</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Email</label>
+                  <input
+                    type="email"
+                    value={newEmployeeEmail}
+                    onChange={(e) => setNewEmployeeEmail(e.target.value)}
+                    placeholder="Nhập email (tùy chọn)..."
+                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Vai trò</label>
+                  <select
+                    value={newEmployeeRole}
+                    onChange={(e) => setNewEmployeeRole(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                  >
+                    <option value="STAFF">Nhân viên (STAFF)</option>
+                    <option value="MANAGER">Quản lý (MANAGER)</option>
+                  </select>
+                </div>
+                
+                <button
+                  type="submit"
+                  disabled={addEmployeeMutation.isPending || !isEmpFormValid}
+                  className="w-full py-3 bg-brand hover:bg-brand-hover disabled:bg-slate-900 text-white disabled:text-slate-600 text-xs font-bold rounded-xl shadow-md transition-all uppercase tracking-wider disabled:cursor-not-allowed disabled:shadow-none cursor-pointer"
+                >
+                  {addEmployeeMutation.isPending ? 'Đang thêm...' : 'Thêm Nhân Viên'}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* ================= EDIT MODALS ================= */}
+
+        {/* 1. Edit Movie Modal */}
+        {editingMovie && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+            <div className="glass-panel p-6 rounded-3xl w-full max-w-lg space-y-4 border border-slate-800 bg-slate-900/90 my-8">
+              <h3 className="font-extrabold text-white text-lg">Chỉnh Sửa Phim</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  updateMovieMutation.mutate(editingMovie);
+                }}
+                className="space-y-4"
+              >
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Tên phim</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingMovie.title || ''}
+                      onChange={(e) => setEditingMovie({ ...editingMovie, title: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Thể loại</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingMovie.genre || ''}
+                      onChange={(e) => setEditingMovie({ ...editingMovie, genre: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                    />
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Thời lượng (phút)</label>
+                    <input
+                      type="number"
+                      required
+                      value={editingMovie.durationMins || 120}
+                      onChange={(e) => setEditingMovie({ ...editingMovie, durationMins: parseInt(e.target.value) || 120 })}
+                      className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Định dạng</label>
+                    <select
+                      value={editingMovie.formatMovie || '2D'}
+                      onChange={(e) => setEditingMovie({ ...editingMovie, formatMovie: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                    >
+                      <option value="2D">2D</option>
+                      <option value="3D">3D</option>
+                      <option value="IMAX">IMAX</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Ngôn ngữ</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingMovie.language || ''}
+                      onChange={(e) => setEditingMovie({ ...editingMovie, language: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Độ tuổi</label>
+                    <input
+                      type="text"
+                      required
+                      value={editingMovie.rating || ''}
+                      onChange={(e) => setEditingMovie({ ...editingMovie, rating: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Ảnh Poster (URL)</label>
+                  <input
+                    type="text"
+                    value={editingMovie.posterUrl || ''}
+                    onChange={(e) => setEditingMovie({ ...editingMovie, posterUrl: e.target.value })}
+                    placeholder="Link ảnh poster..."
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Trạng thái chiếu</label>
+                  <select
+                    value={editingMovie.status || 'ACTIVE'}
+                    onChange={(e) => setEditingMovie({ ...editingMovie, status: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                  >
+                    <option value="ACTIVE">Đang chiếu (ACTIVE)</option>
+                    <option value="INACTIVE">Ngừng chiếu (INACTIVE)</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Mô tả phim</label>
+                  <textarea
+                    rows="3"
+                    value={editingMovie.description || ''}
+                    onChange={(e) => setEditingMovie({ ...editingMovie, description: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingMovie(null)}
+                    className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all uppercase tracking-wider"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={updateMovieMutation.isPending}
+                    className="px-5 py-2.5 bg-brand hover:bg-brand-hover text-white font-bold text-xs rounded-xl shadow-md transition-all uppercase tracking-wider disabled:opacity-50"
+                  >
+                    Lưu Thay Đổi
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 2. Edit Showtime Modal */}
+        {editingShowtime && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="glass-panel p-6 rounded-3xl w-full max-w-md space-y-4 border border-slate-800 bg-slate-900/90">
+              <h3 className="font-extrabold text-white text-base">Chỉnh Sửa Suất Chiếu {editingShowtime.showtimeId}</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  updateShowtimeMutation.mutate(editingShowtime);
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Phòng chiếu</label>
+                  <select
+                    value={editingShowtime.hallId || ''}
+                    onChange={(e) => setEditingShowtime({ ...editingShowtime, hallId: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                  >
+                    {cinemaHalls.map((hall) => (
+                      <option key={hall.hallId} value={hall.hallId}>
+                        {hall.name} ({hall.hallType})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Giá vé cơ bản (VND)</label>
+                  <input
+                    type="number"
+                    required
+                    min="0"
+                    value={editingShowtime.basePrice || 0}
+                    onChange={(e) => setEditingShowtime({ ...editingShowtime, basePrice: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Thời gian bắt đầu</label>
+                  <input
+                    type="datetime-local"
+                    required
+                    value={editingShowtime.startTime ? editingShowtime.startTime.slice(0, 16) : ''}
+                    onChange={(e) => {
+                      const startVal = e.target.value;
+                      const selectedMovie = movies.find(m => m.movieId === editingShowtime.movieId);
+                      const duration = selectedMovie ? selectedMovie.durationMins : 120;
+                      
+                      const startDate = new Date(startVal);
+                      const endDate = new Date(startDate.getTime() + duration * 60 * 1000);
+                      const pad = (n) => n.toString().padStart(2, '0');
+                      
+                      const startISO = startVal + ":00";
+                      const endISO = `${endDate.getFullYear()}-${pad(endDate.getMonth() + 1)}-${pad(endDate.getDate())}T${pad(endDate.getHours())}:${pad(endDate.getMinutes())}:00`;
+                      
+                      setEditingShowtime({
+                        ...editingShowtime,
+                        startTime: startISO,
+                        endTime: endISO
+                      });
+                    }}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Trạng thái suất chiếu</label>
+                  <select
+                    value={editingShowtime.status || 'SCHEDULED'}
+                    onChange={(e) => setEditingShowtime({ ...editingShowtime, status: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm"
+                  >
+                    <option value="SCHEDULED">SCHEDULED (Lên lịch)</option>
+                    <option value="ONGOING">ONGOING (Đang chiếu)</option>
+                    <option value="COMPLETED">COMPLETED (Hoàn thành)</option>
+                    <option value="CANCELLED">CANCELLED (Đã hủy)</option>
+                  </select>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingShowtime(null)}
+                    className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all uppercase tracking-wider"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={updateShowtimeMutation.isPending}
+                    className="px-5 py-2.5 bg-brand hover:bg-brand-hover text-white font-bold text-xs rounded-xl shadow-md transition-all uppercase tracking-wider disabled:opacity-50"
+                  >
+                    Lưu Thay Đổi
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* 3. Edit Employee Modal */}
+        {editingEmployee && (
+          <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+            <div className="glass-panel p-6 rounded-3xl w-full max-w-md space-y-4 border border-slate-800 bg-slate-900/90">
+              <h3 className="font-extrabold text-white text-lg">Chỉnh Sửa Nhân Sự</h3>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  updateEmployeeMutation.mutate(editingEmployee);
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Họ và tên</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingEmployee.fullName || ''}
+                    onChange={(e) => setEditingEmployee({ ...editingEmployee, fullName: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Tên đăng nhập</label>
+                  <input
+                    type="text"
+                    required
+                    value={editingEmployee.username || ''}
+                    onChange={(e) => setEditingEmployee({ ...editingEmployee, username: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Mật khẩu mới (Bỏ trống nếu không đổi)</label>
+                  <input
+                    type="password"
+                    value={editingEmployee.password || ''}
+                    placeholder="Nhập mật khẩu mới..."
+                    onChange={(e) => setEditingEmployee({ ...editingEmployee, password: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Email</label>
+                  <input
+                    type="email"
+                    value={editingEmployee.email || ''}
+                    onChange={(e) => setEditingEmployee({ ...editingEmployee, email: e.target.value })}
+                    className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Vai trò</label>
+                    <select
+                      value={editingEmployee.role || 'STAFF'}
+                      onChange={(e) => setEditingEmployee({ ...editingEmployee, role: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                    >
+                      <option value="STAFF">STAFF</option>
+                      <option value="MANAGER">MANAGER</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-slate-400 uppercase mb-1.5">Trạng thái</label>
+                    <select
+                      value={editingEmployee.status || 'ACTIVE'}
+                      onChange={(e) => setEditingEmployee({ ...editingEmployee, status: e.target.value })}
+                      className="w-full px-3.5 py-2.5 bg-slate-955 border border-slate-800 rounded-xl text-slate-200 text-sm focus:border-brand/40"
+                    >
+                      <option value="ACTIVE">ACTIVE</option>
+                      <option value="INACTIVE">INACTIVE</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditingEmployee(null)}
+                    className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition-all uppercase tracking-wider"
+                  >
+                    Hủy
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={updateEmployeeMutation.isPending}
+                    className="px-5 py-2.5 bg-brand hover:bg-brand-hover text-white font-bold text-xs rounded-xl shadow-md transition-all uppercase tracking-wider disabled:opacity-50"
+                  >
+                    Lưu Thay Đổi
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Delete Movie Confirm Modal */}
+        <ConfirmModal
+          isOpen={!!movieToDelete}
+          onClose={() => setMovieToDelete(null)}
+          onConfirm={() => {
+            if (movieToDelete) {
+              deleteMovieMutation.mutate(movieToDelete.movieId)
+            }
+          }}
+          title="Xác nhận xóa phim"
+          message={
+            movieToDelete ? (
+              <span>
+                Bạn có chắc chắn muốn xóa bộ phim <strong>{movieToDelete.title}</strong>? Hành động này sẽ xóa toàn bộ các suất chiếu của phim và không thể khôi phục.
+              </span>
+            ) : ''
+          }
+          type="danger"
+        />
+
+        {/* ===== HALLS TAB ===== */}
+        {activeTab === 'halls' && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-extrabold text-white flex items-center gap-2">
+                <Building2 size={20} className="text-brand" />
+                Qu\u1ea3n L\u00fd Ph\u00f2ng Chi\u1ebfu
+              </h2>
+              <span className="text-xs text-slate-500">{cinemaHalls.length} ph\u00f2ng</span>
+            </div>
+
+            {/* Add Hall Form */}
+            <div className="glass-panel p-6 rounded-2xl space-y-4">
+              <h3 className="text-sm font-extrabold text-slate-200">Th\u00eam Ph\u00f2ng M\u1edbi</h3>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <input
+                  type="text"
+                  placeholder="M\u00e3 ph\u00f2ng (VD: HALL-5)"
+                  value={newHallId}
+                  onChange={(e) => setNewHallId(e.target.value.toUpperCase())}
+                  className="px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold focus:border-brand/40 transition-all col-span-2 md:col-span-1"
+                />
+                <input
+                  type="text"
+                  placeholder="T\u00ean ph\u00f2ng"
+                  value={newHallName}
+                  onChange={(e) => setNewHallName(e.target.value)}
+                  className="px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold focus:border-brand/40 transition-all col-span-2 md:col-span-1"
+                />
+                <select
+                  value={newHallType}
+                  onChange={(e) => setNewHallType(e.target.value)}
+                  className="px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold cursor-pointer"
+                >
+                  {['2D','3D','IMAX','4DX'].map(t => <option key={t} value={t}>{t}</option>)}
+                </select>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-slate-500 shrink-0">H\u00e0ng:</label>
+                  <input type="number" min={3} max={20} value={newHallRows}
+                    onChange={(e) => setNewHallRows(parseInt(e.target.value))}
+                    className="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold"
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <label className="text-xs text-slate-500 shrink-0">C\u1ed9t:</label>
+                  <input type="number" min={5} max={30} value={newHallCols}
+                    onChange={(e) => setNewHallCols(parseInt(e.target.value))}
+                    className="w-full px-3 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold"
+                  />
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    if (!newHallId.trim() || !newHallName.trim()) {
+                      toast.error('Vui l\u00f2ng nh\u1eadp m\u00e3 v\u00e0 t\u00ean ph\u00f2ng.')
+                      return
+                    }
+                    api.post('/cinema-halls', {
+                      hallId: newHallId.trim(),
+                      name: newHallName.trim(),
+                      hallType: newHallType,
+                      totalRows: newHallRows,
+                      totalCols: newHallCols,
+                    }).then(() => {
+                      queryClient.invalidateQueries({ queryKey: ['cinema-halls'] })
+                      setNewHallId(''); setNewHallName('')
+                      toast.success(`T\u1ea1o ph\u00f2ng ${newHallId} th\u00e0nh c\u00f4ng v\u1edbi ${newHallRows * newHallCols} gh\u1ebf!`)
+                      pushNotification({ type: 'success', title: 'Ph\u00f2ng m\u1edbi', message: `\u0110\u00e3 t\u1ea1o ph\u00f2ng ${newHallId} (${newHallRows}x${newHallCols} gh\u1ebf).` })
+                    }).catch((err) => {
+                      toast.error(err.response?.data?.error || 'L\u1ed7i t\u1ea1o ph\u00f2ng')
+                    })
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-brand hover:bg-brand-hover text-white font-bold rounded-xl text-xs shadow-lg transition-all cursor-pointer"
+                >
+                  <Plus size={14} /> T\u1ea1o ph\u00f2ng + T\u1ef1 sinh gh\u1ebf
+                </button>
+                <span className="text-xs text-slate-500">
+                  S\u1ebd t\u1ea1o {newHallRows * newHallCols} gh\u1ebf — 2 h\u00e0ng cu\u1ed1i l\u00e0 VIP
+                </span>
+              </div>
+            </div>
+
+            {/* Halls Table */}
+            <div className="glass-panel rounded-2xl overflow-hidden">
+              <table className="w-full text-xs">
                 <thead>
-                  <tr className="text-slate-500 border-b border-slate-900 text-xs uppercase tracking-wider font-bold">
-                    <th className="pb-3">Mã NV</th>
-                    <th className="pb-3">Họ và tên</th>
-                    <th className="pb-3">Tên đăng nhập</th>
-                    <th className="pb-3">Vai trò</th>
-                    <th className="pb-3">Email</th>
-                    <th className="pb-3 text-right">Trạng thái</th>
+                  <tr className="border-b border-slate-900 bg-slate-950/40">
+                    <th className="text-left px-5 py-3.5 font-extrabold text-slate-400 uppercase tracking-wider">M\u00e3 Ph\u00f2ng</th>
+                    <th className="text-left px-5 py-3.5 font-extrabold text-slate-400 uppercase tracking-wider">T\u00ean</th>
+                    <th className="text-center px-5 py-3.5 font-extrabold text-slate-400 uppercase tracking-wider">Lo\u1ea1i</th>
+                    <th className="text-center px-5 py-3.5 font-extrabold text-slate-400 uppercase tracking-wider">S\u1ed1 gh\u1ebf</th>
+                    <th className="text-center px-5 py-3.5 font-extrabold text-slate-400 uppercase tracking-wider">Tr\u1ea1ng th\u00e1i</th>
+                    <th className="text-right px-5 py-3.5 font-extrabold text-slate-400 uppercase tracking-wider">H\u00e0nh \u0111\u1ed9ng</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {employees.map((emp) => (
-                    <tr key={emp.employeeId} className="border-b border-slate-900/40 text-slate-300">
-                      <td className="py-3 font-bold uppercase">{emp.employeeId}</td>
-                      <td className="py-3 font-semibold">{emp.fullName}</td>
-                      <td className="py-3 text-slate-400">{emp.username}</td>
-                      <td className="py-3 font-bold text-xs uppercase text-slate-400">{emp.role}</td>
-                      <td className="py-3 text-xs text-slate-500">{emp.email || 'Chưa cung cấp'}</td>
-                      <td className="py-3 text-right">
-                        <span className="px-2 py-0.5 bg-emerald-500/10 border border-emerald-500/25 rounded text-[10px] font-bold text-emerald-400 uppercase tracking-wide">
-                          {emp.status}
-                        </span>
-                      </td>
-                    </tr>
+                <tbody className="divide-y divide-slate-900">
+                  {isCinemaHallsLoading ? (
+                    <tr><td colSpan={6} className="text-center py-8 text-slate-500"><Spinner size="sm" /></td></tr>
+                  ) : cinemaHalls.length === 0 ? (
+                    <tr><td colSpan={6} className="text-center py-8 text-slate-500">Ch\u01b0a c\u00f3 ph\u00f2ng chi\u1ebfu n\u00e0o.</td></tr>
+                  ) : cinemaHalls.map((hall) => (
+                    <AnimatePresence key={hall.hallId}>
+                      <motion.tr
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="hover:bg-slate-900/30 transition-colors"
+                      >
+                        <td className="px-5 py-3.5 font-black text-slate-200">{hall.hallId}</td>
+                        <td className="px-5 py-3.5 text-slate-300 font-semibold">{hall.name}</td>
+                        <td className="px-5 py-3.5 text-center">
+                          <span className="px-2 py-0.5 bg-sky-500/10 text-sky-400 rounded font-bold">{hall.hallType}</span>
+                        </td>
+                        <td className="px-5 py-3.5 text-center text-slate-300 font-semibold">{hall.totalSeats || (hall.totalRows * hall.totalCols)}</td>
+                        <td className="px-5 py-3.5 text-center">
+                          <span className={`px-2 py-0.5 rounded font-bold text-[10px] uppercase ${
+                            hall.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-slate-800 text-slate-500'
+                          }`}>
+                            {hall.status}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5 text-right">
+                          <button
+                            onClick={() => setHallToDelete(hall)}
+                            className="p-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all cursor-pointer"
+                            title="X\u00f3a ph\u00f2ng"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </td>
+                      </motion.tr>
+                    </AnimatePresence>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
         )}
+
+        {/* Delete Hall Confirm Modal */}
+        <ConfirmModal
+          isOpen={!!hallToDelete}
+          onClose={() => setHallToDelete(null)}
+          onConfirm={() => {
+            if (hallToDelete) {
+              api.delete(`/cinema-halls/${hallToDelete.hallId}`)
+                .then(() => {
+                  queryClient.invalidateQueries({ queryKey: ['cinema-halls'] })
+                  toast.success(`\u0110\u00e3 x\u00f3a ph\u00f2ng ${hallToDelete.hallId}.`)
+                  setHallToDelete(null)
+                })
+                .catch((err) => {
+                  toast.error(err.response?.data?.error || 'L\u1ed7i khi x\u00f3a ph\u00f2ng')
+                  setHallToDelete(null)
+                })
+            }
+          }}
+          title="X\u00e1c nh\u1eadn x\u00f3a ph\u00f2ng"
+          message={
+            hallToDelete ? (
+              <span>
+                X\u00f3a ph\u00f2ng <strong>{hallToDelete.hallId} ({hallToDelete.name})</strong>? H\u00e0nh \u0111\u1ed9ng n\u00e0y s\u1ebd x\u00f3a to\u00e0n b\u1ed9 gh\u1ebf trong ph\u00f2ng.
+              </span>
+            ) : ''
+          }
+          type="danger"
+        />
+
+        {/* Delete Showtime Confirm Modal */}
+        <ConfirmModal
+          isOpen={!!showtimeToDelete}
+          onClose={() => setShowtimeToDelete(null)}
+          onConfirm={() => {
+            if (showtimeToDelete) {
+              deleteShowtimeMutation.mutate(showtimeToDelete.showtimeId)
+            }
+          }}
+          title="Xác nhận xóa suất chiếu"
+          message={
+            showtimeToDelete ? (
+              <span>
+                Bạn có chắc chắn muốn xóa suất chiếu <strong>{showtimeToDelete.showtimeId}</strong>? Khách hàng đã mua vé ở suất chiếu này (nếu có) có thể bị ảnh hưởng.
+              </span>
+            ) : ''
+          }
+          type="danger"
+        />
+
+        {/* Delete Employee Confirm Modal */}
+        <ConfirmModal
+          isOpen={!!employeeToDelete}
+          onClose={() => setEmployeeToDelete(null)}
+          onConfirm={() => {
+            if (employeeToDelete) {
+              deleteEmployeeMutation.mutate(employeeToDelete.employeeId)
+            }
+          }}
+          title="Xác nhận xóa nhân sự"
+          message={
+            employeeToDelete ? (
+              <span>
+                Bạn có chắc chắn muốn xóa tài khoản nhân sự <strong>{employeeToDelete.fullName}</strong> ({employeeToDelete.username}) khỏi hệ thống?
+              </span>
+            ) : ''
+          }
+          type="danger"
+        />
       </div>
     </div>
   )

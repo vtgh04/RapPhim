@@ -27,19 +27,25 @@ public class BookingService {
     private final ShowSeatRepository showSeatRepository;
     private final PaymentService paymentService;
     private final ApplicationEventPublisher eventPublisher;
+    private final MovieRepository movieRepository;
+    private final SeatRepository seatRepository;
 
     public BookingService(InvoiceRepository invoiceRepository,
                           TicketRepository ticketRepository,
                           ShowtimeRepository showtimeRepository,
                           ShowSeatRepository showSeatRepository,
                           PaymentService paymentService,
-                          ApplicationEventPublisher eventPublisher) {
+                          ApplicationEventPublisher eventPublisher,
+                          MovieRepository movieRepository,
+                          SeatRepository seatRepository) {
         this.invoiceRepository = invoiceRepository;
         this.ticketRepository = ticketRepository;
         this.showtimeRepository = showtimeRepository;
         this.showSeatRepository = showSeatRepository;
         this.paymentService = paymentService;
         this.eventPublisher = eventPublisher;
+        this.movieRepository = movieRepository;
+        this.seatRepository = seatRepository;
     }
 
     public List<Invoice> getAllInvoices() {
@@ -51,7 +57,27 @@ public class BookingService {
     }
 
     public List<Ticket> getTicketsByInvoice(String invoiceId) {
-        return ticketRepository.findByInvoiceId(invoiceId);
+        List<Ticket> tickets = ticketRepository.findByInvoiceId(invoiceId);
+        for (Ticket t : tickets) {
+            String showSeatId = t.getShowSeatId();
+            if (showSeatId != null) {
+                showSeatRepository.findById(showSeatId).ifPresent(showSeat -> {
+                    seatRepository.findById(showSeat.getSeatId()).ifPresent(seat -> {
+                        t.setSeatLabel(seat.getSeatName());
+                    });
+                    
+                    showtimeRepository.findById(showSeat.getShowtimeId()).ifPresent(showtime -> {
+                        t.setHallId(showtime.getHallId());
+                        t.setStartTime(showtime.getStartTime().toString());
+                        
+                        movieRepository.findById(showtime.getMovieId()).ifPresent(movie -> {
+                            t.setMovieTitle(movie.getTitle());
+                        });
+                    });
+                });
+            }
+        }
+        return tickets;
     }
 
     @Transactional

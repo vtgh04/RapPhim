@@ -3,8 +3,9 @@ import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import api from '../../services/api'
-import Spinner from '../../shared/Spinner'
-import { ChevronLeft, Info, Landmark } from 'lucide-react'
+import Spinner from '../../components/ui/Spinner'
+import { ChevronLeft, Landmark, Wifi, WifiOff } from 'lucide-react'
+import { useRealtimeSeats } from '../../hooks/useRealtimeSeats'
 
 export default function SeatGrid() {
   const { showtimeId } = useParams()
@@ -44,14 +45,18 @@ export default function SeatGrid() {
     enabled: !!hallId
   })
 
-  // 4. Fetch Showseat status map
-  const { data: statusMap = {}, isLoading: isStatusLoading, refetch: refetchStatuses } = useQuery({
+  // 4. Fetch initial Showseat status map
+  const { data: initialStatusMap = {}, isLoading: isStatusLoading } = useQuery({
     queryKey: ['showseat-statuses', showtimeId],
     queryFn: async () => {
       const response = await api.get(`/showtimes/${showtimeId}/seats`)
       return response.data
-    }
+    },
+    refetchInterval: 15000, // polling fallback
   })
+
+  // 5. Realtime WebSocket updates (overlays on top of REST data)
+  const { statusMap, connected, broadcastSeatUpdate } = useRealtimeSeats(showtimeId, initialStatusMap)
 
   if (isShowtimeLoading || isMovieLoading || isSeatsLoading || isStatusLoading) {
     return <Spinner className="py-24" size="lg" />
@@ -100,8 +105,10 @@ export default function SeatGrid() {
 
     if (selectedSeats.some(s => s.seatId === seatId)) {
       setSelectedSeats(prev => prev.filter(s => s.seatId !== seatId))
+      broadcastSeatUpdate(seatId, 'AVAILABLE') // Unlock for others
     } else {
       setSelectedSeats(prev => [...prev, seat])
+      broadcastSeatUpdate(seatId, 'LOCKED') // Lock for others
     }
   }
 
@@ -131,12 +138,15 @@ export default function SeatGrid() {
             {startTimeFormatted} — <span className="capitalize">{showtime.hallId}</span>
           </p>
         </div>
-        <button
-          onClick={() => refetchStatuses()}
-          className="px-3.5 py-1.5 bg-slate-900 border border-slate-800 text-xs font-bold rounded-lg text-slate-300 hover:text-white hover:border-slate-700 transition-all"
-        >
-          Cập nhật trạng thái ghế
-        </button>
+        {/* Realtime indicator */}
+        <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[10px] font-bold border ${
+          connected
+            ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+            : 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+        }`}>
+          {connected ? <Wifi size={11} /> : <WifiOff size={11} />}
+          {connected ? 'LIVE' : 'Polling 15s'}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">

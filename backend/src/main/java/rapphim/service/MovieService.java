@@ -13,9 +13,15 @@ import java.util.Optional;
 public class MovieService {
 
     private final MovieRepository movieRepository;
+    private final rapphim.repository.ShowtimeRepository showtimeRepository;
+    private final ShowtimeService showtimeService;
 
-    public MovieService(MovieRepository movieRepository) {
+    public MovieService(MovieRepository movieRepository, 
+                        rapphim.repository.ShowtimeRepository showtimeRepository, 
+                        ShowtimeService showtimeService) {
         this.movieRepository = movieRepository;
+        this.showtimeRepository = showtimeRepository;
+        this.showtimeService = showtimeService;
     }
 
     public List<Movie> getAllMovies() {
@@ -44,6 +50,15 @@ public class MovieService {
             throw new IllegalArgumentException("Mã phim không hợp lệ để cập nhật!");
         }
         return movieRepository.save(movie);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteMovie(String id) {
+        List<rapphim.model.Showtime> showtimes = showtimeRepository.findByMovieId(id);
+        for (rapphim.model.Showtime st : showtimes) {
+            showtimeService.deleteShowtime(st.getShowtimeId());
+        }
+        movieRepository.deleteById(id);
     }
 
     public String getNextMovieId() {

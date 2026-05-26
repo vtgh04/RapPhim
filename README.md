@@ -4,184 +4,101 @@
   <img src="https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
   <img src="https://img.shields.io/badge/Spring--Boot-3.2.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
-  <img src="https://img.shields.io/badge/Tailwind--CSS-4.0-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
   <img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
   <img src="https://img.shields.io/badge/SQL--Server-2019%2B-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server" />
+  <img src="https://img.shields.io/badge/WebSocket-STOMP-blue?style=for-the-badge&logo=socket.io&logoColor=white" alt="WebSocket" />
 </p>
 
-<p align="center">
-  <strong>An enterprise-grade, high-performance web application for Cinema Point of Sale (POS) and administration, built with Spring Boot and React.</strong>
-</p>
+**Hệ thống bán vé (POS) tại quầy và quản trị rạp chiếu phim chuyên nghiệp được thiết kế theo kiến trúc Web hiện đại, phân tách rõ rệt giữa Spring Boot Backend REST API và React Client (SPA) sử dụng công nghệ WebSocket đồng bộ thời gian thực.**
 
 ---
 
-## 🚀 Project Migration & Current Status
+## 📑 Thư Mục Tài Liệu Phân Tích Nghiệp Vụ & Thiết Kế (BA Docs)
 
-> [!IMPORTANT]
-> **Architecture Modernization:** The project has successfully transitioned from its original desktop version (Java Swing + JDBC) to a decoupled Web Application. The application now uses a **Spring Boot REST API backend** and a **React SPA frontend** built with Vite and Tailwind CSS.
-
-### Recent Accomplishments (Real-time updates)
-- [x] **REST API Modernization:** Replaced Swing controllers and JDBC DAOs with Spring REST Controllers and Spring Data JPA.
-- [x] **JWT Security Integration:** Secured endpoints with stateless JWT authentication and role-based filters.
-- [x] **Interactive Dashboard Analytics:** Designed and built responsive, fully custom SVG charts (Line, Bar, Area, and Donut) for financial metrics without external chart libraries.
-- [x] **Visual Showtime Scheduler:** Replaced raw tables with a card-based visual movie scheduling interface.
-- [x] **Cascade Showtime Operations:** Enabled showtime deletion that cleans up linked dynamically generated seats automatically in a single `@Transactional` boundary.
+Hệ thống được thiết kế và đặc tả chuyên nghiệp theo chuẩn tài liệu BA. Bạn có thể truy cập các tài liệu chi tiết tại đây:
+1. **[Tài liệu Yêu cầu Nghiệp vụ (BRD)](docs/1.BRD/BRD.md):** Bối cảnh, mục tiêu chiến lược, sơ đồ phân quyền Stakeholders, phạm vi (In-scope/Out-of-scope) và các chỉ số KPIs đánh giá hiệu năng hệ thống.
+2. **[Đặc tả Yêu cầu Phần mềm (SRS)](docs/2.SRS/SRS.md):** Danh sách User Stories, Luật nghiệp vụ tính giá vé & kiểm tra trùng lịch chiếu, Đặc tả Use Case và luồng đi chi tiết của hệ thống.
+3. **[Thiết kế Cơ sở Dữ liệu & Class](docs/3.System_Design/Database_Design.md):** Từ điển dữ liệu chi tiết của 9 bảng, đặc tả khoá chính/ngoại, kiểu dữ liệu và cách ánh xạ đối tượng Entity JPA của Hibernate.
 
 ---
 
-## 📑 Table of Contents
+## 🎨 Sơ Đồ Hệ Thống Trực Quan (SVG Diagrams)
 
-1. [Features](#-features)
-2. [Tech Stack](#%EF%B8%8F-tech-stack)
-3. [Project Architecture](#-project-architecture)
-4. [Folder Structure](#-folder-structure)
-5. [Database Design](#-database-design)
-6. [API Endpoints](#-api-endpoints)
-7. [Setup & Installation](#-setup--installation)
-8. [Running the Application](#-running-the-application)
-9. [Author](#-author)
+### 1. Kiến Trúc Tổng Quan (System Architecture)
+Mô hình 4 lớp (Client SPA, Security/API Gateway, Core Service, Data Layer) cùng cơ chế giao tiếp HTTP REST và Realtime WebSocket.
+
+![Sơ đồ tổng quan kiến trúc](docs/assets/diagrams/overview.svg)
 
 ---
 
-## 🌟 Features
+### 2. Sơ đồ Use Case phân quyền người dùng (Use Case Diagram)
+Phân quyền chức năng rạch ròi giữa vai trò Quản lý (Manager) và Nhân viên bán vé (Staff).
 
-### 🔐 Authentication & Authorization
-* Secure login using stateless JWT tokens.
-* Auto token-rotation via interceptors on the React client.
-* Role-Based Access Control (RBAC): UI panels and API requests are protected based on employee roles (`MANAGER` / `STAFF`).
-
-### 📊 Dashboard Statistics & Charts
-* **Interactive SVG Revenue Chart:** View daily income trends over the last 30 days in **Bar (Cột)**, **Line (Đường)**, or **Area (Miền)** mode with hover details.
-* **Movie Share Donut Chart:** A visual donut chart showing tickets distribution amongst top-selling movies with an interactive legend.
-
-### 📅 Showtime Management
-* Available movies display as rich visual cards indicating their schedule counts.
-* Interactive side-panel detailing individual movie configurations.
-* **Auto End-time Calculation:** The scheduler automatically adds the showtime end time using the movie duration.
-* **Conflict Prevention:** Real-time checking to ensure no room conflicts or overlaps.
-* **Cascade Delete:** Easily remove showtimes; automatically removes all generated seat layouts.
-
-### 🎟️ Point of Sale (POS) & Checkout
-* Interactive visual seating map (VIP, Regular, Broken, Booked seats).
-* Real-time cart calculations and support for discounts and promo codes.
-* Generates PDF invoices and printable barcodes/tickets upon successful checkout.
+![Sơ đồ Use Case](docs/assets/diagrams/use_case.svg)
 
 ---
 
-## 🛠️ Tech Stack
+### 3. Sơ đồ Trình tự Đặt Vé & Thanh Toán (Sequence Diagram)
+Trình tự tương tác giữa Nhân viên quầy, Client, WebSocket Broker, Server và Database trong suốt vòng đời chọn ghế, khóa ghế tạm thời và checkout in hóa đơn.
 
-![Tech Stack](images/tech_stack.svg)
-
----
-
-## 📐 Project Architecture
-
-The application has been restructured into a decoupled web framework:
-
-![Project Architecture](images/project_architecture.svg)
+![Sơ đồ Trình tự](docs/assets/diagrams/sequence.svg)
 
 ---
 
-## 📁 Folder Structure
+### 4. Sơ đồ Thực Thể Quan Hệ (Entity Relationship Diagram - ERD)
+Cơ sở dữ liệu được chuẩn hoá 3NF của hệ thống chạy trên Microsoft SQL Server.
 
-### Backend (`/backend`)
-```text
-src/main/java/rapphim/
-├── config/             # Security configs, Web MVC configurations, CORS setup
-├── controller/         # Spring REST Controllers (Auth, Movies, Showtimes, Dashboard)
-├── event/              # Event listeners and handlers (e.g. seeding, logging)
-├── model/              # Hibernate Entities and Enums (Movie, Showtime, ShowSeat, etc.)
-├── repository/         # Spring Data JPA Repositories
-├── security/           # JWT Filters, Token Providers, UserDetailsService
-├── service/            # Core business workflows and transactional limits (@Transactional)
-└── util/               # PDF/Excel exporters, converters, and date helpers
-```
-
-### Frontend (`/frontend`)
-```text
-src/
-├── features/           # Feature-based folder structure
-│   ├── auth/           # Login, Session state, and Auth Store
-│   ├── booking/        # POS, Invoices, Seat selections
-│   └── dashboard/      # Analytical panels, custom SVG charts
-├── services/           # Axios instance with request/response interceptors
-├── shared/             # Reusable UI elements (Spinners, Buttons)
-├── index.css           # Global typography and theme configurations
-└── main.jsx            # React root mount
-```
+![Sơ đồ ERD](docs/assets/diagrams/erd.svg)
 
 ---
 
-## 🗄️ Database Design
+### 5. Sơ đồ Lớp Thực Thể (Domain Class Diagram)
+Cấu trúc lớp Domain JPA Entity trong Spring Boot Backend mô tả đầy đủ các thuộc tính và quan hệ liên kết.
 
-The relational database is normalized to 3NF to ensure data integrity and prevent redundancy:
-
-![Database Design ERD](images/database_design.svg)
-
----
-
-## 📡 API Endpoints
-
-Below is a summary of the main REST endpoints:
-
-| Endpoint | Method | Role Required | Description |
-| :--- | :--- | :--- | :--- |
-| `/api/auth/login` | `POST` | `All` | Authenticates user, returns Access + Refresh token |
-| `/api/auth/refresh-token` | `POST` | `All` | Silent token renewal using Refresh token |
-| `/api/dashboard/revenue-by-day` | `GET` | `MANAGER` | Daily revenue analytics for the last 30 days |
-| `/api/dashboard/top-movies` | `GET` | `MANAGER` | Top 5 best selling movies and ticket counts |
-| `/api/movies` | `GET` | `All` | Returns all available movies |
-| `/api/movies` | `POST` | `MANAGER` | Add a new movie into the system |
-| `/api/showtimes` | `GET` | `All` | Retrieve scheduled showtimes |
-| `/api/showtimes` | `POST` | `MANAGER` | Schedule a showtime (auto-generates seat structures) |
-| `/api/showtimes/{id}` | `DELETE` | `MANAGER` | Cancel a showtime (cascade deletes generated seats) |
-| `/api/cinema-halls` | `GET` | `All` | Retrieve available cinema auditoriums |
+![Sơ đồ Class Diagram](docs/assets/diagrams/class_diagram.svg)
 
 ---
 
-## 📦 Setup & Installation
+## 🌟 Tính Năng Nổi Bật Đang Hoạt Động
+* **Xác thực Dual-Token JWT:** Bảo mật tuyệt đối với Access Token & Refresh Token, tự động xoay vòng token ngầm ở Client để không ngắt quãng phiên làm việc.
+* **Giao diện bán vé POS & Sơ đồ ghế động:** Vẽ động bản đồ phòng chiếu theo số hàng và cột của phòng, phân biệt ghế VIP/Thường, ghế hỏng, ghế đã mua.
+* **Đồng bộ ghế Realtime (WebSocket/STOMP):** Ngăn chặn hoàn toàn việc mua trùng ghế (Double Booking) giữa các quầy bán vé.
+* **Tự động phòng tránh xung đột lịch chiếu:** Thuật toán Backend tự động tính toán thời gian kết thúc dựa vào thời lượng phim, chặn lưu suất chiếu nếu phát hiện phòng bị trùng hoặc chồng lấn thời gian.
+* **Cascade Delete Showtime:** Xóa suất chiếu tự động xóa sạch dữ liệu ghế động liên quan trong cùng một ranh giới `@Transactional` an toàn.
+* **Xuất hoá đơn & Vé PDF chứa Barcode:** Sử dụng Apache POI và iText xuất hoá đơn kèm vé có mã vạch sẵn sàng phục vụ kiểm vé.
+* **Dashboard Biểu đồ SVG Động:** Dashboard thống kê doanh thu, cơ cấu vé bán hiển thị bằng biểu đồ SVG do hệ thống tự tính toán toạ độ vẽ, không phụ thuộc vào thư viện bên thứ ba.
+* **Đa ngôn ngữ (i18n):** Chuyển đổi ngôn ngữ Việt - Anh tức thời trên toàn bộ giao diện.
 
-### Prerequisites
-* **Java JDK 17** or higher
+---
+
+## 🏃 Hướng Dẫn Cài Đặt & Chạy Ứng Dụng
+
+### Điều kiện tiên quyết
+* **Java JDK 17** hoặc cao hơn
 * **Node.js** (v18+) & **npm**
-* **Microsoft SQL Server**
+* **Microsoft SQL Server** (đã chạy các script khởi tạo tại `backend/database/scripts/Database.sql` và `Seed.sql`)
 
-### 1. Database Setup
-1. Open SQL Server Management Studio (SSMS) or command line database tool.
-2. Run the SQL schema files located in `backend/src/main/resources/schema.sql` (if present) or execute the initialization scripts to create the database schema.
-3. Configure JDBC configurations in `backend/src/main/resources/application.properties` (or YAML) with your local database URL, username, and password.
-
-### 2. Run Backend API
+### 1. Khởi chạy Backend API
 ```bash
-cd RapPhim/backend
-# Using Maven Wrapper to compile and run Spring Boot
+cd backend
+# Cấu hình db credentials trong src/main/resources/application.properties trước khi chạy
 .\mvnw.cmd spring-boot:run
 ```
+*Backend API sẽ chạy tại cổng `5001`.*
 
-### 3. Run Frontend Client
+### 2. Khởi chạy Frontend Client
 ```bash
-cd RapPhim/frontend
-# Install dependencies
+cd frontend
 npm install
-# Run in development mode (hot-reloads dynamically)
 npm run dev
 ```
+*Frontend sẽ chạy tại cổng `3000` (hoặc cổng được Vite cấp phát, proxy tự động trỏ về backend cổng `5001`).*
 
 ---
 
-## 🏃 Running the Application
-
-1. **Dashboard Access:** Open the browser and visit `http://localhost:5173`.
-2. **Staff Credentials:** Login using role-authorized credentials.
-3. **Showtimes Management:** Navigate to **Suất Chiếu** to click visual movie cards and add or delete showtimes.
-4. **Checkout:** Select movie seats and checkout to test automatic invoice and PDF ticket generation.
-
----
-
-## 🐙 Author
+## 🐙 Tác Giả & Bản Quyền
 
 * **GitHub:** [@vtgh04](https://github.com/vtgh04)
 * **Email:** vtgh1602@gmail.com
 
----
-*If you find this project helpful, please drop a ⭐ on the repository!*
+*Nếu dự án này giúp ích cho bạn, hãy tặng 1 ⭐ trên repository nhé!*

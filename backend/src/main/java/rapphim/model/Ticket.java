@@ -30,6 +30,19 @@ public class Ticket implements Serializable {
     @Column(name = "status")
     private String status;
 
+    @Transient
+    private String movieTitle;
+
+    @Transient
+    private String startTime;
+
+    @Transient
+    private String hallId;
+
+    @Transient
+    private String seatLabel;
+
+
     public Ticket() {
         this.status = "VALID";
     }
@@ -98,6 +111,38 @@ public class Ticket implements Serializable {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getMovieTitle() {
+        return movieTitle;
+    }
+
+    public void setMovieTitle(String movieTitle) {
+        this.movieTitle = movieTitle;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getHallId() {
+        return hallId;
+    }
+
+    public void setHallId(String hallId) {
+        this.hallId = hallId;
+    }
+
+    public String getSeatLabel() {
+        return seatLabel;
+    }
+
+    public void setSeatLabel(String seatLabel) {
+        this.seatLabel = seatLabel;
     }
 
     @Override

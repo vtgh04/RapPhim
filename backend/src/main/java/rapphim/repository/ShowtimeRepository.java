@@ -18,6 +18,8 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, String> {
 
     List<Showtime> findByStartTimeBetweenOrderByMovieIdAscStartTimeAsc(LocalDateTime start, LocalDateTime end);
 
+    List<Showtime> findByMovieId(String movieId);
+
     @Query("SELECT COUNT(s) FROM Showtime s WHERE s.hallId = :hallId AND s.status != rapphim.model.enums.ShowtimeStatus.CANCELLED AND s.startTime < :endTime AND s.endTime > :startTime")
     long countOverlappingShowtimes(@Param("hallId") String hallId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
@@ -34,6 +36,8 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, String> {
     int autoUpdateScheduled(@Param("now") LocalDateTime now);
 
     long countByStatus(ShowtimeStatus status);
+
+    long countByHallIdAndStatus(String hallId, ShowtimeStatus status);
 
     @Query("SELECT COUNT(DISTINCT s.hallId) FROM Showtime s WHERE s.status IN (rapphim.model.enums.ShowtimeStatus.SCHEDULED, rapphim.model.enums.ShowtimeStatus.ONGOING)")
     long countActiveHalls();

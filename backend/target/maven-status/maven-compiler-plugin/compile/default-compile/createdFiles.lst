@@ -1,3 +1,4 @@
+rapphim\controller\ReviewController.class
 rapphim\util\ShowtimeExcelUtils.class
 rapphim\service\MovieService.class
 rapphim\security\JwtAuthenticationFilter.class
@@ -6,6 +7,7 @@ rapphim\repository\ShowSeatRepository.class
 rapphim\service\AuthService.class
 rapphim\config\WebConfig.class
 rapphim\security\JwtTokenProvider.class
+rapphim\controller\SeatStatusController.class
 rapphim\service\BookingService.class
 rapphim\model\enums\EmployeeStatus.class
 rapphim\config\OpenApiConfig.class
@@ -20,6 +22,7 @@ rapphim\controller\AuthController$1.class
 rapphim\service\ShowtimeService.class
 rapphim\util\MovieExcelUtils$1.class
 rapphim\model\Seat.class
+rapphim\repository\ReviewRepository.class
 rapphim\repository\InvoiceRepository.class
 rapphim\model\enums\EmployeeRole.class
 rapphim\model\enums\Payment.class
@@ -30,6 +33,7 @@ rapphim\service\payment\CashStrategy.class
 rapphim\util\TicketsExporter.class
 rapphim\model\dto\RegisterRequest.class
 rapphim\config\SecurityConfig.class
+rapphim\config\WebSocketConfig.class
 rapphim\model\enums\CinemaHallStatus.class
 rapphim\event\SeatBookedEvent.class
 rapphim\controller\EmployeeController.class
@@ -38,6 +42,7 @@ rapphim\repository\DiscountRepository.class
 rapphim\controller\TestController.class
 rapphim\model\Showtime.class
 rapphim\service\DiscountService.class
+rapphim\model\Review.class
 rapphim\service\HallService.class
 rapphim\model\Ticket.class
 rapphim\model\CinemaHall.class
@@ -59,6 +64,7 @@ rapphim\controller\BookingController.class
 rapphim\controller\CinemaHallController.class
 rapphim\service\AuthService$AuthError.class
 rapphim\controller\DiscountController.class
+rapphim\config\DatabaseInitializer.class
 rapphim\repository\EmployeeRepository.class
 rapphim\service\DashboardService.class
 rapphim\model\Invoice.class

@@ -2,6 +2,7 @@ C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\util\
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\repository\ShowtimeRepository.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\TestController.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\ShowtimeController.java
+C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\ReviewController.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\enums\ShowSeatStatus.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\service\MovieService.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\repository\TicketRepository.java
@@ -23,6 +24,7 @@ C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\contr
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\enums\Payment.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\util\InvoiceExcelUtils.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\repository\InvoiceRepository.java
+C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\config\DatabaseInitializer.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\enums\InvoiceStatus.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\service\payment\PaymentStrategy.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\BookingController.java
@@ -40,6 +42,7 @@ C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\repos
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\CinemaHallController.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\service\payment\PaymentService.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\Ticket.java
+C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\repository\ReviewRepository.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\util\InvoicePdfExporter.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\dto\LoginRequest.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\config\TestConnection.java
@@ -54,8 +57,10 @@ C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\repos
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\config\WebConfig.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\dto\RefreshTokenRequest.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\service\DashboardService.java
+C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\Review.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\AuthController.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\service\ShowtimeService.java
+C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\config\WebSocketConfig.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\service\AuthService.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\enums\ShowtimeStatus.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\MovieController.java
@@ -69,4 +74,5 @@ C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\config\SecurityConfig.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\util\MovieExcelUtils.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\event\SeatBookedEvent.java
+C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\SeatStatusController.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\enums\EmployeeRole.java

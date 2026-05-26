@@ -1,17 +1,2 @@
-import React from 'react'
-
-export default function Spinner({ size = 'md', className = '' }) {
-  const sizeClasses = {
-    sm: 'w-5 h-5 border-2',
-    md: 'w-8 h-8 border-3',
-    lg: 'w-12 h-12 border-4',
-  }
-
-  return (
-    <div className={`flex items-center justify-center ${className}`}>
-      <div
-        className={`${sizeClasses[size] || sizeClasses.md} border-t-brand border-r-transparent border-b-brand border-l-transparent rounded-full animate-spin`}
-      />
-    </div>
-  )
-}
+// Deprecated: Moved to src/components/ui/Spinner.jsx
+export { default } from '../components/ui/Spinner';

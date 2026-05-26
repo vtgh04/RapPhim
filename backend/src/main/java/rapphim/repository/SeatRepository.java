@@ -9,4 +9,5 @@ import java.util.List;
 public interface SeatRepository extends JpaRepository<Seat, String> {
     List<Seat> findByHallIdOrderByRowCharAscColNumberAsc(String hallId);
     List<Seat> findByHallIdAndIsBrokenFalse(String hallId);
+    void deleteByHallId(String hallId);
 }

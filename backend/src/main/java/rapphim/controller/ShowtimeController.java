@@ -85,4 +85,15 @@ public class ShowtimeController {
         showtimeService.deleteShowtime(id);
         return ResponseEntity.ok().build();
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Showtime> updateShowtime(@PathVariable String id, @Valid @RequestBody Showtime showtime) {
+        Showtime st = showtimeService.getShowtimeById(id);
+        if (st == null) {
+            return ResponseEntity.notFound().build();
+        }
+        showtime.setShowtimeId(id);
+        // If status or price is updated, we can apply business rules if needed
+        return ResponseEntity.ok(showtimeService.updateInfo(showtime));
+    }
 }

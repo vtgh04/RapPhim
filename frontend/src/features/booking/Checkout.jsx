@@ -3,8 +3,8 @@ import { useSearchParams, useNavigate, Link } from 'react-router-dom'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { motion, AnimatePresence } from 'framer-motion'
 import api from '../../services/api'
-import Spinner from '../../shared/Spinner'
-import { ChevronLeft, Landmark, CreditCard, Ticket, CheckCircle, FileText, Gift, Info } from 'lucide-react'
+import Spinner from '../../components/ui/Spinner'
+import { ChevronLeft, Landmark, CreditCard, Ticket, CheckCircle, FileText, Gift, Info, Download } from 'lucide-react'
 
 export default function Checkout() {
   const [searchParams] = useSearchParams()
@@ -138,6 +138,40 @@ export default function Checkout() {
     })
   }
 
+  const handleDownloadInvoice = async (invoiceId) => {
+    try {
+      const response = await api.get(`/bookings/invoices/${invoiceId}/pdf`, {
+        responseType: 'blob'
+      })
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `invoice_${invoiceId}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (err) {
+      // Handled by global toast interceptor
+    }
+  }
+
+  const handleDownloadTickets = async (invoiceId) => {
+    try {
+      const response = await api.get(`/bookings/invoices/${invoiceId}/tickets/pdf`, {
+        responseType: 'blob'
+      })
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', `tickets_${invoiceId}.pdf`)
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+    } catch (err) {
+      // Handled by global toast interceptor
+    }
+  }
+
   if (checkoutSuccess) {
     return (
       <div className="flex items-center justify-center min-h-[70vh]">
@@ -149,13 +183,23 @@ export default function Checkout() {
           {/* Accent decoration */}
           <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-green-500 via-emerald-400 to-green-500" />
           
-          <div className="flex items-center justify-center w-20 h-20 bg-emerald-500/10 text-emerald-400 rounded-full mx-auto shadow-2xl">
-            <CheckCircle size={48} />
+          <div className="flex items-center justify-center w-16 h-16 bg-emerald-500/10 text-emerald-400 rounded-full mx-auto shadow-2xl">
+            <CheckCircle size={36} />
           </div>
 
-          <div className="space-y-2">
-            <h2 className="text-3xl font-black text-white">THANH TOÁN THÀNH CÔNG!</h2>
-            <p className="text-sm text-slate-400">Giao dịch đã được hệ thống ghi nhận thành công.</p>
+          <div className="space-y-1">
+            <h2 className="text-2xl font-black text-white">THANH TOÁN THÀNH CÔNG!</h2>
+            <p className="text-xs text-slate-400">Giao dịch đã được hệ thống ghi nhận thành công.</p>
+          </div>
+
+          {/* Dynamic QR Code */}
+          <div className="p-4 bg-white/5 border border-white/10 rounded-2xl max-w-[180px] mx-auto shadow-inner flex flex-col items-center justify-center gap-2">
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${checkoutSuccess.invoiceId}`}
+              alt="E-ticket QR Code"
+              className="w-[130px] h-[130px] rounded-lg border-2 border-white bg-white"
+            />
+            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">MÃ QR NHẬN VÉ</span>
           </div>
 
           {/* Bill summary card */}
@@ -182,9 +226,22 @@ export default function Checkout() {
             </div>
           </div>
 
-          <div className="flex items-center justify-center gap-2 p-3.5 bg-brand/10 border border-brand/15 rounded-xl text-xs text-brand font-bold max-w-md mx-auto">
-            <FileText size={14} className="flex-shrink-0" />
-            <span>Hóa đơn PDF và vé xem phim (PDF) đã được xuất thành công vào thư mục `invoice/` của server!</span>
+          {/* PDF Downloads */}
+          <div className="flex gap-3 justify-center max-w-md mx-auto pt-1">
+            <button
+              onClick={() => handleDownloadInvoice(checkoutSuccess.invoiceId)}
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-slate-900 border border-slate-800 text-xs font-bold rounded-xl text-slate-300 hover:text-white hover:border-slate-700 transition-all cursor-pointer shadow-md"
+            >
+              <Download size={14} />
+              Tải hóa đơn
+            </button>
+            <button
+              onClick={() => handleDownloadTickets(checkoutSuccess.invoiceId)}
+              className="flex-1 flex items-center justify-center gap-2 py-3 bg-brand/10 border border-brand/20 text-xs font-bold rounded-xl text-brand hover:bg-brand/20 transition-all cursor-pointer shadow-md"
+            >
+              <Download size={14} />
+              Tải vé xem phim
+            </button>
           </div>
 
           <div className="pt-4">

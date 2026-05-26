@@ -8,7 +8,9 @@ import rapphim.model.enums.CinemaHallStatus;
 import rapphim.model.enums.SeatType;
 import rapphim.repository.CinemaHallRepository;
 import rapphim.repository.SeatRepository;
+import rapphim.repository.ShowtimeRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -16,10 +18,14 @@ public class HallService {
 
     private final CinemaHallRepository cinemaHallRepository;
     private final SeatRepository seatRepository;
+    private final ShowtimeRepository showtimeRepository;
 
-    public HallService(CinemaHallRepository cinemaHallRepository, SeatRepository seatRepository) {
+    public HallService(CinemaHallRepository cinemaHallRepository,
+                       SeatRepository seatRepository,
+                       ShowtimeRepository showtimeRepository) {
         this.cinemaHallRepository = cinemaHallRepository;
         this.seatRepository = seatRepository;
+        this.showtimeRepository = showtimeRepository;
     }
 
     public List<CinemaHall> getAllHalls() {
@@ -86,5 +92,49 @@ public class HallService {
             throw new IllegalArgumentException("Danh sách ghế không hợp lệ.");
         }
         seatRepository.saveAll(seats);
+    }
+
+    /**
+     * Creates a new cinema hall and auto-generates seats row by row.
+     * Rows are labeled A, B, C... up to totalRows.
+     * All seats default to STANDARD type with seatFactor=1.0.
+     */
+    @Transactional
+    public CinemaHall createHall(CinemaHall hall) {
+        if (cinemaHallRepository.existsById(hall.getHallId())) {
+            throw new IllegalArgumentException("Mã phòng đã tồn tại: " + hall.getHallId());
+        }
+        hall.setStatus(CinemaHallStatus.ACTIVE);
+        cinemaHallRepository.save(hall);
+
+        List<Seat> seats = new ArrayList<>();
+        for (int r = 0; r < hall.getTotalRows(); r++) {
+            char rowChar = (char) ('A' + r);
+            for (int c = 1; c <= hall.getTotalCols(); c++) {
+                String seatId = hall.getHallId() + "-" + rowChar + c;
+                // Last 2 rows are VIP
+                SeatType type = (r >= hall.getTotalRows() - 2) ? SeatType.VIP : SeatType.REGULAR;
+                double factor = type == SeatType.VIP ? 1.5 : 1.0;
+                seats.add(new Seat(seatId, hall.getHallId(), rowChar, c, type, factor));
+            }
+        }
+        seatRepository.saveAll(seats);
+        return hall;
+    }
+
+    /**
+     * Deletes a hall and all its seats.
+     * Refuses if there are SCHEDULED showtimes linked to this hall.
+     */
+    @Transactional
+    public void deleteHall(String hallId) {
+        long scheduled = showtimeRepository.countByHallIdAndStatus(hallId,
+                rapphim.model.enums.ShowtimeStatus.SCHEDULED);
+        if (scheduled > 0) {
+            throw new IllegalStateException(
+                "Không thể xóa phòng " + hallId + " vì còn " + scheduled + " suất chiếu đang lên lịch.");
+        }
+        seatRepository.deleteByHallId(hallId);
+        cinemaHallRepository.deleteById(hallId);
     }
 }

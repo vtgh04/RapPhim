@@ -41,4 +41,13 @@ public class MovieController {
         movie.setMovieId(id);
         return ResponseEntity.ok(movieService.updateMovie(movie));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteMovie(@PathVariable String id) {
+        if (!movieService.getMovieById(id).isPresent()) {
+            return ResponseEntity.notFound().build();
+        }
+        movieService.deleteMovie(id);
+        return ResponseEntity.ok().build();
+    }
 }

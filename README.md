@@ -22,7 +22,6 @@ Tài liệu hợp nhất này bao gồm:
 1. **Tài liệu Yêu cầu Nghiệp vụ (BRD):** Bối cảnh, mục tiêu chiến lược, sơ đồ phân quyền Stakeholders, phạm vi (In-scope/Out-of-scope) và các chỉ số KPIs.
 2. **Đặc tả Yêu cầu Phần mềm (SRS):** Danh sách User Stories, Luật nghiệp vụ tính giá vé & kiểm tra trùng lịch chiếu, Đặc tả Use Case và luồng đi Sequence.
 3. **Thiết kế Cơ sở Dữ liệu & Class:** Sơ đồ ERD chuẩn hóa 3NF của 9 bảng cơ sở dữ liệu và cách ánh xạ Entities trong JPA Hibernate.
-4. **9 Sơ đồ SVG Trực quan:** Hệ thống các sơ đồ kiến trúc, cơ sở dữ liệu, Use Case, Sequence, cấu trúc thư mục được thiết kế bằng SVG.
 
 ---
 
@@ -65,6 +64,29 @@ Bố cục cấu trúc phân vùng nghiệp vụ và tổ chức mã nguồn chu
 * **Xuất hoá đơn & Vé PDF chứa Barcode:** Sử dụng Apache POI và iText xuất hoá đơn kèm vé có mã vạch sẵn sàng phục vụ kiểm vé.
 * **Dashboard Biểu đồ SVG Động:** Dashboard thống kê doanh thu, cơ cấu vé bán hiển thị bằng biểu đồ SVG do hệ thống tự tính toán toạ độ vẽ, không phụ thuộc vào thư viện bên thứ ba.
 * **Đa ngôn ngữ (i18n):** Chuyển đổi ngôn ngữ Việt - Anh tức thời trên toàn bộ giao diện.
+
+---
+
+## 🖥️ Giao Diện Ứng Dụng (User Interfaces)
+
+### 1. Trang Chủ & Danh Sách Phim (Main Landing Page)
+Giao diện trang chủ hiển thị danh sách các bộ phim đang hoạt động với hiệu ứng hover mượt mà, tích hợp thanh tìm kiếm toàn cục thông minh (phím tắt `Ctrl + K` hoặc `⌘ + K`) và cụm chuyển đổi đa ngôn ngữ/chế độ sáng tối tức thì.
+
+![Trang chủ hiển thị danh sách phim](docs/assets/diagrams/Page.png)
+
+---
+
+### 2. Giao Diện Đặt Vé POS & Bản Đồ Ghế (Ticket Booking Seat Map)
+Giao diện bán vé tại quầy (POS) cho nhân viên rạp. Sơ đồ ghế ngồi được vẽ động hoàn toàn dựa trên kích thước phòng chiếu cứng, tự động phân loại màu sắc loại ghế VIP (vàng)/Thường (slate), nhận diện ghế hỏng (xám gạch chéo), ghế đã được người khác đặt (đỏ) và phát sóng đồng bộ trạng thái khóa ghế tạm thời (LIVE) qua kết nối WebSocket.
+
+![Giao diện chọn ghế POS](docs/assets/diagrams/Buy%20Tickets.png)
+
+---
+
+### 3. Bảng Quản Trị & Biểu Đồ Thống Kê (Manager Dashboard & SVG Charts)
+Bảng điều khiển dành cho Quản lý rạp, tích hợp các thẻ thống kê tổng quan doanh thu/vé bán và bộ biểu đồ SVG động do hệ thống tự tính toán tọa độ vẽ (dạng Cột, Đường, Miền và Biểu đồ Tròn thị phần) cập nhật dữ liệu thời gian thực.
+
+![Bảng điều khiển quản lý và biểu đồ](docs/assets/diagrams/Manager.png)
 
 ---
 

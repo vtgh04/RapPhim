@@ -13,49 +13,81 @@
 
 ---
 
-## 📑 Thư Mục Tài Liệu Phân Tích Nghiệp Vụ & Thiết Kế (BA Docs)
+## 📑 Tài Liệu Phân Tích Nghiệp Vụ & Thiết Kế Hệ Thống Hợp Nhất (BA Docs)
 
-Hệ thống được thiết kế và đặc tả chuyên nghiệp theo chuẩn tài liệu BA. Bạn có thể truy cập các tài liệu chi tiết tại đây:
-1. **[Tài liệu Yêu cầu Nghiệp vụ (BRD)](docs/1.BRD/BRD.md):** Bối cảnh, mục tiêu chiến lược, sơ đồ phân quyền Stakeholders, phạm vi (In-scope/Out-of-scope) và các chỉ số KPIs đánh giá hiệu năng hệ thống.
-2. **[Đặc tả Yêu cầu Phần mềm (SRS)](docs/2.SRS/SRS.md):** Danh sách User Stories, Luật nghiệp vụ tính giá vé & kiểm tra trùng lịch chiếu, Đặc tả Use Case và luồng đi chi tiết của hệ thống.
-3. **[Thiết kế Cơ sở Dữ liệu & Class](docs/3.System_Design/Database_Design.md):** Từ điển dữ liệu chi tiết của 9 bảng, đặc tả khoá chính/ngoại, kiểu dữ liệu và cách ánh xạ đối tượng Entity JPA của Hibernate.
+Hệ thống được thiết kế, đặc tả chuyên nghiệp theo chuẩn tài liệu BA và đã được hợp nhất thành một tài liệu duy nhất để dễ quản lý, theo dõi:
+* **[Tài liệu Nghiệp vụ & Thiết Kế Hệ Thống Chi Tiết (DOCUMENTATION.md)](docs/DOCUMENTATION.md)**
+
+Tài liệu hợp nhất này bao gồm:
+1. **Tài liệu Yêu cầu Nghiệp vụ (BRD):** Bối cảnh, mục tiêu chiến lược, sơ đồ phân quyền Stakeholders, phạm vi (In-scope/Out-of-scope) và các chỉ số KPIs.
+2. **Đặc tả Yêu cầu Phần mềm (SRS):** Danh sách User Stories, Luật nghiệp vụ tính giá vé & kiểm tra trùng lịch chiếu, Đặc tả Use Case và luồng đi Sequence.
+3. **Thiết kế Cơ sở Dữ liệu & Class:** Sơ đồ ERD chuẩn hóa 3NF của 9 bảng cơ sở dữ liệu và cách ánh xạ Entities trong JPA Hibernate.
+4. **9 Sơ đồ SVG Trực quan:** Hệ thống các sơ đồ kiến trúc, cơ sở dữ liệu, Use Case, Sequence, cấu trúc thư mục được thiết kế bằng SVG.
 
 ---
 
 ## 🎨 Sơ Đồ Hệ Thống Trực Quan (SVG Diagrams)
 
-### 1. Kiến Trúc Tổng Quan (System Architecture)
-Mô hình 4 lớp (Client SPA, Security/API Gateway, Core Service, Data Layer) cùng cơ chế giao tiếp HTTP REST và Realtime WebSocket.
+### 1. Công Nghệ Sử Dụng (Technology Stack)
+Các công nghệ cốt lõi của Frontend client, Backend API, Database và Realtime Engine.
+
+![Công nghệ sử dụng](docs/assets/diagrams/tech_stack.svg)
+
+---
+
+### 2. Kiến Trúc Chi Tiết / Cấu Trúc Các Lớp (Project Architecture Topology)
+Mô hình kết nối HTTPS REST API và đồng bộ WebSocket STOMP thời gian thực.
+
+![Kiến trúc chi tiết](docs/assets/diagrams/project_architecture.svg)
+
+---
+
+### 3. Kiến Trúc Tổng Quan (System Architecture Overview)
+Phân lớp hệ thống từ Client UI, Security Gateway, Core Service đến Data Storage.
 
 ![Sơ đồ tổng quan kiến trúc](docs/assets/diagrams/overview.svg)
 
 ---
 
-### 2. Sơ đồ Use Case phân quyền người dùng (Use Case Diagram)
+### 4. Sơ đồ Use Case phân quyền người dùng (Use Case Diagram)
 Phân quyền chức năng rạch ròi giữa vai trò Quản lý (Manager) và Nhân viên bán vé (Staff).
 
 ![Sơ đồ Use Case](docs/assets/diagrams/use_case.svg)
 
 ---
 
-### 3. Sơ đồ Trình tự Đặt Vé & Thanh Toán (Sequence Diagram)
+### 5. Sơ đồ Trình tự Đặt Vé & Thanh Toán (Sequence Diagram)
 Trình tự tương tác giữa Nhân viên quầy, Client, WebSocket Broker, Server và Database trong suốt vòng đời chọn ghế, khóa ghế tạm thời và checkout in hóa đơn.
 
 ![Sơ đồ Trình tự](docs/assets/diagrams/sequence.svg)
 
 ---
 
-### 4. Sơ đồ Thực Thể Quan Hệ (Entity Relationship Diagram - ERD)
+### 6. Sơ đồ Thực Thể Quan Hệ (Entity Relationship Diagram - ERD)
 Cơ sở dữ liệu được chuẩn hoá 3NF của hệ thống chạy trên Microsoft SQL Server.
 
 ![Sơ đồ ERD](docs/assets/diagrams/erd.svg)
 
 ---
 
-### 5. Sơ đồ Lớp Thực Thể (Domain Class Diagram)
+### 7. Sơ đồ Cơ Sở Dữ Liệu Quan Hệ (Database Relational Schema)
+Đặc tả chi tiết cấu trúc khoá chính, khoá ngoại và liên kết bảng.
+
+![Sơ đồ thiết kế database](docs/assets/diagrams/database_design.svg)
+
+---
+
+### 8. Sơ đồ Lớp Thực Thể (Domain Class Diagram)
 Cấu trúc lớp Domain JPA Entity trong Spring Boot Backend mô tả đầy đủ các thuộc tính và quan hệ liên kết.
 
 ![Sơ đồ Class Diagram](docs/assets/diagrams/class_diagram.svg)
+
+---
+
+### 9. Cấu Trúc Thư Mục Dự Án (Project Folder Structure)
+Bố cục cấu trúc phân vùng nghiệp vụ và tổ chức mã nguồn chuẩn hóa.
+
+![Sơ đồ cấu trúc thư mục](docs/assets/diagrams/folder_structure.svg)
 
 ---
 

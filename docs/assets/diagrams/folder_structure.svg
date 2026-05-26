@@ -1,0 +1,174 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 700" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="100%" stop-color="#1e293b" />
+    </linearGradient>
+
+    <!-- Folder/File Gradients -->
+    <linearGradient id="folderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8" />
+      <stop offset="100%" stop-color="#0284c7" />
+    </linearGradient>
+    <linearGradient id="fileGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <linearGradient id="confGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="700" rx="12" fill="url(#bgGrad)" />
+  <rect width="900" height="700" rx="12" fill="none" stroke="#334155" stroke-width="2" />
+
+  <!-- Title -->
+  <text x="450" y="45" font-family="'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="bold" fill="#f8fafc" text-anchor="middle" letter-spacing="1">
+    SƠ ĐỒ CẤU TRÚC THƯ MỤC DỰ ÁN (PROJECT STRUCTURE)
+  </text>
+  <line x1="380" y1="55" x2="520" y2="55" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Icons Templates -->
+  <!-- Folder Icon Template: Draw using <g id="folderIcon"> -->
+  <g id="folderIcon" transform="scale(0.8)">
+    <path d="M 2 4 C 2 2.9, 2.9 2, 4 2 L 10 2 L 13 5 L 22 5 C 23.1 5, 24 5.9, 24 7 L 24 20 C 24 21.1, 23.1 22, 22 22 L 4 22 C 2.9 22, 2 21.1, 2 20 Z" fill="url(#folderGrad)" />
+  </g>
+  <!-- File Icon Template -->
+  <g id="fileIcon" transform="scale(0.8)">
+    <path d="M 6 2 C 4.9 2, 4 2.9, 4 4 L 4 20 C 4 21.1, 4.9 22, 6 22 L 18 22 C 19.1 22, 20 21.1, 20 20 L 20 8 L 14 2 L 6 2 Z" fill="url(#fileGrad)" />
+    <path d="M 14 2 L 14 8 L 20 8 Z" fill="#a7f3d0" opacity="0.8" />
+  </g>
+  <!-- Config File Icon Template -->
+  <g id="configIcon" transform="scale(0.8)">
+    <path d="M 6 2 C 4.9 2, 4 2.9, 4 4 L 4 20 C 4 21.1, 4.9 22, 6 22 L 18 22 C 19.1 22, 20 21.1, 20 20 L 20 8 L 14 2 L 6 2 Z" fill="url(#confGrad)" />
+    <path d="M 14 2 L 14 8 L 20 8 Z" fill="#fde68a" opacity="0.8" />
+  </g>
+
+  <!-- TREE GRAPHICS -->
+  <!-- Root: RapPhim -->
+  <g transform="translate(40, 90)" filter="url(#shadow)">
+    <use href="#folderIcon" x="0" y="0" />
+    <text x="25" y="16" font-family="Consolas, monospace" font-size="14" font-weight="bold" fill="#f8fafc">RapPhim/ (Project Root)</text>
+  </g>
+
+  <!-- Connecting Lines -->
+  <!-- Vertical lines from root -->
+  <line x1="50" y1="110" x2="50" y2="640" stroke="#475569" stroke-width="1.5" />
+
+  <!-- Backend Branch (x=80) -->
+  <!-- Horizontal line to Backend -->
+  <line x1="50" y1="140" x2="80" y2="140" stroke="#475569" stroke-width="1.5" />
+  <g transform="translate(80, 130)" filter="url(#shadow)">
+    <use href="#folderIcon" />
+    <text x="25" y="16" font-family="Consolas, monospace" font-size="13" font-weight="bold" fill="#38bdf8">backend/ (Spring Boot App)</text>
+  </g>
+  
+  <!-- Backend Sub-branches vertical line -->
+  <line x1="95" y1="150" x2="95" y2="350" stroke="#475569" stroke-width="1.2" />
+
+  <!-- backend/database -->
+  <line x1="95" y1="180" x2="120" y2="180" stroke="#475569" stroke-width="1.2" />
+  <g transform="translate(120, 170)">
+    <use href="#folderIcon" />
+    <text x="25" y="15" font-family="Consolas, monospace" font-size="12" fill="#94a3b8">database/scripts/ (Database.sql &amp; Seed.sql)</text>
+  </g>
+
+  <!-- backend/src/main/resources -->
+  <line x1="95" y1="210" x2="120" y2="210" stroke="#475569" stroke-width="1.2" />
+  <g transform="translate(120, 200)">
+    <use href="#folderIcon" />
+    <text x="25" y="15" font-family="Consolas, monospace" font-size="12" fill="#94a3b8">src/main/resources/ (application.properties)</text>
+  </g>
+
+  <!-- backend/src/main/java/rapphim -->
+  <line x1="95" y1="240" x2="120" y2="240" stroke="#475569" stroke-width="1.2" />
+  <g transform="translate(120, 230)">
+    <use href="#folderIcon" />
+    <text x="25" y="15" font-family="Consolas, monospace" font-size="12" fill="#e2e8f0" font-weight="bold">src/main/java/rapphim/ (Java Packages)</text>
+  </g>
+
+  <!-- Java packages detailed list -->
+  <line x1="135" y1="250" x2="135" y2="320" stroke="#475569" stroke-width="1" stroke-dasharray="2,2" />
+  
+  <line x1="135" y1="270" x2="155" y2="270" stroke="#475569" stroke-width="1" />
+  <text x="160" y="274" font-family="Consolas, monospace" font-size="11" fill="#64748b">config/ , controller/ , event/ , model/</text>
+
+  <line x1="135" y1="300" x2="155" y2="300" stroke="#475569" stroke-width="1" />
+  <text x="160" y="304" font-family="Consolas, monospace" font-size="11" fill="#64748b">repository/ , security/ , service/ , util/</text>
+
+  <!-- backend/pom.xml -->
+  <line x1="95" y1="340" x2="120" y2="340" stroke="#475569" stroke-width="1.2" />
+  <g transform="translate(120, 330)">
+    <use href="#configIcon" />
+    <text x="25" y="15" font-family="Consolas, monospace" font-size="12" fill="#f59e0b">pom.xml (Maven dependencies)</text>
+  </g>
+
+
+  <!-- Frontend Branch (x=80) -->
+  <!-- Horizontal line to Frontend -->
+  <line x1="50" y1="390" x2="80" y2="390" stroke="#475569" stroke-width="1.5" />
+  <g transform="translate(80, 380)" filter="url(#shadow)">
+    <use href="#folderIcon" />
+    <text x="25" y="16" font-family="Consolas, monospace" font-size="13" font-weight="bold" fill="#38bdf8">frontend/ (React Client SPA)</text>
+  </g>
+
+  <!-- Frontend Sub-branches vertical line -->
+  <line x1="95" y1="400" x2="95" y2="560" stroke="#475569" stroke-width="1.2" />
+
+  <!-- frontend/src -->
+  <line x1="95" y1="430" x2="120" y2="430" stroke="#475569" stroke-width="1.2" />
+  <g transform="translate(120, 420)">
+    <use href="#folderIcon" />
+    <text x="25" y="15" font-family="Consolas, monospace" font-size="12" fill="#e2e8f0" font-weight="bold">src/ (Source files)</text>
+  </g>
+
+  <!-- Frontend src subfolders detailed -->
+  <line x1="135" y1="440" x2="135" y2="500" stroke="#475569" stroke-width="1" stroke-dasharray="2,2" />
+  
+  <line x1="135" y1="460" x2="155" y2="460" stroke="#475569" stroke-width="1" />
+  <text x="160" y="464" font-family="Consolas, monospace" font-size="11" fill="#64748b">features/ (auth, booking, dashboard)</text>
+
+  <line x1="135" y1="485" x2="155" y2="485" stroke="#475569" stroke-width="1" />
+  <text x="160" y="489" font-family="Consolas, monospace" font-size="11" fill="#64748b">hooks/ , components/ , store/ , services/</text>
+
+  <!-- frontend/package.json -->
+  <line x1="95" y1="520" x2="120" y2="520" stroke="#475569" stroke-width="1.2" />
+  <g transform="translate(120, 510)">
+    <use href="#configIcon" />
+    <text x="25" y="15" font-family="Consolas, monospace" font-size="12" fill="#f59e0b">package.json (Vite scripts &amp; npm packages)</text>
+  </g>
+
+  <!-- frontend/vite.config.js -->
+  <line x1="95" y1="550" x2="120" y2="550" stroke="#475569" stroke-width="1.2" />
+  <g transform="translate(120, 540)">
+    <use href="#configIcon" />
+    <text x="25" y="15" font-family="Consolas, monospace" font-size="12" fill="#f59e0b">vite.config.js (Vite configuration &amp; Proxy)</text>
+  </g>
+
+
+  <!-- Docs Branch (x=80) -->
+  <!-- Horizontal line to Docs -->
+  <line x1="50" y1="600" x2="80" y2="600" stroke="#475569" stroke-width="1.5" />
+  <g transform="translate(80, 590)" filter="url(#shadow)">
+    <use href="#folderIcon" />
+    <text x="25" y="16" font-family="Consolas, monospace" font-size="13" font-weight="bold" fill="#38bdf8">docs/ (Tài liệu BA &amp; Thiết kế Hệ thống)</text>
+  </g>
+
+  <!-- Docs sub-branches vertical line -->
+  <line x1="95" y1="610" x2="95" y2="650" stroke="#475569" stroke-width="1.2" />
+
+  <!-- docs/1.BRD, 2.SRS, 3.System_Design -->
+  <line x1="95" y1="630" x2="120" y2="630" stroke="#475569" stroke-width="1.2" />
+  <g transform="translate(120, 620)">
+    <use href="#fileIcon" />
+    <text x="25" y="15" font-family="Consolas, monospace" font-size="12" fill="#10b981">BRD.md , SRS.md , Database_Design.md , Folder_Structure.md</text>
+  </g>
+
+</svg>

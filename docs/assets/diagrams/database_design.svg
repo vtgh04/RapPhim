@@ -1,0 +1,229 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 580" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="tblHdr" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1e293b"/>
+      <stop offset="100%" stop-color="#2d3f55"/>
+    </linearGradient>
+    <marker id="crow" viewBox="0 0 12 12" refX="10" refY="6" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 2 L10 6 L0 10 M10 2 L10 10" fill="none" stroke="#64748b" stroke-width="1.5"/>
+    </marker>
+    <marker id="one" viewBox="0 0 12 12" refX="2" refY="6" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <line x1="4" y1="2" x2="4" y2="10" stroke="#64748b" stroke-width="1.5"/>
+      <line x1="7" y1="2" x2="7" y2="10" stroke="#64748b" stroke-width="1.5"/>
+    </marker>
+    <filter id="glow">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1100" height="580" rx="20" fill="url(#bg)"/>
+  <rect width="1100" height="580" rx="20" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- Title -->
+  <text x="550" y="44" font-family="'Segoe UI',Roboto,sans-serif" font-size="11" fill="#475569" text-anchor="middle" letter-spacing="3">SCHEMA DESIGN — 3NF NORMALIZED</text>
+  <text x="550" y="72" font-family="'Segoe UI',Roboto,sans-serif" font-size="24" font-weight="900" fill="#f8fafc" text-anchor="middle">RELATIONAL DATABASE SCHEMA</text>
+  <rect x="460" y="80" width="180" height="3" rx="2" fill="#38bdf8"/>
+
+  <!-- ================================================================
+       TABLE MACRO:  X Y W H  color  icon+name  fields…
+       ================================================================ -->
+
+  <!-- TABLE: employees (40,100) -->
+  <g transform="translate(30,100)" filter="url(#glow)">
+    <rect width="190" height="185" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="190" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="190" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">👤 employees</text>
+    <line x1="0" y1="36" x2="190" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 employee_id  PK</text>
+      <text x="10" y="78" fill="#e2e8f0">   full_name</text>
+      <text x="10" y="98" fill="#e2e8f0">   username</text>
+      <text x="10" y="118" fill="#e2e8f0">   password</text>
+      <text x="10" y="138" fill="#e2e8f0">   role</text>
+      <text x="10" y="158" fill="#e2e8f0">   status</text>
+      <text x="10" y="178" fill="#e2e8f0">   email</text>
+    </g>
+  </g>
+
+  <!-- TABLE: movies (280,100) -->
+  <g transform="translate(270,100)" filter="url(#glow)">
+    <rect width="190" height="205" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="190" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="190" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">🎬 movies</text>
+    <line x1="0" y1="36" x2="190" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 movie_id     PK</text>
+      <text x="10" y="78" fill="#e2e8f0">   title</text>
+      <text x="10" y="98" fill="#e2e8f0">   genre</text>
+      <text x="10" y="118" fill="#e2e8f0">   duration_mins</text>
+      <text x="10" y="138" fill="#e2e8f0">   format_movie</text>
+      <text x="10" y="158" fill="#e2e8f0">   rating</text>
+      <text x="10" y="178" fill="#e2e8f0">   status</text>
+      <text x="10" y="198" fill="#e2e8f0">   poster_url</text>
+    </g>
+  </g>
+
+  <!-- TABLE: reviews (520,100) -->
+  <g transform="translate(510,100)" filter="url(#glow)">
+    <rect width="190" height="165" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="190" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="190" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">⭐ reviews</text>
+    <line x1="0" y1="36" x2="190" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 review_id    PK</text>
+      <text x="10" y="78" fill="#a855f7">🔗 movie_id     FK</text>
+      <text x="10" y="98" fill="#e2e8f0">   user_id</text>
+      <text x="10" y="118" fill="#e2e8f0">   rating (1-5)</text>
+      <text x="10" y="138" fill="#e2e8f0">   comment</text>
+      <text x="10" y="158" fill="#e2e8f0">   created_at</text>
+    </g>
+  </g>
+
+  <!-- TABLE: cinema_halls (770,100) -->
+  <g transform="translate(760,100)" filter="url(#glow)">
+    <rect width="200" height="165" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="200" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="200" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">🏢 cinema_halls</text>
+    <line x1="0" y1="36" x2="200" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 hall_id      PK</text>
+      <text x="10" y="78" fill="#e2e8f0">   name</text>
+      <text x="10" y="98" fill="#e2e8f0">   hall_type</text>
+      <text x="10" y="118" fill="#e2e8f0">   total_rows</text>
+      <text x="10" y="138" fill="#e2e8f0">   total_cols</text>
+      <text x="10" y="158" fill="#e2e8f0">   status</text>
+    </g>
+  </g>
+
+  <!-- TABLE: showtimes (270,360) -->
+  <g transform="translate(150,360)" filter="url(#glow)">
+    <rect width="200" height="165" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="200" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="200" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">📅 showtimes</text>
+    <line x1="0" y1="36" x2="200" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 showtime_id  PK</text>
+      <text x="10" y="78" fill="#a855f7">🔗 movie_id     FK</text>
+      <text x="10" y="98" fill="#a855f7">🔗 hall_id      FK</text>
+      <text x="10" y="118" fill="#e2e8f0">   start_time</text>
+      <text x="10" y="138" fill="#e2e8f0">   end_time</text>
+      <text x="10" y="158" fill="#e2e8f0">   base_price</text>
+    </g>
+  </g>
+
+  <!-- TABLE: seats (510,360) -->
+  <g transform="translate(400,360)" filter="url(#glow)">
+    <rect width="190" height="165" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="190" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="190" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">💺 seats</text>
+    <line x1="0" y1="36" x2="190" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 seat_id      PK</text>
+      <text x="10" y="78" fill="#a855f7">🔗 hall_id      FK</text>
+      <text x="10" y="98" fill="#e2e8f0">   row_char</text>
+      <text x="10" y="118" fill="#e2e8f0">   col_number</text>
+      <text x="10" y="138" fill="#e2e8f0">   seat_type</text>
+      <text x="10" y="158" fill="#e2e8f0">   seat_factor</text>
+    </g>
+  </g>
+
+  <!-- TABLE: show_seats (680,360) -->
+  <g transform="translate(638,360)" filter="url(#glow)">
+    <rect width="190" height="145" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="190" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="190" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">🪑 show_seats</text>
+    <line x1="0" y1="36" x2="190" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 show_seat_id PK</text>
+      <text x="10" y="78" fill="#a855f7">🔗 showtime_id  FK</text>
+      <text x="10" y="98" fill="#a855f7">🔗 seat_id      FK</text>
+      <text x="10" y="118" fill="#e2e8f0">   price</text>
+      <text x="10" y="138" fill="#e2e8f0">   status</text>
+    </g>
+  </g>
+
+  <!-- TABLE: invoices (880,260) -->
+  <g transform="translate(878,260)" filter="url(#glow)">
+    <rect width="195" height="165" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="195" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="195" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">🧾 invoices</text>
+    <line x1="0" y1="36" x2="195" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 invoice_id   PK</text>
+      <text x="10" y="78" fill="#a855f7">🔗 employee_id  FK</text>
+      <text x="10" y="98" fill="#e2e8f0">   total_amount</text>
+      <text x="10" y="118" fill="#e2e8f0">   payment_method</text>
+      <text x="10" y="138" fill="#e2e8f0">   status</text>
+      <text x="10" y="158" fill="#e2e8f0">   created_at</text>
+    </g>
+  </g>
+
+  <!-- TABLE: tickets (880,460) -->
+  <g transform="translate(878,445)" filter="url(#glow)">
+    <rect width="195" height="125" rx="10" fill="#0f172a" stroke="#334155" stroke-width="1.5"/>
+    <rect width="195" height="36" rx="10" fill="url(#tblHdr)"/>
+    <rect y="22" width="195" height="14" fill="url(#tblHdr)"/>
+    <text x="10" y="24" font-family="'Segoe UI',Roboto,sans-serif" font-size="13" font-weight="800" fill="#38bdf8">🎟 tickets</text>
+    <line x1="0" y1="36" x2="195" y2="36" stroke="#334155"/>
+    <g font-family="Consolas,monospace" font-size="11">
+      <text x="10" y="58" fill="#f43f5e">🔑 ticket_id    PK</text>
+      <text x="10" y="78" fill="#a855f7">🔗 invoice_id   FK</text>
+      <text x="10" y="98" fill="#a855f7">🔗 show_seat_id FK</text>
+      <text x="10" y="118" fill="#e2e8f0">   barcode  / status</text>
+    </g>
+  </g>
+
+  <!-- ================================================================
+       RELATIONSHIP LINES
+       ================================================================ -->
+
+  <!-- employees → invoices (1:N) -->
+  <path d="M220 185 C220 230 870 250 878 295" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- invoices → tickets (1:N) -->
+  <path d="M975 425 L975 445" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- movies → reviews (1:N) -->
+  <path d="M460 183 L510 183" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- movies → showtimes (1:N) -->
+  <path d="M365 305 C365 330 240 345 250 360" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- cinema_halls → showtimes (1:N) -->
+  <path d="M858 183 C858 330 370 345 350 360" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- cinema_halls → seats (1:N) -->
+  <path d="M858 220 C800 300 600 345 590 360" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- showtimes → show_seats (1:N) -->
+  <path d="M350 450 C400 455 600 445 638 440" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- seats → show_seats (1:N) -->
+  <path d="M590 450 L638 450" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- show_seats → tickets (1:1) -->
+  <path d="M828 435 C855 435 870 490 878 490" fill="none" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#crow)" marker-start="url(#one)"/>
+
+  <!-- Legend -->
+  <g transform="translate(30,540)" font-family="'Segoe UI',Roboto,sans-serif" font-size="11" fill="#64748b">
+    <text fill="#f43f5e" font-weight="700">🔑 PK</text>
+    <text x="60">Primary Key</text>
+    <text x="170" fill="#a855f7" font-weight="700">🔗 FK</text>
+    <text x="230">Foreign Key (relationship)</text>
+    <text x="430">── ── Dashed = 1:N association</text>
+    <text x="700">Schema normalized to 3NF</text>
+  </g>
+</svg>

@@ -70,17 +70,7 @@
 
 ## 🛠️ Tech Stack
 
-### Backend
-* **Core:** Java 17, Spring Boot 3.2.5
-* **Persistence:** Spring Data JPA, Hibernate
-* **Database:** Microsoft SQL Server
-* **Security:** Spring Security, JWT (Json Web Token)
-* **Libraries:** iTextPDF (PDF ticket exporting), Apache POI (Excel reporting)
-
-### Frontend
-* **Core:** React 19, Vite 6, Zustand (State Management)
-* **Styling:** Tailwind CSS 4.0, Framer Motion (Animations), Lucide React (Icons)
-* **Data Fetching:** TanStack React Query v5 (Caching and automated sync)
+![Tech Stack](images/tech_stack.svg)
 
 ---
 
@@ -88,24 +78,7 @@
 
 The application has been restructured into a decoupled web framework:
 
-```mermaid
-graph LR
-    subgraph Frontend [React SPA]
-        Z[Zustand Store] --> View[React Views]
-        RQ[React Query] --> View
-        View -->|HTTP Request / JWT| Api[Axios Client]
-    end
-
-    subgraph Backend [Spring Boot REST API]
-        Api -->|JSON Payload| Ctrl[REST Controllers]
-        Ctrl -->|DTOs| Svc[Services]
-        Svc -->|Entities| Repo[JPA Repositories]
-    end
-
-    subgraph Database [SQL Server]
-        Repo -->|JDBC / Hibernate| DB[(Database)]
-    end
-```
+![Project Architecture](images/project_architecture.svg)
 
 ---
 

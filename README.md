@@ -95,11 +95,11 @@
 
 | Login & Authentication | Point of Sale (POS) |
 |:---:|:---:|
-| ![Login UI](image/README/Login.png) | ![POS Interface](image/README/Sale.png) |
+| ![Login UI](Images/Login.png) | ![POS Interface](Images/Sale.png) |
 | **Interactive Seat Map** | **Dashboard & Analytics** |
-| ![Seat Map](image/README/SeatMap.png) | ![Dashboard](image/README/Dashboard.png) |
+| ![Seat Map](Images/SeatMap.png) | ![Dashboard](Images/Dashboard.png) |
 | **Showtime Scheduling** | **Exported Tickets & Invoices** |
-| ![Showtime](image/README/Showtimes.png) | ![Invoice](image/README/Invoice.png)<br>[🎫 View PDF Ticket](invoice/tickets/tickets_INV024.pdf) \| [🧾 View PDF Invoice](invoice/invoice_INV024.pdf) |
+| ![Showtime](Images/Showtimes.png) | ![Invoice](Images/Invoice.png)<br>[🎫 View PDF Ticket](invoice/tickets/tickets_INV024.pdf) \| [🧾 View PDF Invoice](invoice/invoice_INV024.pdf) |
 
 ---
 

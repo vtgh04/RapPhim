@@ -49,42 +49,7 @@ Phân lớp hệ thống từ Client UI, Security Gateway, Core Service đến D
 
 ---
 
-### 4. Sơ đồ Use Case phân quyền người dùng (Use Case Diagram)
-Phân quyền chức năng rạch ròi giữa vai trò Quản lý (Manager) và Nhân viên bán vé (Staff).
-
-![Sơ đồ Use Case](docs/assets/diagrams/use_case.svg)
-
----
-
-### 5. Sơ đồ Trình tự Đặt Vé & Thanh Toán (Sequence Diagram)
-Trình tự tương tác giữa Nhân viên quầy, Client, WebSocket Broker, Server và Database trong suốt vòng đời chọn ghế, khóa ghế tạm thời và checkout in hóa đơn.
-
-![Sơ đồ Trình tự](docs/assets/diagrams/sequence.svg)
-
----
-
-### 6. Sơ đồ Thực Thể Quan Hệ (Entity Relationship Diagram - ERD)
-Cơ sở dữ liệu được chuẩn hoá 3NF của hệ thống chạy trên Microsoft SQL Server.
-
-![Sơ đồ ERD](docs/assets/diagrams/erd.svg)
-
----
-
-### 7. Sơ đồ Cơ Sở Dữ Liệu Quan Hệ (Database Relational Schema)
-Đặc tả chi tiết cấu trúc khoá chính, khoá ngoại và liên kết bảng.
-
-![Sơ đồ thiết kế database](docs/assets/diagrams/database_design.svg)
-
----
-
-### 8. Sơ đồ Lớp Thực Thể (Domain Class Diagram)
-Cấu trúc lớp Domain JPA Entity trong Spring Boot Backend mô tả đầy đủ các thuộc tính và quan hệ liên kết.
-
-![Sơ đồ Class Diagram](docs/assets/diagrams/class_diagram.svg)
-
----
-
-### 9. Cấu Trúc Thư Mục Dự Án (Project Folder Structure)
+### 4. Cấu Trúc Thư Mục Dự Án (Project Folder Structure)
 Bố cục cấu trúc phân vùng nghiệp vụ và tổ chức mã nguồn chuẩn hóa.
 
 ![Sơ đồ cấu trúc thư mục](docs/assets/diagrams/folder_structure.svg)

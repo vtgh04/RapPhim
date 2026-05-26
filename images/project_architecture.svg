@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 850 320" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    
+    <linearGradient id="boxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.4" />
+    </linearGradient>
+    
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#ec4899" stop-opacity="0.2" />
+    </linearGradient>
+
+    <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+    
+    <linearGradient id="flowGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#10b981" />
+    </linearGradient>
+
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.6" />
+    </filter>
+
+    <!-- Arrow Markers -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#f43f5e" />
+    </marker>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" />
+    </marker>
+  </defs>
+
+  <style>
+    .title { font-family: 'Outfit', 'Inter', sans-serif; font-size: 20px; font-weight: 900; fill: #ffffff; letter-spacing: 1px; }
+    .subtitle { font-family: 'Outfit', 'Inter', sans-serif; font-size: 10px; font-weight: 700; fill: #64748b; letter-spacing: 1.5px; }
+    .node-title { font-family: 'Outfit', 'Inter', sans-serif; font-size: 13px; font-weight: 800; fill: #f8fafc; letter-spacing: 0.5px; }
+    .node-text { font-family: 'Outfit', 'Inter', sans-serif; font-size: 11px; font-weight: 600; fill: #94a3b8; }
+    .flow-text { font-family: 'Outfit', 'Inter', sans-serif; font-size: 9px; font-weight: 700; fill: #e2e8f0; letter-spacing: 0.5px; }
+  </style>
+
+  <!-- Background -->
+  <rect width="850" height="320" rx="20" fill="url(#bgGrad)" />
+  <rect width="850" height="320" rx="20" fill="none" stroke="url(#borderGrad)" stroke-width="1.5" />
+
+  <!-- Header -->
+  <g transform="translate(40, 45)">
+    <text class="subtitle" y="0">SYSTEM TOPOLOGY</text>
+    <text class="title" y="24">PROJECT ARCHITECTURE</text>
+  </g>
+
+  <!-- Flow 1: Client to Server -->
+  <path d="M 255 170 L 320 170" fill="none" stroke="url(#flowGrad)" stroke-width="2.5" stroke-dasharray="4 4" marker-end="url(#arrow)" />
+  <rect x="258" y="142" width="58" height="18" rx="4" fill="#f43f5e" fill-opacity="0.2" stroke="#f43f5e" stroke-opacity="0.3" stroke-width="1" />
+  <text class="flow-text" x="287" y="154" text-anchor="middle">REST / JWT</text>
+
+  <!-- Flow 2: Server to DB -->
+  <path d="M 565 170 L 630 170" fill="none" stroke="url(#flowGrad2)" stroke-width="2.5" stroke-dasharray="4 4" marker-end="url(#arrow2)" />
+  <rect x="572" y="142" width="52" height="18" rx="4" fill="#3b82f6" fill-opacity="0.2" stroke="#3b82f6" stroke-opacity="0.3" stroke-width="1" />
+  <text class="flow-text" x="598" y="154" text-anchor="middle">JPA/JDBC</text>
+
+  <!-- Node 1: React Client -->
+  <g transform="translate(40, 95)" filter="url(#shadow)">
+    <rect width="210" height="150" rx="16" fill="url(#boxGrad)" stroke="#334155" stroke-opacity="0.5" stroke-width="1" />
+    <rect width="180" height="30" x="15" y="15" rx="8" fill="#1e1b4b" stroke="#61DAFB" stroke-opacity="0.4" />
+    <text class="node-title" x="105" y="34" text-anchor="middle" fill="#61DAFB">React SPA (Client)</text>
+    
+    <text class="node-text" x="25" y="75">• Zustand (Session / Store)</text>
+    <text class="node-text" x="25" y="98">• React Query (Server Cache)</text>
+    <text class="node-text" x="25" y="121">• Axios Client (HTTP Requests)</text>
+  </g>
+
+  <!-- Node 2: Spring Boot Server -->
+  <g transform="translate(330, 95)" filter="url(#shadow)">
+    <rect width="230" height="150" rx="16" fill="url(#boxGrad)" stroke="#334155" stroke-opacity="0.5" stroke-width="1" />
+    <rect width="200" height="30" x="15" y="15" rx="8" fill="#14532d" stroke="#6DB33F" stroke-opacity="0.4" />
+    <text class="node-title" x="115" y="34" text-anchor="middle" fill="#6DB33F">Spring Boot (Server)</text>
+    
+    <text class="node-text" x="25" y="75">• REST Controllers &amp; Routing</text>
+    <text class="node-text" x="25" y="98">• Spring Security (JWT filter)</text>
+    <text class="node-text" x="25" y="121">• Service Layer (@Transactional)</text>
+  </g>
+
+  <!-- Node 3: Database -->
+  <g transform="translate(640, 95)" filter="url(#shadow)">
+    <rect width="170" height="150" rx="16" fill="url(#boxGrad)" stroke="#334155" stroke-opacity="0.5" stroke-width="1" />
+    <rect width="140" height="30" x="15" y="15" rx="8" fill="#7f1d1d" stroke="#CC2927" stroke-opacity="0.4" />
+    <text class="node-title" x="85" y="34" text-anchor="middle" fill="#CC2927">MS SQL Server</text>
+    
+    <text class="node-text" x="25" y="75">• Relational Data (3NF)</text>
+    <text class="node-text" x="25" y="98">• Showtime timetables</text>
+    <text class="node-text" x="25" y="121">• Generated Seat maps</text>
+  </g>
+</svg>

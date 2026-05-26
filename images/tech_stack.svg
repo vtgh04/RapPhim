@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="100%" height="100%">
+  <!-- Definitions for gradients and shadows -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#020617" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+    
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.6" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.3" />
+    </linearGradient>
+    
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f43f5e" stop-opacity="0.4" />
+      <stop offset="50%" stop-color="#3b82f6" stop-opacity="0.1" />
+      <stop offset="100%" stop-color="#10b981" stop-opacity="0.3" />
+    </linearGradient>
+
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f43f5e" />
+      <stop offset="100%" stop-color="#ec4899" />
+    </linearGradient>
+
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.5" />
+    </filter>
+  </defs>
+
+  <style>
+    .title { font-family: 'Outfit', 'Inter', sans-serif; font-size: 22px; font-weight: 900; fill: #ffffff; letter-spacing: 1px; }
+    .subtitle { font-family: 'Outfit', 'Inter', sans-serif; font-size: 11px; font-weight: 700; fill: #64748b; letter-spacing: 1.5px; }
+    .card-title { font-family: 'Outfit', 'Inter', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.5px; }
+    .tech-item { font-family: 'Outfit', 'Inter', sans-serif; font-size: 12px; font-weight: 600; fill: #cbd5e1; }
+    .tech-version { font-family: 'Outfit', 'Inter', sans-serif; font-size: 10px; font-weight: 700; fill: #f43f5e; }
+    .desc { font-family: 'Outfit', 'Inter', sans-serif; font-size: 11px; font-weight: 500; fill: #94a3b8; }
+  </style>
+
+  <!-- Background -->
+  <rect width="800" height="400" rx="24" fill="url(#bgGrad)" />
+  <rect width="800" height="400" rx="24" fill="none" stroke="url(#borderGrad)" stroke-width="1.5" />
+
+  <!-- Header -->
+  <g transform="translate(40, 50)">
+    <text class="subtitle" y="0">SYSTEM SPECIFICATION</text>
+    <text class="title" y="26">TECHNOLOGY STACK</text>
+  </g>
+
+  <!-- Card 1: Frontend -->
+  <g transform="translate(40, 110)" filter="url(#shadow)">
+    <rect width="220" height="250" rx="20" fill="url(#cardGrad)" stroke="#334155" stroke-opacity="0.4" stroke-width="1" />
+    <rect width="6" height="40" x="0" y="24" rx="3" fill="#61DAFB" />
+    <text class="card-title" x="24" y="38" fill="#61DAFB">FRONTEND CLIENT</text>
+    
+    <!-- Items -->
+    <g transform="translate(24, 75)">
+      <circle cx="6" cy="6" r="4" fill="#38B2AC" />
+      <text class="tech-item" x="18" y="10">React 19 <tspan class="tech-version">(SPA)</tspan></text>
+      
+      <circle cx="6" cy="36" r="4" fill="#38B2AC" />
+      <text class="tech-item" x="18" y="40">Vite 6 <tspan class="tech-version">(Builder)</tspan></text>
+
+      <circle cx="6" cy="66" r="4" fill="#38B2AC" />
+      <text class="tech-item" x="18" y="70">Tailwind CSS 4.0</text>
+
+      <circle cx="6" cy="96" r="4" fill="#38B2AC" />
+      <text class="tech-item" x="18" y="100">Zustand <tspan class="tech-version">(Store)</tspan></text>
+
+      <circle cx="6" cy="126" r="4" fill="#38B2AC" />
+      <text class="tech-item" x="18" y="130">React Query v5</text>
+    </g>
+  </g>
+
+  <!-- Card 2: Backend -->
+  <g transform="translate(290, 110)" filter="url(#shadow)">
+    <rect width="220" height="250" rx="20" fill="url(#cardGrad)" stroke="#334155" stroke-opacity="0.4" stroke-width="1" />
+    <rect width="6" height="40" x="0" y="24" rx="3" fill="#6DB33F" />
+    <text class="card-title" x="24" y="38" fill="#6DB33F">BACKEND API</text>
+    
+    <!-- Items -->
+    <g transform="translate(24, 75)">
+      <circle cx="6" cy="6" r="4" fill="#6DB33F" />
+      <text class="tech-item" x="18" y="10">Spring Boot 3.2.5</text>
+      
+      <circle cx="6" cy="36" r="4" fill="#6DB33F" />
+      <text class="tech-item" x="18" y="40">Spring Security</text>
+
+      <circle cx="6" cy="66" r="4" fill="#6DB33F" />
+      <text class="tech-item" x="18" y="70">JWT <tspan class="tech-version">(Stateless)</tspan></text>
+
+      <circle cx="6" cy="96" r="4" fill="#6DB33F" />
+      <text class="tech-item" x="18" y="100">Spring Data JPA</text>
+
+      <circle cx="6" cy="126" r="4" fill="#6DB33F" />
+      <text class="tech-item" x="18" y="130">Hibernate <tspan class="tech-version">(ORM)</tspan></text>
+    </g>
+  </g>
+
+  <!-- Card 3: Database & Utils -->
+  <g transform="translate(540, 110)" filter="url(#shadow)">
+    <rect width="220" height="250" rx="20" fill="url(#cardGrad)" stroke="#334155" stroke-opacity="0.4" stroke-width="1" />
+    <rect width="6" height="40" x="0" y="24" rx="3" fill="#CC2927" />
+    <text class="card-title" x="24" y="38" fill="#CC2927">DATABASE &amp; UTILS</text>
+    
+    <!-- Items -->
+    <g transform="translate(24, 75)">
+      <circle cx="6" cy="6" r="4" fill="#CC2927" />
+      <text class="tech-item" x="18" y="10">MS SQL Server 2019+</text>
+      
+      <circle cx="6" cy="36" r="4" fill="#CC2927" />
+      <text class="tech-item" x="18" y="40">HikariCP <tspan class="tech-version">(Pool)</tspan></text>
+
+      <circle cx="6" cy="66" r="4" fill="#CC2927" />
+      <text class="tech-item" x="18" y="70">iTextPDF <tspan class="tech-version">(Ticket)</tspan></text>
+
+      <circle cx="6" cy="96" r="4" fill="#CC2927" />
+      <text class="tech-item" x="18" y="100">Apache POI <tspan class="tech-version">(Excel)</tspan></text>
+
+      <circle cx="6" cy="126" r="4" fill="#CC2927" />
+      <text class="tech-item" x="18" y="130">Maven <tspan class="tech-version">(Build)</tspan></text>
+    </g>
+  </g>
+</svg>

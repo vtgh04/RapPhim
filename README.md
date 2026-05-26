@@ -1,172 +1,147 @@
-<h1 align="center">
-  🍿 Cinema POS & Management System
-</h1>
+# 🍿 RapPhim - Modern Cinema POS & Management System
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Java-ED8B00?style=for-the-badge&logo=java&logoColor=white" alt="Java" />
-  <img src="https://img.shields.io/badge/Swing-1A1A1A?style=for-the-badge&logo=java&logoColor=white" alt="Java Swing" />
-  <img src="https://img.shields.io/badge/Microsoft%20SQL%20Server-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server" />
-  <img src="https://img.shields.io/badge/JDBC-007396?style=for-the-badge&logo=java&logoColor=white" alt="JDBC" />
-  <img src="https://img.shields.io/badge/Architecture-3--Tier-4B0082?style=for-the-badge" alt="3-Tier Architecture" />
+  <img src="https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
+  <img src="https://img.shields.io/badge/Spring--Boot-3.2.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
+  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
+  <img src="https://img.shields.io/badge/Tailwind--CSS-4.0-38B2AC?style=for-the-badge&logo=tailwindcss&logoColor=white" alt="Tailwind CSS" />
+  <img src="https://img.shields.io/badge/Vite-6-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
+  <img src="https://img.shields.io/badge/SQL--Server-2019%2B-CC2927?style=for-the-badge&logo=microsoft-sql-server&logoColor=white" alt="SQL Server" />
 </p>
 
 <p align="center">
-  <strong>An enterprise-grade, high-performance Point of Sale (POS) and Management System for Cinemas, built with Java Swing and SQL Server.</strong>
+  <strong>An enterprise-grade, high-performance web application for Cinema Point of Sale (POS) and administration, built with Spring Boot and React.</strong>
 </p>
+
+---
+
+## 🚀 Project Migration & Current Status
+
+> [!IMPORTANT]
+> **Architecture Modernization:** The project has successfully transitioned from its original desktop version (Java Swing + JDBC) to a decoupled Web Application. The application now uses a **Spring Boot REST API backend** and a **React SPA frontend** built with Vite and Tailwind CSS.
+
+### Recent Accomplishments (Real-time updates)
+- [x] **REST API Modernization:** Replaced Swing controllers and JDBC DAOs with Spring REST Controllers and Spring Data JPA.
+- [x] **JWT Security Integration:** Secured endpoints with stateless JWT authentication and role-based filters.
+- [x] **Interactive Dashboard Analytics:** Designed and built responsive, fully custom SVG charts (Line, Bar, Area, and Donut) for financial metrics without external chart libraries.
+- [x] **Visual Showtime Scheduler:** Replaced raw tables with a card-based visual movie scheduling interface.
+- [x] **Cascade Showtime Operations:** Enabled showtime deletion that cleans up linked dynamically generated seats automatically in a single `@Transactional` boundary.
 
 ---
 
 ## 📑 Table of Contents
 
-1. [Project Overview](#1-project-overview)
-2. [Features](#2-features)
-3. [Screenshots](#3-screenshots)
-4. [Tech Stack](#4-tech-stack)
-5. [Project Architecture](#5-project-architecture)
-6. [Folder Structure](#6-folder-structure)
-7. [Database Design](#7-database-design)
-8. [Setup &amp; Installation](#8-setup--installation)
-9. [Running The Application](#9-running-the-application)
-10. [Core Business Flows](#10-core-business-flows)
-11. [Clean Architecture &amp; Design Patterns](#11-clean-architecture--design-patterns)
-12. [Security](#12-security)
-13. [Future Improvements](#13-future-improvements)
-14. [Performance Notes](#14-performance-notes)
-15. [Known Issues &amp; Refactoring Opportunities](#15-known-issues--refactoring-opportunities)
-16. [Author](#16-author)
+1. [Features](#-features)
+2. [Tech Stack](#%EF%B8%8F-tech-stack)
+3. [Project Architecture](#-project-architecture)
+4. [Folder Structure](#-folder-structure)
+5. [Database Design](#-database-design)
+6. [API Endpoints](#-api-endpoints)
+7. [Setup & Installation](#-setup--installation)
+8. [Running the Application](#-running-the-application)
+9. [Author](#-author)
 
 ---
 
-## 1. Project Overview
-
-**Cinema POS** is a comprehensive, desktop-based management application designed to streamline the daily operations of a modern cinema. It handles everything from movie and showtime scheduling, interactive seat booking, and transaction processing to robust dashboard analytics.
-
-**Goals:**
-
-- Provide a blazing-fast, intuitive POS interface for cinema staff to quickly serve customers.
-- Equip cinema managers with powerful tools for inventory (halls, movies, showtimes) and employee management.
-- Establish a strict, maintainable, and scalable **3-Layer Architecture** (UI ➔ Service ➔ DAO) to separate business logic from data persistence.
-
----
-
-## 2. Features
+## 🌟 Features
 
 ### 🔐 Authentication & Authorization
+* Secure login using stateless JWT tokens.
+* Auto token-rotation via interceptors on the React client.
+* Role-Based Access Control (RBAC): UI panels and API requests are protected based on employee roles (`MANAGER` / `STAFF`).
 
-- Secure login mechanism with Role-Based Access Control (RBAC).
-- Specialized views for **Manager** (Full Access) and **Staff** (Restricted Access).
-
-### 🎬 Movie Management
-
-- Full CRUD operations for movies (Title, Genre, Duration, Rating, Poster, etc.).
-- Active/Inactive toggling to manage currently showing films.
+### 📊 Dashboard Statistics & Charts
+* **Interactive SVG Revenue Chart:** View daily income trends over the last 30 days in **Bar (Cột)**, **Line (Đường)**, or **Area (Miền)** mode with hover details.
+* **Movie Share Donut Chart:** A visual donut chart showing tickets distribution amongst top-selling movies with an interactive legend.
 
 ### 📅 Showtime Management
+* Available movies display as rich visual cards indicating their schedule counts.
+* Interactive side-panel detailing individual movie configurations.
+* **Auto End-time Calculation:** The scheduler automatically adds the showtime end time using the movie duration.
+* **Conflict Prevention:** Real-time checking to ensure no room conflicts or overlaps.
+* **Cascade Delete:** Easily remove showtimes; automatically removes all generated seat layouts.
 
-- Schedule movies into cinema halls with specific start/end times.
-- Prevent overlapping schedules with robust validation algorithms.
-- Automatic seat generation for each scheduled showtime.
-
-### 🎟️ Ticket Booking & POS
-
-- Interactive, real-time visual **Seat Map** (VIP, Regular, Broken, Booked).
-- Shopping cart functionality with real-time total calculation.
-- Support for multiple payment methods (Cash, Credit Card, Bank Transfer).
-
-### 🧾 Invoice & Transactions
-
-- Complete transaction history tracking.
-- Staff can view their own transactions; Managers can view all.
-- Automatic barcode generation and **PDF Ticket Export**.
-
-### 💸 Discount System
-
-- Validate and apply promotional discount codes during checkout.
-
-### 📊 Dashboard Statistics
-
-- Real-time animated charts showing revenue over the last 30 days.
-- Top 5 best-selling movies leaderboards with visual posters.
-- Export transaction data to **Excel**.
+### 🎟️ Point of Sale (POS) & Checkout
+* Interactive visual seating map (VIP, Regular, Broken, Booked seats).
+* Real-time cart calculations and support for discounts and promo codes.
+* Generates PDF invoices and printable barcodes/tickets upon successful checkout.
 
 ---
 
-## 3. Screenshots
+## 🛠️ Tech Stack
 
-| Login & Authentication | Point of Sale (POS) |
-|:---:|:---:|
-| ![Login UI](Images/Login.png) | ![POS Interface](Images/Sale.png) |
-| **Interactive Seat Map** | **Dashboard & Analytics** |
-| ![Seat Map](Images/SeatMap.png) | ![Dashboard](Images/Dashboard.png) |
-| **Showtime Scheduling** | **Exported Tickets & Invoices** |
-| ![Showtime](Images/Showtimes.png) | ![Invoice](Images/Invoice.png)<br>[🎫 View PDF Ticket](invoice/tickets/tickets_INV024.pdf) \| [🧾 View PDF Invoice](invoice/invoice_INV024.pdf) |
+### Backend
+* **Core:** Java 17, Spring Boot 3.2.5
+* **Persistence:** Spring Data JPA, Hibernate
+* **Database:** Microsoft SQL Server
+* **Security:** Spring Security, JWT (Json Web Token)
+* **Libraries:** iTextPDF (PDF ticket exporting), Apache POI (Excel reporting)
 
----
-
-## 4. Tech Stack
-
-- **Language:** Java 17+
-- **GUI Framework:** Java Swing (Custom styled for modern, flat UI)
-- **Database:** Microsoft SQL Server
-- **Data Access:** Pure JDBC (Optimized for performance)
-- **Libraries:**
-  - `iTextPDF`: Generating professional PDF invoices and tickets.
-  - `Apache POI`: Exporting analytics and transactions to Excel.
-  - `JCalendar / JDateChooser`: Advanced date picking UI components.
+### Frontend
+* **Core:** React 19, Vite 6, Zustand (State Management)
+* **Styling:** Tailwind CSS 4.0, Framer Motion (Animations), Lucide React (Icons)
+* **Data Fetching:** TanStack React Query v5 (Caching and automated sync)
 
 ---
 
-## 5. Project Architecture
+## 📐 Project Architecture
 
-The application strictly enforces a **3-Layer Architecture** to guarantee the Single Responsibility Principle (SRP) and high maintainability.
+The application has been restructured into a decoupled web framework:
 
 ```mermaid
-graph TD
-    UI[View Layer / UI Panels] -->|DTOs / Domain Models| S[Service Layer]
-    S -->|Entity Models| DAO[DAO Layer]
-    DAO -->|JDBC| DB[(SQL Server Database)]
-```
+graph LR
+    subgraph Frontend [React SPA]
+        Z[Zustand Store] --> View[React Views]
+        RQ[React Query] --> View
+        View -->|HTTP Request / JWT| Api[Axios Client]
+    end
 
-- **View Layer (Panels/Dialogs):** Handles user interactions, captures input, and strictly delegates business operations to Services. *Never interacts with DAOs directly.*
-- **Service Layer (`Service`):** The orchestrator. Contains all business logic, workflow validations, ID generation, and transaction management (Commit/Rollback).
-- **DAO Layer (`DAO`):** Pure Data Access Objects. Contains only SQL statements (`INSERT`, `SELECT`, `UPDATE`). Receives `Connection` objects from Services for transactional consistency.
-- **Model Layer (`Model`):** POJOs (Plain Old Java Objects) representing database entities.
+    subgraph Backend [Spring Boot REST API]
+        Api -->|JSON Payload| Ctrl[REST Controllers]
+        Ctrl -->|DTOs| Svc[Services]
+        Svc -->|Entities| Repo[JPA Repositories]
+    end
+
+    subgraph Database [SQL Server]
+        Repo -->|JDBC / Hibernate| DB[(Database)]
+    end
+```
 
 ---
 
-## 6. Folder Structure
+## 📁 Folder Structure
 
+### Backend (`/backend`)
 ```text
-src/main/java/com/rapphim/
-├── config/             # Database connection pooling & configurations
-├── controller/         # Action handlers for complex UI flows (e.g., LoginController)
-├── dao/                # Data Access Objects (SQL queries, ResultSet mapping)
-├── model/              # Domain entities and Enums (Movie, Showtime, Ticket, etc.)
-├── service/            # Business logic, Orchestration, Transaction boundaries
-├── util/               # Helper utilities (PDF Exporter, Excel Exporter, Formatters)
-└── view/               # UI Layer
-    ├── dialogs/        # Modal windows (Add/Edit items, Payment forms)
-    └── panels/         # Main screens (Dashboard, POS, Showtimes, Settings)
+src/main/java/rapphim/
+├── config/             # Security configs, Web MVC configurations, CORS setup
+├── controller/         # Spring REST Controllers (Auth, Movies, Showtimes, Dashboard)
+├── event/              # Event listeners and handlers (e.g. seeding, logging)
+├── model/              # Hibernate Entities and Enums (Movie, Showtime, ShowSeat, etc.)
+├── repository/         # Spring Data JPA Repositories
+├── security/           # JWT Filters, Token Providers, UserDetailsService
+├── service/            # Core business workflows and transactional limits (@Transactional)
+└── util/               # PDF/Excel exporters, converters, and date helpers
+```
+
+### Frontend (`/frontend`)
+```text
+src/
+├── features/           # Feature-based folder structure
+│   ├── auth/           # Login, Session state, and Auth Store
+│   ├── booking/        # POS, Invoices, Seat selections
+│   └── dashboard/      # Analytical panels, custom SVG charts
+├── services/           # Axios instance with request/response interceptors
+├── shared/             # Reusable UI elements (Spinners, Buttons)
+├── index.css           # Global typography and theme configurations
+└── main.jsx            # React root mount
 ```
 
 ---
 
-## 7. Database Design
+## 🗄️ Database Design
 
-The database is normalized to 3NF to ensure data integrity and prevent redundancy.
-
-### Core Tables:
-
-1. `employees`: Stores user credentials and roles (Manager/Staff).
-2. `movies`: Movie metadata (Title, duration, rating, poster URL).
-3. `cinema_halls`: Physical halls containing seating capacity metadata.
-4. `seats`: Physical seats mapped to specific halls.
-5. `showtimes`: Timetable linking a `Movie` to a `CinemaHall`.
-6. `show_seats`: Junction table reflecting the *status* of a seat for a specific showtime (Available/Booked).
-7. `invoices`: Financial records of a checkout session.
-8. `tickets`: Individual ticket records linked to an invoice and a show_seat.
-
-### ERD Overview (ASCII):
+The relational database is optimized for ACID transactions, especially during concurrent seat bookings:
 
 ```text
 [employees] 1 ---- * [invoices] 1 ---- * [tickets]
@@ -178,116 +153,68 @@ The database is normalized to 3NF to ensure data integrity and prevent redundanc
 
 ---
 
-## 8. Setup & Installation
+## 📡 API Endpoints
 
-### Prerequisites:
+Below is a summary of the main REST endpoints:
 
-- Java JDK 17 or higher.
-- Microsoft SQL Server (2019+).
-- Maven (optional, if migrating to a managed build system).
-
-### Step-by-Step:
-
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/cinema-pos.git
-   cd cinema-pos
-   ```
-2. **Setup Database:**
-   - Open SQL Server Management Studio (SSMS).
-   - Execute the initialization script located at `database/init_schema.sql` to create the schema and seed initial data.
-3. **Configure Connection:**
-   - Navigate to `src/main/java/com/rapphim/config/DatabaseConnection.java`.
-   - Update the JDBC connection string, username, and password to match your local SQL Server instance.
-4. **Compile & Run:**
-   - Open the project in IntelliJ IDEA, Eclipse, or VS Code.
-   - Run the `Main.java` class to launch the application.
+| Endpoint | Method | Role Required | Description |
+| :--- | :--- | :--- | :--- |
+| `/api/auth/login` | `POST` | `All` | Authenticates user, returns Access + Refresh token |
+| `/api/auth/refresh-token` | `POST` | `All` | Silent token renewal using Refresh token |
+| `/api/dashboard/revenue-by-day` | `GET` | `MANAGER` | Daily revenue analytics for the last 30 days |
+| `/api/dashboard/top-movies` | `GET` | `MANAGER` | Top 5 best selling movies and ticket counts |
+| `/api/movies` | `GET` | `All` | Returns all available movies |
+| `/api/movies` | `POST` | `MANAGER` | Add a new movie into the system |
+| `/api/showtimes` | `GET` | `All` | Retrieve scheduled showtimes |
+| `/api/showtimes` | `POST` | `MANAGER` | Schedule a showtime (auto-generates seat structures) |
+| `/api/showtimes/{id}` | `DELETE` | `MANAGER` | Cancel a showtime (cascade deletes generated seats) |
+| `/api/cinema-halls` | `GET` | `All` | Retrieve available cinema auditoriums |
 
 ---
 
-## 9. Running The Application
+## 📦 Setup & Installation
 
-1. **Login Screen:** Use `admin` / `admin` for Manager access, or `staff` / `staff` for Staff access.
-2. **Dashboard (Manager Only):** View the 30-day revenue chart and top-selling movies.
-3. **Sales / POS:**
-   - Select a movie ➔ Select a showtime.
-   - Click on the interactive seat map to add tickets to the cart.
-   - Click **Thanh toán (Checkout)**, select payment method, and confirm.
-   - PDF invoices and tickets will automatically generate in the project root.
+### Prerequisites
+* **Java JDK 17** or higher
+* **Node.js** (v18+) & **npm**
+* **Microsoft SQL Server**
 
----
+### 1. Database Setup
+1. Open SQL Server Management Studio (SSMS) or command line database tool.
+2. Run the SQL schema files located in `backend/src/main/resources/schema.sql` (if present) or execute the initialization scripts to create the database schema.
+3. Configure JDBC configurations in `backend/src/main/resources/application.properties` (or YAML) with your local database URL, username, and password.
 
-## 10. Core Business Flows
+### 2. Run Backend API
+```bash
+cd RapPhim/backend
+# Using Maven Wrapper to compile and run Spring Boot
+.\mvnw.cmd spring-boot:run
+```
 
-### Ticket Booking Workflow (Checkout Orchestration)
-
-The checkout process is a highly transactional workflow handled by `SaleService`:
-
-1. Validates the cart and selected showtime.
-2. **Disables Auto-Commit** on the JDBC connection to start a transaction.
-3. Generates consecutive Invoice and Ticket IDs.
-4. Inserts the `Invoice` record.
-5. Iterates through the cart:
-   - Verifies seat availability (`show_seats`).
-   - Updates seat status to `BOOKED`.
-   - Generates a unique Barcode.
-   - Inserts the `Ticket` record.
-6. **Commits** the transaction. (Rolls back entirely if any step fails).
-7. Triggers the PDF export utility.
+### 3. Run Frontend Client
+```bash
+cd RapPhim/frontend
+# Install dependencies
+npm install
+# Run in development mode (hot-reloads dynamically)
+npm run dev
+```
 
 ---
 
-## 11. Clean Architecture & Design Patterns
+## 🏃 Running the Application
 
-- **DAO Pattern:** Abstracts and encapsulates all access to the data source.
-- **Service Layer Pattern:** Encapsulates business logic and orchestrates multiple DAOs. Connection objects are passed from Service to DAO to ensure transaction boundaries are respected.
-- **Singleton Pattern:** Used for `DatabaseConnection` to manage a shared connection instance (can be upgraded to a Connection Pool like HikariCP).
-- **Observer / Callback Pattern:** Used in Swing UI components for event-driven updates (e.g., updating the cart UI when a seat is clicked).
-
----
-
-## 12. Security
-
-- **Role-Based Access Control (RBAC):** UI dynamically renders based on the logged-in user's role. Staff cannot access Settings, Dashboard, or Employee management.
-- **SQL Injection Prevention:** 100% usage of `PreparedStatement` for all dynamic database queries.
-- **Transaction Safety:** ACID compliance guaranteed during ticket sales to prevent race conditions (double-booking the same seat).
+1. **Dashboard Access:** Open the browser and visit `http://localhost:5173`.
+2. **Staff Credentials:** Login using role-authorized credentials.
+3. **Showtimes Management:** Navigate to **Suất Chiếu** to click visual movie cards and add or delete showtimes.
+4. **Checkout:** Select movie seats and checkout to test automatic invoice and PDF ticket generation.
 
 ---
 
-## 13. Future Improvements
+## 🐙 Author
 
-To scale this monolithic desktop app to a modern enterprise ecosystem:
-
-- **Migration to Spring Boot:** Convert the backend into a RESTful API.
-- **Web/Mobile Frontend:** Replace Java Swing with React.js (Admin/Staff Web) and React Native (Customer Mobile App).
-- **Connection Pooling:** Integrate **HikariCP** to manage database connections more efficiently.
-- **Password Hashing:** Implement BCrypt for storing employee passwords securely.
-- **Caching:** Integrate Redis to cache the `Showtime` seat map, reducing database hits during high-traffic bookings.
+* **GitHub:** [@vtgh04](https://github.com/vtgh04)
+* **Email:** vtgh1602@gmail.com
 
 ---
-
-## 14. Performance Notes
-
-- **JDBC Optimization:** The system reuses prepared statements and leverages `Connection` passing to execute batch inserts within a single database transaction.
-- **Lazy Loading:** UI panels (like Showtimes and Transactions) implement manual data refreshing and background loading (`SwingWorker`) to prevent UI thread blocking.
-- **Indexing:** Ensure indexes are created on `showtime_id` and `seat_id` in the `show_seats` table to optimize the heavy read/write operations during checkout.
-
----
-
-## 15. Known Issues & Refactoring Opportunities
-
-*Recently refactored to eliminate architectural violations (e.g., UI directly calling DAOs, DAOs handling business logic).*
-
-- **Tight Coupling in UI:** Some Swing Panels are quite large. Future refactoring should abstract complex UI components (like the Seat Grid) into separate classes.
-- **Global State:** Currently, `AuthService` stores the logged-in user as a static variable. Moving to a Context-based dependency injection framework would improve testability.
-
----
-
-## 16. Author
-
-- 🐙 **GitHub:** [@vtgh04](https://github.com/vtgh04)
-- ✉️ **Contact:** vtgh1602@gmail.com
-
-<p align="center">
-  <i>If you find this project interesting, consider giving it a ⭐!</i>
-</p>
+*If you find this project helpful, please drop a ⭐ on the repository!*

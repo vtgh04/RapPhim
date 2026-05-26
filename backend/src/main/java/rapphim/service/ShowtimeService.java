@@ -78,6 +78,12 @@ public class ShowtimeService {
     }
 
     @Transactional
+    public void deleteShowtime(String showtimeId) {
+        showSeatRepository.deleteByShowtimeId(showtimeId);
+        showtimeRepository.deleteById(showtimeId);
+    }
+
+    @Transactional
     public void updateBasePrice(String showtimeId, double newPrice) {
         if (newPrice < 0) {
             throw new IllegalArgumentException("Giá không được âm.");

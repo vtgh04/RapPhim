@@ -75,4 +75,14 @@ public class ShowtimeController {
         showtimeService.autoUpdateStatuses(LocalDateTime.now());
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteShowtime(@PathVariable String id) {
+        Showtime st = showtimeService.getShowtimeById(id);
+        if (st == null) {
+            return ResponseEntity.notFound().build();
+        }
+        showtimeService.deleteShowtime(id);
+        return ResponseEntity.ok().build();
+    }
 }

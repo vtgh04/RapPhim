@@ -4,6 +4,7 @@ rapphim\security\JwtAuthenticationFilter.class
 rapphim\config\TestConnection.class
 rapphim\repository\ShowSeatRepository.class
 rapphim\service\AuthService.class
+rapphim\config\WebConfig.class
 rapphim\security\JwtTokenProvider.class
 rapphim\service\BookingService.class
 rapphim\model\enums\EmployeeStatus.class

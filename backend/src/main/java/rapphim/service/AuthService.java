@@ -91,10 +91,10 @@ public class AuthService {
         // Verify password (supports BCrypt and fallback to plain-text)
         boolean passwordMatches;
         String storedPassword = employee.getPassword();
-        if (storedPassword != null && (storedPassword.startsWith("$2a$") || storedPassword.startsWith("$2b$"))) {
-            passwordMatches = passwordEncoder.matches(password, storedPassword);
+        if (storedPassword != null && (storedPassword.trim().startsWith("$2a$") || storedPassword.startsWith("$2b$"))) {
+            passwordMatches = passwordEncoder.matches(password.trim(), storedPassword.trim());
         } else {
-            passwordMatches = password.equals(storedPassword);
+            passwordMatches = password.trim().equals(storedPassword.trim());
         }
 
         if (!passwordMatches) {

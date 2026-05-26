@@ -51,6 +51,7 @@ C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\servi
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\dto\JwtResponse.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\config\OpenApiConfig.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\repository\ShowSeatRepository.java
+C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\config\WebConfig.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\model\dto\RefreshTokenRequest.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\service\DashboardService.java
 C:\Users\ADMIN\Desktop\CinemaProject\RapPhim\backend\src\main\java\rapphim\controller\AuthController.java

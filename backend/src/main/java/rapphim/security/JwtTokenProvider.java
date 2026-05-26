@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +20,8 @@ import java.util.Map;
  */
 @Component
 public class JwtTokenProvider {
+
+    private static final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     private final SecretKey key;
     private final long expirationMs;
@@ -78,7 +82,7 @@ public class JwtTokenProvider {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(authToken);
             return true;
         } catch (JwtException | IllegalArgumentException ex) {
-            // Token is invalid, expired, or signature is mismatched
+            log.error("JWT Token validation failed: {}", ex.getMessage());
         }
         return false;
     }

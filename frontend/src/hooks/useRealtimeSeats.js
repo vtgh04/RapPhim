@@ -33,7 +33,11 @@ export function useRealtimeSeats(showtimeId, initialStatusMap = {}) {
         ])
 
         client = new Client({
-          webSocketFactory: () => new SockJS.default('/ws'),
+          webSocketFactory: () => {
+            const baseUrl = import.meta.env.VITE_API_URL || '';
+            const wsUrl = baseUrl ? `${baseUrl}/ws` : '/ws';
+            return new SockJS.default(wsUrl);
+          },
           reconnectDelay: 5000,
           onConnect: () => {
             if (!isActive) return

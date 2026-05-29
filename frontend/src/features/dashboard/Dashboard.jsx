@@ -1076,7 +1076,7 @@ export default function Dashboard() {
                           {/* Mini Poster Mockup */}
                           <div className="w-14 h-20 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center shrink-0 overflow-hidden relative">
                             {movie.posterUrl ? (
-                              <img src={movie.posterUrl} alt={movie.title} className="w-full h-full object-cover" />
+                              <img src={movie.posterUrl.startsWith('http') ? movie.posterUrl : (import.meta.env.VITE_API_URL || '') + (movie.posterUrl.startsWith('/') ? '' : '/') + movie.posterUrl} alt={movie.title} className="w-full h-full object-cover" />
                             ) : (
                               <Film size={20} className="text-slate-600" />
                             )}
@@ -1142,7 +1142,7 @@ export default function Dashboard() {
                       <div className="flex flex-col sm:flex-row gap-5 pb-5 border-b border-slate-900/60">
                         <div className="w-20 h-28 rounded-2xl bg-slate-900 border border-slate-800 overflow-hidden shrink-0">
                           {selectedMovie.posterUrl ? (
-                            <img src={selectedMovie.posterUrl} alt={selectedMovie.title} className="w-full h-full object-cover" />
+                            <img src={selectedMovie.posterUrl.startsWith('http') ? selectedMovie.posterUrl : (import.meta.env.VITE_API_URL || '') + (selectedMovie.posterUrl.startsWith('/') ? '' : '/') + selectedMovie.posterUrl} alt={selectedMovie.title} className="w-full h-full object-cover" />
                           ) : (
                             <Film size={24} className="text-slate-600" />
                           )}

@@ -88,8 +88,10 @@ export default function MovieList() {
 
   const getImageUrl = (url) => {
     if (!url) return '';
-    if (url.startsWith('http') || url.startsWith('/')) return url;
-    return '/' + url;
+    if (url.startsWith('http')) return url;
+    const baseUrl = import.meta.env.VITE_API_URL || '';
+    const cleanedUrl = url.startsWith('/') ? url : '/' + url;
+    return baseUrl + cleanedUrl;
   }
 
   const { data: movies = [], isLoading, error } = useQuery({

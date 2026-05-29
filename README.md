@@ -1,6 +1,12 @@
 # 🍿 RapPhim - Modern Cinema POS & Management System
 
 <p align="center">
+  <a href="https://github.com/vtgh04/RapPhim/actions/workflows/ci-cd.yml">
+    <img src="https://github.com/vtgh04/RapPhim/actions/workflows/ci-cd.yml/badge.svg" alt="RapPhim CI/CD Pipeline" />
+  </a>
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java" />
   <img src="https://img.shields.io/badge/Spring--Boot-3.2.5-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot" />
   <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black" alt="React" />
@@ -64,6 +70,17 @@ Bố cục cấu trúc phân vùng nghiệp vụ và tổ chức mã nguồn chu
 * **Xuất hoá đơn & Vé PDF chứa Barcode:** Sử dụng Apache POI và iText xuất hoá đơn kèm vé có mã vạch sẵn sàng phục vụ kiểm vé.
 * **Dashboard Biểu đồ SVG Động:** Dashboard thống kê doanh thu, cơ cấu vé bán hiển thị bằng biểu đồ SVG do hệ thống tự tính toán toạ độ vẽ, không phụ thuộc vào thư viện bên thứ ba.
 * **Đa ngôn ngữ (i18n):** Chuyển đổi ngôn ngữ Việt - Anh tức thời trên toàn bộ giao diện.
+
+---
+
+## 🛠️ Điểm Cộng Kỹ Thuật & Thực Hành Kỹ Nghệ Phần Mềm (Software Engineering Best Practices)
+
+Dự án được xây dựng tuân thủ nghiêm ngặt các thực hành kỹ nghệ phần mềm chuyên nghiệp mà các nhà tuyển dụng và Tech Lead luôn đánh giá cao:
+* **Container hóa hoàn chỉnh (Docker & Compose):** Đóng gói toàn bộ hệ sinh thái thành các service độc lập (`sqlserver`, `backend`, `frontend`, `db-init`) kết nối qua mạng ảo nội bộ, giúp chạy toàn bộ dự án trên máy mới chỉ bằng 1 lệnh duy nhất.
+* **Quy trình Khởi tạo dữ liệu tự động (Auto Database Bootstrapping):** Tích hợp container phụ trợ `db-init` có nhiệm vụ đợi SQL Server khởi động hoàn tất, tự động nạp cấu trúc database [Database.sql](file:///c:/Users/ADMIN/Desktop/CinemaProject/RapPhim/backend/database/scripts/Database.sql) và dữ liệu mẫu [Seed.sql](file:///c:/Users/ADMIN/Desktop/CinemaProject/RapPhim/backend/database/scripts/Seed.sql), đồng bộ luồng giúp backend không bị crash khi kết nối.
+* **Tự động hóa kiểm thử & Tích hợp liên tục (CI/CD):** Thiết lập quy trình tự động hóa kiểm thử trên **GitHub Actions** (`.github/workflows/ci-cd.yml`). Mỗi khi có code mới push lên, hệ thống tự động kiểm thử Unit/Integration Test trên Backend (JUnit 5 + H2) và Component Test trên Frontend (Vitest + JSDOM).
+* **Bảo mật thông tin nhạy cảm (Environment Variables):** Tuân thủ triết lý **12-Factor App**, tách toàn bộ thông tin tài khoản DB, khóa bảo mật JWT Secret ra ngoài mã nguồn, quản lý tập trung thông qua biến môi trường (.env) và Docker Environments.
+* **Tài liệu & Thiết kế Hệ thống chuẩn chỉ:** Cung cấp đầy đủ file đặc tả nghiệp vụ chi tiết [DOCUMENTATION.md](file:///c:/Users/ADMIN/Desktop/CinemaProject/RapPhim/docs/DOCUMENTATION.md) (BRD, SRS, Database Schema, Class) kèm bộ sơ đồ thiết kế SVG sắc nét.
 
 ---
 

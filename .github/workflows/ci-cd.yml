@@ -53,10 +53,12 @@ jobs:
         with:
           node-version: '18'
           cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json # Falls back to package.json if not present, but package-lock.json is safer if cached
+          cache-dependency-path: frontend/package.json
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          rm -f package-lock.json
+          npm install
         working-directory: frontend
 
       - name: Run Component Tests (Vitest)

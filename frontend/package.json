@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "vitest run",
     "test-api": "node test-api.js"
   },
   "dependencies": {
@@ -23,8 +24,12 @@
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0-beta.8",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "jsdom": "^25.0.1",
     "tailwindcss": "^4.0.0-beta.8",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "vitest": "^2.1.8"
   }
 }

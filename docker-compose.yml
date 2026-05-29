@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # Database Service (Microsoft SQL Server)
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: rapphim-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD:-RapPhimPass123!}
+    ports:
+      - "1433:1433"
+    networks:
+      - rapphim-network
+    volumes:
+      - mssql-data:/var/opt/mssql
+
+  # DB Init Service (Wait for SQL Server & run init/seed scripts)
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: rapphim-db-init
+    depends_on:
+      - sqlserver
+    volumes:
+      - ./backend/database/scripts:/scripts
+    environment:
+      - DB_PASSWORD=${DB_PASSWORD:-RapPhimPass123!}
+    entrypoint: /bin/bash -c "
+      echo 'Waiting for SQL Server to boot...';
+      for i in {1..50}; do
+        /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P \"$$DB_PASSWORD\" -C -Q \"SELECT 1\" && break;
+        echo 'SQL Server not ready yet, sleeping 2s...';
+        sleep 2;
+      done;
+      echo 'Running Database setup scripts...';
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P \"$$DB_PASSWORD\" -C -i /scripts/Database.sql;
+      echo 'Running Seed scripts...';
+      /opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P \"$$DB_PASSWORD\" -C -i /scripts/Seed.sql;
+      echo 'Database initialization completed!';"
+    networks:
+      - rapphim-network
+
+  # Backend REST API Service (Spring Boot)
+  backend:
+    build: ./backend
+    container_name: rapphim-backend
+    ports:
+      - "5001:5001"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=${DB_NAME:-RapPhim};encrypt=false;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=${DB_USER:-sa}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD:-RapPhimPass123!}
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update  # Automatically create/update schema in container database
+      - JWT_SECRET=${JWT_SECRET:-9a76a982ba3da908b89f81234abcd5678ef0123456789abcdef0123456789abcdef}
+      - JWT_EXPIRATION_MS=${JWT_EXPIRATION_MS:-86400000}
+      - JWT_REFRESH_EXPIRATION_MS=${JWT_REFRESH_EXPIRATION_MS:-604800000}
+    depends_on:
+      db-init:
+        condition: service_completed_successfully
+    networks:
+      - rapphim-network
+
+  # Frontend UI Service (React SPA served by Nginx)
+  frontend:
+    build: ./frontend
+    container_name: rapphim-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - rapphim-network
+
+networks:
+  rapphim-network:
+    driver: bridge
+
+volumes:
+  mssql-data:
+    driver: local

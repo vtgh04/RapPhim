@@ -1,0 +1,369 @@
+{
+  "info": {
+    "_postman_id": "c1f77d34-9721-4f9e-a89c-4bf07a01cb6b",
+    "name": "RapPhim API Collection",
+    "description": "Bộ sưu tập các RESTful API của hệ thống RapPhim. Bao gồm các kiểm thử tự động (tests) cho luồng đăng nhập, suất chiếu, đặt vé và thanh toán.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "1. Login (Đăng nhập)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"HTTP Status 200 - Đăng nhập thành công\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Nhận được Access Token và thông tin cơ bản\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('accessToken');",
+                  "    pm.expect(jsonData).to.have.property('employeeId');",
+                  "    pm.expect(jsonData).to.have.property('username');",
+                  "    // Lưu token vào biến môi trường dùng cho các API sau",
+                  "    pm.collectionVariables.set(\"jwt_token\", jsonData.accessToken);",
+                  "    pm.collectionVariables.set(\"employee_id\", jsonData.employeeId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Movies",
+      "item": [
+        {
+          "name": "Get All Movies (Lấy tất cả phim)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"HTTP Status 200 - Lấy danh sách phim thành công\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Trả về mảng danh sách phim\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('array');",
+                  "    if (jsonData.length > 0) {",
+                  "        pm.collectionVariables.set(\"first_movie_id\", jsonData[0].movieId);",
+                  "    }",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/movies",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "movies"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Showtimes",
+      "item": [
+        {
+          "name": "Get Today Showtimes (Suất chiếu hôm nay)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"HTTP Status 200 - Lấy suất chiếu thành công\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/showtimes/today",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "showtimes",
+                "today"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Showtime (Tạo suất chiếu)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"HTTP Status 201 hoặc 200\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});",
+                  "pm.test(\"Suất chiếu mới đã được lưu thành công\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('showtimeId');",
+                  "    pm.collectionVariables.set(\"new_showtime_id\", jsonData.showtimeId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"movieId\": \"{{first_movie_id}}\",\n    \"hallId\": \"HALL01\",\n    \"startTime\": \"2026-12-31T10:00:00\",\n    \"endTime\": \"2026-12-31T12:00:00\",\n    \"basePrice\": 80000.0,\n    \"status\": \"SCHEDULED\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/showtimes",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "showtimes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Seat Grid (Lấy sơ đồ ghế)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"HTTP Status 200 - Lấy sơ đồ ghế thành công\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Trả về danh sách trạng thái các ghế\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.be.an('object');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/showtimes/{{new_showtime_id}}/seats",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "showtimes",
+                "{{new_showtime_id}}",
+                "seats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Checkout Booking (Thực hiện đặt vé)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"HTTP Status 200 - Thanh toán đặt vé thành công\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Nhận được hóa đơn trả về hợp lệ\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('invoiceId');",
+                  "    pm.expect(jsonData.totalTickets).to.eql(2);",
+                  "    pm.collectionVariables.set(\"new_invoice_id\", jsonData.invoiceId);",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"showtimeId\": \"{{new_showtime_id}}\",\n    \"seatIds\": [\"HALL01_A1\", \"HALL01_A2\"],\n    \"paymentMethod\": \"CASH\",\n    \"employeeId\": \"{{employee_id}}\",\n    \"note\": \"Đặt vé thử nghiệm qua Postman Collection\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/bookings/checkout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "bookings",
+                "checkout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Download Invoice PDF (Tải hóa đơn PDF)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"HTTP Status 200 - Trả về tệp PDF hóa đơn\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "    pm.response.to.have.header(\"Content-Disposition\");",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/bookings/invoices/{{new_invoice_id}}/pdf",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "bookings",
+                "invoices",
+                "{{new_invoice_id}}",
+                "pdf"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:5001",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "employee_id",
+      "value": "EMP001",
+      "type": "string"
+    },
+    {
+      "key": "first_movie_id",
+      "value": "MOV001",
+      "type": "string"
+    },
+    {
+      "key": "new_showtime_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "new_invoice_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

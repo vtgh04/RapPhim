@@ -13,14 +13,19 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: 'http://localhost:5001',
-        changeOrigin: true,
-        secure: false,
+                changeOrigin: true,
+                secure: false,
       },
       '/images': {
         target: 'http://localhost:5001',
-        changeOrigin: true,
-        secure: false,
+                changeOrigin: true,
+                secure: false,
       }
     }
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.js',
   }
 })

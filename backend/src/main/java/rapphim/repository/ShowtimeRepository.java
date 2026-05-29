@@ -20,7 +20,7 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, String> {
 
     List<Showtime> findByMovieId(String movieId);
 
-    @Query("SELECT COUNT(s) FROM Showtime s WHERE s.hallId = :hallId AND s.status != rapphim.model.enums.ShowtimeStatus.CANCELLED AND s.startTime < :endTime AND s.endTime > :startTime")
+    @Query("SELECT COUNT(s.showtimeId) FROM Showtime s WHERE s.hallId = :hallId AND s.status != rapphim.model.enums.ShowtimeStatus.CANCELLED AND s.startTime < :endTime AND s.endTime > :startTime")
     long countOverlappingShowtimes(@Param("hallId") String hallId, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
     @Modifying
@@ -41,4 +41,5 @@ public interface ShowtimeRepository extends JpaRepository<Showtime, String> {
 
     @Query("SELECT COUNT(DISTINCT s.hallId) FROM Showtime s WHERE s.status IN (rapphim.model.enums.ShowtimeStatus.SCHEDULED, rapphim.model.enums.ShowtimeStatus.ONGOING)")
     long countActiveHalls();
+
 }

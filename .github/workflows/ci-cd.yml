@@ -1,0 +1,82 @@
+name: RapPhim CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, master, dev ]
+  pull_request:
+    branches: [ main, master, dev ]
+
+jobs:
+  # ----------------------------------------------------
+  # Job 1: Build & Test Java Spring Boot Backend
+  # ----------------------------------------------------
+  backend-test:
+    name: Backend Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Grant execute permission for Maven Wrapper
+        run: chmod +x backend/mvnw
+        working-directory: backend
+
+      - name: Run Backend Tests
+        run: ./mvnw test
+        working-directory: backend
+
+      - name: Build JAR package (Verify Compile)
+        run: ./mvnw package -DskipTests
+        working-directory: backend
+
+  # ----------------------------------------------------
+  # Job 2: Build & Test React Vite Frontend
+  # ----------------------------------------------------
+  frontend-test:
+    name: Frontend Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-json-lock.json # Falls back to package.json if not present, but package-lock.json is safer if cached
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: frontend
+
+      - name: Run Component Tests (Vitest)
+        run: npm run test
+        working-directory: frontend
+
+      - name: Build Production Bundle (Verify Compile)
+        run: npm run build
+        working-directory: frontend
+
+  # ----------------------------------------------------
+  # Job 3: Docker Lint & Syntax Check
+  # ----------------------------------------------------
+  docker-check:
+    name: Docker Configuration Validate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Validate Docker Compose Configuration
+        run: docker compose config

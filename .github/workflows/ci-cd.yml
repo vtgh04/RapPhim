@@ -26,7 +26,7 @@ jobs:
           cache: 'maven'
 
       - name: Grant execute permission for Maven Wrapper
-        run: chmod +x backend/mvnw
+        run: chmod +x mvnw
         working-directory: backend
 
       - name: Run Backend Tests

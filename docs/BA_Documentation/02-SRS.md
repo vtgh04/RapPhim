@@ -62,3 +62,13 @@ This document defines the functional and non-functional requirements for the Rap
 ### NFR-4: Usability & Internationalization (i18n)
 * **NFR-4.1:** Cashier screens must adapt to Full HD (1920x1080) and HD (1366x768) resolutions.
 * **NFR-4.2:** The application must support seamless translation switches between English and Vietnamese.
+
+---
+
+## 4. System Diagrams
+
+### 4.1 Domain Class Diagram
+![Domain Class Diagram](class_diagram.svg)
+
+### 4.2 Sequence Diagram
+![Sequence Diagram](sequence.svg)

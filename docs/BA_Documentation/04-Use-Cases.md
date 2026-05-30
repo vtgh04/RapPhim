@@ -13,6 +13,8 @@
 
 ## 2. Use Case Diagrams
 
+![Sơ đồ Use Case](use_case.svg)
+
 ```mermaid
 usecaseDiagram
     actor Cashier

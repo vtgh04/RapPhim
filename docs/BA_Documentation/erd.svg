@@ -167,8 +167,7 @@
     <text x="10" y="135">   status: VARCHAR(20)</text>
   </g>
 
-  <!-- RELATIONSHIP LINES (Crows Foot/Standard Connector Style) -->
-
+  <!-- RELATIONSHIP LINES (Crows Foot Connector Style) -->
   <!-- employees to invoices (1 - N) -->
   <path d="M 240,185 C 340,185 800,200 850,330" fill="none" stroke="#64748b" stroke-width="1.5" />
   <circle cx="242" cy="185" r="3" fill="#64748b" />

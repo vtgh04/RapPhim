@@ -137,7 +137,6 @@
   <!-- CONNECTIONS -->
 
   <!-- Manager Links -->
-  <!-- Line color is slate-400, styling with smooth marker arrows or simple stroke -->
   <line x1="135" y1="210" x2="250" y2="152" stroke="#64748b" stroke-width="1.5" />
   <line x1="135" y1="210" x2="250" y2="217" stroke="#64748b" stroke-width="1.5" />
   <line x1="135" y1="210" x2="250" y2="282" stroke="#64748b" stroke-width="1.5" />
@@ -153,7 +152,6 @@
 
   <!-- Extends relationship -->
   <path d="M 560,370 C 560,450 540,490 490,520" fill="none" stroke="#38bdf8" stroke-dasharray="5,5" stroke-width="1.5" />
-  <!-- Arrow marker manually drawn -->
   <polygon points="490,520 498,514 493,510" fill="#38bdf8" />
   <text x="565" y="470" font-family="'Segoe UI', Roboto, sans-serif" font-size="11" fill="#38bdf8" font-style="italic" text-anchor="middle">&lt;&lt;extend&gt;&gt;</text>
 

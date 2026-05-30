@@ -6,6 +6,8 @@
 
 ## 1. Mermaid Entity-Relationship Diagram (3NF)
 
+![Sơ đồ ERD](erd.svg)
+
 ```mermaid
 erDiagram
     employees {

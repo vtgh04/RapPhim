@@ -80,7 +80,7 @@ public class BookingService {
         return tickets;
     }
 
-    @Transactional
+    @Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
     public Invoice processCheckout(String showtimeId, List<String> seatIds, String paymentMethod, String employeeId, String note) {
         if (seatIds == null || seatIds.isEmpty()) {
             throw new IllegalArgumentException("Danh sách ghế chọn không được trống.");
@@ -99,7 +99,7 @@ public class BookingService {
             ShowSeat showSeat = showSeatRepository.findByShowtimeIdAndSeatId(showtimeId, seatId)
                     .orElseThrow(() -> new IllegalArgumentException("Ghế " + seatId + " không được cấu hình cho suất chiếu này."));
             
-            if (showSeat.getStatus() != ShowSeatStatus.AVAILABLE) {
+            if (showSeat.getStatus() == ShowSeatStatus.BOOKED) {
                 throw new IllegalStateException("Ghế " + seatId + " đã bị đặt hoặc đang bị giữ.");
             }
             
@@ -181,5 +181,36 @@ public class BookingService {
             } catch (NumberFormatException ignored) {}
         }
         return 1;
+    }
+
+    @Transactional(isolation = org.springframework.transaction.annotation.Isolation.SERIALIZABLE)
+    public void holdSeat(String showtimeId, String seatId) {
+        ShowSeat showSeat = showSeatRepository.findByShowtimeIdAndSeatId(showtimeId, seatId)
+                .orElseThrow(() -> new IllegalArgumentException("Ghế " + seatId + " không được cấu hình cho suất chiếu này."));
+        
+        if (showSeat.getStatus() == ShowSeatStatus.BOOKED) {
+            throw new IllegalStateException("Ghế " + seatId + " đã bị đặt.");
+        }
+        
+        LocalDateTime now = LocalDateTime.now();
+        if (showSeat.getStatus() == ShowSeatStatus.HELD && showSeat.getHeldUntil() != null && showSeat.getHeldUntil().isAfter(now)) {
+            throw new IllegalStateException("Ghế " + seatId + " đang được giữ bởi người khác.");
+        }
+        
+        showSeat.setStatus(ShowSeatStatus.HELD);
+        showSeat.setHeldUntil(now.plusMinutes(5));
+        showSeatRepository.save(showSeat);
+    }
+
+    @Transactional
+    public void releaseSeat(String showtimeId, String seatId) {
+        ShowSeat showSeat = showSeatRepository.findByShowtimeIdAndSeatId(showtimeId, seatId)
+                .orElseThrow(() -> new IllegalArgumentException("Ghế " + seatId + " không được cấu hình cho suất chiếu này."));
+        
+        if (showSeat.getStatus() == ShowSeatStatus.HELD) {
+            showSeat.setStatus(ShowSeatStatus.AVAILABLE);
+            showSeat.setHeldUntil(null);
+            showSeatRepository.save(showSeat);
+        }
     }
 }

@@ -13,7 +13,7 @@ export default function Checkout() {
   const seatIdsString = searchParams.get('seats') || ''
   const seatIds = seatIdsString ? seatIdsString.split(',') : []
 
-  const [paymentMethod, setPaymentMethod] = useState('VNPAY')
+  const [paymentMethod, setPaymentMethod] = useState('CASH')
   const [note, setNote] = useState('')
   const [discountCode, setDiscountCode] = useState('')
   const [discountApplied, setDiscountApplied] = useState(null)
@@ -70,6 +70,45 @@ export default function Checkout() {
     }
   })
 
+  // Automatic printing trigger on checkout success
+  React.useEffect(() => {
+    if (checkoutSuccess && checkoutSuccess.invoiceId) {
+      const triggerAutomaticPrint = async () => {
+        try {
+          const response = await api.get(`/bookings/invoices/${checkoutSuccess.invoiceId}/tickets/pdf`, {
+            responseType: 'blob'
+          })
+          const blob = new Blob([response.data], { type: 'application/pdf' })
+          const blobUrl = window.URL.createObjectURL(blob)
+          
+          const iframe = document.createElement('iframe')
+          iframe.style.position = 'absolute'
+          iframe.style.width = '0'
+          iframe.style.height = '0'
+          iframe.style.border = 'none'
+          iframe.src = blobUrl
+          document.body.appendChild(iframe)
+          
+          iframe.onload = () => {
+            try {
+              iframe.contentWindow.focus()
+              iframe.contentWindow.print()
+            } catch (e) {
+              console.error('Failed to trigger iframe print, falling back to window.open', e)
+              const printWindow = window.open(blobUrl)
+              if (printWindow) {
+                printWindow.print()
+              }
+            }
+          }
+        } catch (err) {
+          console.error('Failed to auto print ticket PDF', err)
+        }
+      }
+      triggerAutomaticPrint()
+    }
+  }, [checkoutSuccess])
+
   if (isShowtimeLoading || isMovieLoading || isSeatsLoading) {
     return <Spinner className="py-24" size="lg" />
   }
@@ -100,10 +139,10 @@ export default function Checkout() {
 
   const subtotal = selectedSeatsData.reduce((sum, item) => sum + item.price, 0)
   
-  // Calculate discount amount
-  const discountVal = discountApplied 
-    ? (discountApplied.discountPercentage ? (subtotal * discountApplied.discountPercentage) / 100 : 0)
+  const discountRate = discountApplied 
+    ? (discountApplied.discountRate !== undefined ? discountApplied.discountRate : (discountApplied.discountPercentage ? discountApplied.discountPercentage / 100 : 0))
     : 0
+  const discountVal = subtotal * discountRate
   const finalTotal = Math.max(0, subtotal - discountVal)
 
   const handleApplyDiscount = () => {
@@ -111,9 +150,28 @@ export default function Checkout() {
     const code = discountCode.trim().toUpperCase()
     if (!code) return
 
-    const match = discounts.find(d => d.code === code)
+    const match = discounts.find(d => d.discountId.trim().toUpperCase() === code)
     if (!match) {
       setDiscountError('Mã giảm giá không tồn tại.')
+      return
+    }
+
+    const activeState = match.active !== undefined ? match.active : match.isActive
+    if (!activeState) {
+      setDiscountError('Mã giảm giá đã hết hiệu lực.')
+      return
+    }
+
+    const now = new Date()
+    const validFrom = new Date(match.validFrom)
+    const validTo = new Date(match.validTo)
+    if (now < validFrom || now > validTo) {
+      setDiscountError('Mã giảm giá ngoài thời gian áp dụng.')
+      return
+    }
+
+    if (seatIds.length < match.minTicketQuantity) {
+      setDiscountError(`Mã giảm giá yêu cầu tối thiểu ${match.minTicketQuantity} vé.`)
       return
     }
 
@@ -127,7 +185,7 @@ export default function Checkout() {
 
   const handleConfirmOrder = () => {
     const noteText = discountApplied 
-      ? `${note} | Mã giảm giá: ${discountApplied.code} (Giảm ${discountApplied.discountPercentage}%)`
+      ? `${note} | Mã giảm giá: ${discountApplied.discountId} (Giảm ${Math.round(discountRate * 100)}%)`
       : note
 
     checkoutMutation.mutate({
@@ -280,9 +338,9 @@ export default function Checkout() {
             
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {[
-                { id: 'VNPAY', label: 'Cổng VNPAY', desc: 'Thanh toán QR hoặc ATM' },
-                { id: 'MOMO', label: 'Ví MoMo', desc: 'Thanh toán nhanh qua App' },
                 { id: 'CASH', label: 'Tiền mặt', desc: 'Thanh toán tại quầy vé' },
+                { id: 'CARD', label: 'Thẻ ngân hàng', desc: 'Cà thẻ ATM, Visa, Mastercard' },
+                { id: 'TRANSFER', label: 'Chuyển khoản', desc: 'Quét mã QR chuyển khoản nhanh' },
               ].map((pm) => (
                 <div
                   key={pm.id}
@@ -329,14 +387,14 @@ export default function Checkout() {
               {discountError && <p className="text-xs text-brand font-medium mt-1">{discountError}</p>}
 
               <AnimatePresence>
-                {discountApplied && (
+                { discountApplied && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
                     className="flex justify-between items-center p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl text-xs font-semibold mt-3"
                   >
-                    <span>Mã `{discountApplied.code}` đã áp dụng: Giảm {discountApplied.discountPercentage}%</span>
+                    <span>Mã `{discountApplied.discountId}` đã áp dụng: Giảm {Math.round(discountRate * 100)}%</span>
                     <button
                       type="button"
                       onClick={handleRemoveDiscount}
@@ -403,7 +461,7 @@ export default function Checkout() {
               
               {discountApplied && (
                 <div className="flex justify-between text-emerald-400">
-                  <span>Giảm giá ({discountApplied.discountPercentage}%)</span>
+                  <span>Giảm giá ({Math.round(discountRate * 100)}%)</span>
                   <span>-{discountVal.toLocaleString('vi-VN')}đ</span>
                 </div>
               )}

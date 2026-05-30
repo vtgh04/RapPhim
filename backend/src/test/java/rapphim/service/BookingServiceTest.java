@@ -122,4 +122,79 @@ public class BookingServiceTest {
         assertTrue(exception.getMessage().contains("đã bị đặt hoặc đang bị giữ"));
         verify(invoiceRepository, never()).save(any());
     }
+
+    @Test
+    public void testHoldSeat_Success() {
+        // Arrange
+        ShowSeat seat = new ShowSeat();
+        seat.setShowSeatId("ST001_A1");
+        seat.setSeatId(seatId1);
+        seat.setStatus(ShowSeatStatus.AVAILABLE);
+
+        when(showSeatRepository.findByShowtimeIdAndSeatId(showtimeId, seatId1)).thenReturn(Optional.of(seat));
+
+        // Act
+        bookingService.holdSeat(showtimeId, seatId1);
+
+        // Assert
+        assertEquals(ShowSeatStatus.HELD, seat.getStatus());
+        assertNotNull(seat.getHeldUntil());
+        assertTrue(seat.getHeldUntil().isAfter(java.time.LocalDateTime.now()));
+        verify(showSeatRepository, times(1)).save(seat);
+    }
+
+    @Test
+    public void testHoldSeat_AlreadyBooked() {
+        // Arrange
+        ShowSeat seat = new ShowSeat();
+        seat.setShowSeatId("ST001_A1");
+        seat.setSeatId(seatId1);
+        seat.setStatus(ShowSeatStatus.BOOKED);
+
+        when(showSeatRepository.findByShowtimeIdAndSeatId(showtimeId, seatId1)).thenReturn(Optional.of(seat));
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> {
+            bookingService.holdSeat(showtimeId, seatId1);
+        });
+        verify(showSeatRepository, never()).save(any());
+    }
+
+    @Test
+    public void testHoldSeat_AlreadyHeld() {
+        // Arrange
+        ShowSeat seat = new ShowSeat();
+        seat.setShowSeatId("ST001_A1");
+        seat.setSeatId(seatId1);
+        seat.setStatus(ShowSeatStatus.HELD);
+        seat.setHeldUntil(java.time.LocalDateTime.now().plusMinutes(2));
+
+        when(showSeatRepository.findByShowtimeIdAndSeatId(showtimeId, seatId1)).thenReturn(Optional.of(seat));
+
+        // Act & Assert
+        assertThrows(IllegalStateException.class, () -> {
+            bookingService.holdSeat(showtimeId, seatId1);
+        });
+        verify(showSeatRepository, never()).save(any());
+    }
+
+    @Test
+    public void testReleaseSeat_Success() {
+        // Arrange
+        ShowSeat seat = new ShowSeat();
+        seat.setShowSeatId("ST001_A1");
+        seat.setSeatId(seatId1);
+        seat.setStatus(ShowSeatStatus.HELD);
+        seat.setHeldUntil(java.time.LocalDateTime.now().plusMinutes(2));
+
+        when(showSeatRepository.findByShowtimeIdAndSeatId(showtimeId, seatId1)).thenReturn(Optional.of(seat));
+
+        // Act
+        bookingService.releaseSeat(showtimeId, seatId1);
+
+        // Assert
+        assertEquals(ShowSeatStatus.AVAILABLE, seat.getStatus());
+        assertNull(seat.getHeldUntil());
+        verify(showSeatRepository, times(1)).save(seat);
+    }
 }

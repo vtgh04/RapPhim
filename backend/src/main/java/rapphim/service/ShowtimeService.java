@@ -145,9 +145,15 @@ public class ShowtimeService {
 
     public Map<String, ShowSeatStatus> getShowSeatStatuses(String showtimeId) {
         List<ShowSeat> showSeats = showSeatRepository.findByShowtimeId(showtimeId);
+        LocalDateTime now = LocalDateTime.now();
         return showSeats.stream().collect(Collectors.toMap(
                 ShowSeat::getSeatId,
-                ShowSeat::getStatus
+                ss -> {
+                    if (ss.getStatus() == ShowSeatStatus.HELD && ss.getHeldUntil() != null && ss.getHeldUntil().isBefore(now)) {
+                        return ShowSeatStatus.AVAILABLE;
+                    }
+                    return ss.getStatus();
+                }
         ));
     }
 

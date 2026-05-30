@@ -100,13 +100,15 @@ export default function SeatGrid() {
   const handleSeatClick = (seat) => {
     const seatId = seat.seatId
     const status = statusMap[seatId]
+    const isSelected = selectedSeats.some(s => s.seatId === seatId)
 
-    if (status !== 'AVAILABLE' || seat.broken) return
+    if (seat.broken) return
 
-    if (selectedSeats.some(s => s.seatId === seatId)) {
+    if (isSelected) {
       setSelectedSeats(prev => prev.filter(s => s.seatId !== seatId))
       broadcastSeatUpdate(seatId, 'AVAILABLE') // Unlock for others
     } else {
+      if (status !== 'AVAILABLE') return
       setSelectedSeats(prev => [...prev, seat])
       broadcastSeatUpdate(seatId, 'LOCKED') // Lock for others
     }
@@ -179,10 +181,15 @@ export default function SeatGrid() {
                     
                     if (isBroken) {
                       bgClass = 'bg-slate-950 border-slate-950 text-slate-700 opacity-30 cursor-not-allowed'
-                    } else if (status === 'BOOKED' || status === 'LOCKED') {
+                      cursorClass = 'cursor-not-allowed'
+                    } else if (status === 'BOOKED') {
                       bgClass = 'bg-brand/20 border-brand/10 text-brand cursor-not-allowed'
+                      cursorClass = 'cursor-not-allowed'
                     } else if (isSelected) {
                       bgClass = 'bg-brand text-white border-brand shadow-lg shadow-brand/20'
+                    } else if (status === 'LOCKED' || status === 'HELD') {
+                      bgClass = 'bg-amber-500/20 border-amber-500/30 text-amber-500 cursor-not-allowed'
+                      cursorClass = 'cursor-not-allowed'
                     } else if (seat.seatType === 'VIP') {
                       bgClass = 'bg-amber-950/20 hover:bg-amber-900/30 border-amber-600/40 hover:border-amber-500 text-amber-400'
                     }
@@ -219,6 +226,10 @@ export default function SeatGrid() {
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border border-brand bg-brand rounded" />
               <span>Ghế đang chọn</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border border-amber-500/30 bg-amber-500/20 rounded" />
+              <span>Ghế đang giữ (Người khác)</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 border border-brand/10 bg-brand/20 rounded" />

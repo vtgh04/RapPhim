@@ -15,30 +15,6 @@
 
 ![Sơ đồ Use Case](use_case.svg)
 
-```mermaid
-usecaseDiagram
-    actor Cashier
-    actor Manager
-    
-    rectangle "RapPhim System" {
-        usecase UC1 as "Browse Movies & Showtimes"
-        usecase UC2 as "Select Seats (Real-time Hold)"
-        usecase UC3 as "Apply Discount Code"
-        usecase UC4 as "Process Checkout & Auto-Print"
-        usecase UC5 as "Manage Showtimes & Overlap Checks"
-        usecase UC6 as "Review Sales Dashboard"
-    }
-
-    Cashier --> UC1
-    Cashier --> UC2
-    Cashier --> UC3
-    Cashier --> UC4
-
-    Manager --> UC5
-    Manager --> UC6
-    Manager --> UC4
-```
-
 ---
 
 ## 3. Detailed Use Case Specifications
